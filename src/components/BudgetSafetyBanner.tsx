@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, ShieldCheck, AlertTriangle, Edit3, Tag, Scissors } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, AlertTriangle, Scissors } from 'lucide-react';
 import { formatRupiah, getBudgetSafetyStatus } from '../lib/calculations';
 import type { BudgetSettings } from '../types/grocery';
 
@@ -31,75 +31,66 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
   const statusClass = safety.status.toLowerCase();
 
   return (
-    <div className={`budget-banner ${statusClass}`}>
-      {/* Top row: Label badge & edit button */}
-      <div className="budget-top-row">
-        <div className="budget-label-group">
-          <span className={`budget-badge ${statusClass}`}>
-            {safety.status === 'SAFE' && <ShieldCheck size={13} />}
-            {safety.status === 'WARNING' && <AlertTriangle size={13} />}
-            {safety.status === 'DANGER' && <ShieldAlert size={13} />}
-            {safety.label}
-          </span>
-          <span style={{ fontSize: '11px', color: '#94a3b8' }}>
-            ({safety.percentage}% terpakai)
-          </span>
+    <div className={`stitch-budget-card ${statusClass}`}>
+      {/* Top Header */}
+      <div className="stitch-budget-header">
+        <div className="stitch-budget-title" onClick={onEditBudget} style={{ cursor: 'pointer' }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '10px',
+              background: safety.status === 'SAFE' ? '#ecfdf5' : safety.status === 'WARNING' ? '#fef3c7' : '#fee2e2',
+              color: safety.status === 'SAFE' ? '#059669' : safety.status === 'WARNING' ? '#d97706' : '#dc2626',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {safety.status === 'SAFE' && <ShieldCheck size={18} />}
+            {safety.status === 'WARNING' && <AlertTriangle size={18} />}
+            {safety.status === 'DANGER' && <ShieldAlert size={18} />}
+          </div>
+          <div>
+            <h3>F-05 Pengendali Anggaran</h3>
+            <p>Dompet Bulanan: {formatRupiah(budgetSettings.monthlyBudget)}</p>
+          </div>
         </div>
 
-        <button
-          className="budget-edit-btn"
-          onClick={onEditBudget}
-          title="Ubah batas anggaran"
-        >
-          <Edit3 size={13} />
-          <span>Batas: {formatRupiah(budgetSettings.monthlyBudget)}</span>
-        </button>
+        <span className={`stitch-status-pill ${statusClass}`}>
+          {safety.status === 'SAFE' && 'Aman'}
+          {safety.status === 'WARNING' && 'Waspada'}
+          {safety.status === 'DANGER' && 'Bahaya'}
+        </span>
       </div>
 
-      {/* Main Numbers: Total Keranjang & Sisa Dompet */}
-      <div className="budget-numbers-grid">
-        <div className="budget-col">
-          <span className="budget-col-label">Total Belanja Keranjang</span>
-          <span className="budget-col-value spent">
-            {formatRupiah(totalSpent)}
-          </span>
-        </div>
-
-        <div className="budget-col" style={{ textAlign: 'right' }}>
-          <span className="budget-col-label">
-            {safety.remaining >= 0 ? 'Sisa Uang Saku' : 'Kelebihan (Boncos)'}
-          </span>
-          <span className={`budget-col-value remaining ${statusClass}`}>
+      {/* Numbers */}
+      <div className="stitch-budget-stats">
+        <span>
+          Terpakai: <strong>{formatRupiah(totalSpent)}</strong> ({safety.percentage}%)
+        </span>
+        <span style={{ textAlign: 'right' }}>
+          {safety.remaining >= 0 ? 'Sisa: ' : 'Boncos: '}
+          <strong style={{ color: safety.remaining >= 0 ? '#10b981' : '#ef4444' }}>
             {formatRupiah(Math.abs(safety.remaining))}
-          </span>
-        </div>
+          </strong>
+        </span>
       </div>
 
-      {/* Progress Bar Visual */}
-      <div className="budget-progress-track">
+      {/* Progress Bar */}
+      <div className="stitch-progress-bar-wrap">
         <div
-          className={`budget-progress-fill ${statusClass}`}
+          className={`stitch-progress-bar-fill ${statusClass}`}
           style={{ width: `${Math.min(100, safety.percentage)}%` }}
         />
       </div>
 
-      {/* Safety Advice Box */}
-      <div className="budget-advice-box">
-        {safety.status === 'SAFE' && <ShieldCheck size={16} color="#34d399" />}
-        {safety.status === 'WARNING' && <AlertTriangle size={16} color="#fbbf24" />}
-        {safety.status === 'DANGER' && <ShieldAlert size={16} color="#f87171" />}
-        <span style={{ color: safety.status === 'DANGER' ? '#fca5a5' : '#cbd5e1' }}>
-          {safety.advice}
-        </span>
-      </div>
-
-      {/* Rekomendasi Pangkas Otomatis jika Over-Budget */}
+      {/* Auto-Trim button if Over Budget */}
       {safety.status === 'DANGER' && optionalCount > 0 && onAutoTrimOptional && (
         <button
           type="button"
           onClick={onAutoTrimOptional}
           style={{
-            marginTop: 6,
             background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
             color: '#fff',
             border: 'none',
@@ -112,7 +103,7 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
             justifyContent: 'center',
             gap: 6,
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
             width: '100%',
           }}
         >
@@ -123,9 +114,8 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
 
       {/* Total Promo Savings */}
       {totalSavings > 0 && (
-        <div className="budget-savings-pill">
-          <Tag size={12} />
-          <span>Kamu hemat {formatRupiah(totalSavings)} dari promo supermarket!</span>
+        <div style={{ fontSize: '11px', color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span>🏷️ Hemat {formatRupiah(totalSavings)} dari promo supermarket</span>
         </div>
       )}
     </div>

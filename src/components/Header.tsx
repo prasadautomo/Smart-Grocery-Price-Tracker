@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Cloud, HardDrive, Settings } from 'lucide-react';
+import { ShoppingCart, Cloud, HardDrive } from 'lucide-react';
 
 interface HeaderProps {
   isSupabaseConnected: boolean;
@@ -13,50 +13,47 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenBudgetModal,
 }) => {
   return (
-    <header className="mobile-header">
-      <div className="header-inner">
-        <div className="header-brand">
-          <div className="header-logo-badge">
-            <ShoppingBag size={20} strokeWidth={2.5} />
+    <header className="stitch-hero-header">
+      <div className="stitch-hero-top">
+        <div className="stitch-user-profile">
+          <div className="stitch-avatar" onClick={onOpenBudgetModal} title="Atur Anggaran">
+            <ShoppingCart size={22} strokeWidth={2.4} />
           </div>
-          <div className="header-title-group">
-            <h1>Smart Grocery</h1>
-            <p>Anak Kos Price & Budget Tracker</p>
+          <div className="stitch-user-info">
+            <h1>
+              <span>Halo, Rian</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.9 }}>(Anak Kos)</span>
+            </h1>
+            <p>Troli Belanja Supermarket</p>
           </div>
         </div>
 
-        <div className="header-actions">
-          {/* Status Sinkronisasi Cloud Supabase */}
-          <button
-            className={`cloud-status-pill ${isSupabaseConnected ? 'connected' : 'offline'}`}
-            onClick={onOpenSupabaseModal}
-            title={
-              isSupabaseConnected
-                ? 'Terhubung ke Supabase Cloud (Klik untuk info)'
-                : 'Penyimpanan Lokal Aktif (Klik untuk hubungkan Supabase)'
-            }
-          >
-            <span className={`cloud-dot ${isSupabaseConnected ? 'pulse' : ''}`} />
-            {isSupabaseConnected ? (
-              <>
-                <Cloud size={13} />
-                <span>Cloud</span>
-              </>
-            ) : (
-              <>
-                <HardDrive size={13} />
-                <span>Offline</span>
-              </>
-            )}
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {/* PWA Aktif Badge */}
+          <div className="stitch-header-badge">
+            <span className="stitch-header-badge-dot" />
+            <span>PWA Aktif</span>
+          </div>
 
-          {/* Quick Settings Icon */}
+          {/* Cloud Indicator */}
           <button
-            className="icon-action-btn"
-            onClick={onOpenBudgetModal}
-            title="Pengaturan Anggaran"
+            type="button"
+            onClick={onOpenSupabaseModal}
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud' : 'Mode Offline (LocalStorage)'}
           >
-            <Settings size={16} />
+            {isSupabaseConnected ? <Cloud size={15} /> : <HardDrive size={15} />}
           </button>
         </div>
       </div>

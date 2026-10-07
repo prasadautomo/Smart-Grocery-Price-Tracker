@@ -265,6 +265,7 @@ export const App: React.FC = () => {
               {/* Daftar Barang Belanjaan (F-01 s/d F-04 + Checklist + Presets + Share) */}
               <GroceryList
                 items={items}
+                budgetLimit={budgetSettings.monthlyBudget}
                 onAddItem={() => {
                   setItemToEdit(null);
                   setIsAddModalOpen(true);
@@ -287,7 +288,15 @@ export const App: React.FC = () => {
           )}
 
           {/* TAB 2: KALKULATOR CERDAS (PROMO & KEMASAN) */}
-          {activeTab === 'calculator' && <SmartPromoCalculator />}
+          {activeTab === 'calculator' && (
+            <SmartPromoCalculator
+              budgetSettings={budgetSettings}
+              totalSpent={totalSpent}
+              items={items}
+              onEditBudget={() => setIsBudgetModalOpen(true)}
+              onApplyToCart={handleSaveItem}
+            />
+          )}
 
           {/* TAB 3: RIWAYAT & STRUK DIGITAL (F-06 + VISUAL ANALYTICS) */}
           {activeTab === 'history' && <ShoppingHistory history={history} />}
