@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, ShieldCheck, AlertTriangle, Edit3, Tag } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, AlertTriangle, Edit3, Tag, Scissors } from 'lucide-react';
 import { formatRupiah, getBudgetSafetyStatus } from '../lib/calculations';
 import type { BudgetSettings } from '../types/grocery';
 
@@ -8,6 +8,9 @@ interface BudgetSafetyBannerProps {
   totalSavings: number;
   budgetSettings: BudgetSettings;
   onEditBudget: () => void;
+  onAutoTrimOptional?: () => void;
+  optionalCount?: number;
+  optionalTotal?: number;
 }
 
 export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
@@ -15,6 +18,9 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
   totalSavings,
   budgetSettings,
   onEditBudget,
+  onAutoTrimOptional,
+  optionalCount = 0,
+  optionalTotal = 0,
 }) => {
   const safety = getBudgetSafetyStatus(
     totalSpent,
@@ -86,6 +92,34 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
           {safety.advice}
         </span>
       </div>
+
+      {/* Rekomendasi Pangkas Otomatis jika Over-Budget */}
+      {safety.status === 'DANGER' && optionalCount > 0 && onAutoTrimOptional && (
+        <button
+          type="button"
+          onClick={onAutoTrimOptional}
+          style={{
+            marginTop: 6,
+            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            padding: '8px 12px',
+            fontSize: '12px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)',
+            width: '100%',
+          }}
+        >
+          <Scissors size={14} />
+          <span>⚡ Pangkas {optionalCount} Barang Jajan ({formatRupiah(optionalTotal)})</span>
+        </button>
+      )}
 
       {/* Total Promo Savings */}
       {totalSavings > 0 && (

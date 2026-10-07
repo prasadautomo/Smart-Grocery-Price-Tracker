@@ -12,7 +12,7 @@ import {
   INITIAL_BUDGET,
 } from './lib/storage';
 import { getSupabaseClient } from './lib/supabase';
-import { calculateItemPrice } from './lib/calculations';
+import { calculateItemPrice, formatRupiah, getTrimRecommendations } from './lib/calculations';
 
 // Components
 import { Header } from './components/Header';
@@ -28,6 +28,8 @@ import { AddEditItemModal } from './components/AddEditItemModal';
 import { BudgetSettingsModal } from './components/BudgetSettingsModal';
 import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 import { CheckoutModal } from './components/CheckoutModal';
+import { QuickPresetModal } from './components/QuickPresetModal';
+import { ShareChecklistModal } from './components/ShareChecklistModal';
 
 export const App: React.FC = () => {
   // State Data Belanja
@@ -44,6 +46,8 @@ export const App: React.FC = () => {
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Cloud & PWA State
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
@@ -85,6 +89,9 @@ export const App: React.FC = () => {
     totalSavings += calc.totalDiscountAmount;
   });
 
+  // Hitung barang jajan/opsional untuk rekomendasi auto-trim
+  const trimRec = getTrimRecommendations(items, totalSpent, budgetSettings.monthlyBudget);
+
   // Handler: Tambah / Ubah Item
   const handleSaveItem = (savedItem: GroceryItem) => {
     let updated: GroceryItem[];
@@ -100,6 +107,48 @@ export const App: React.FC = () => {
 
     setItems(updated);
     saveGroceryItems(updated);
+  };
+
+  // Handler: Tambah dari Preset Cepat
+  const handleAddPresetItem = (presetItem: GroceryItem) => {
+    const exists = items.some((i) => i.name.toLowerCase() === presetItem.name.toLowerCase());
+    if (exists) {
+      showToast(`Item "${presetItem.name}" sudah ada di troli.`);
+      return;
+    }
+    const updated = [presetItem, ...items];
+    setItems(updated);
+    saveGroceryItems(updated);
+    showToast(`⚡ "${presetItem.name}" ditambahkan dari Katalog Cepat!`);
+  };
+
+  // Handler: Checklist Lorong Toko (Centang barang di troli fisik)
+  const handleToggleCheckItem = (id: string) => {
+    const updated = items.map((item) => {
+      if (item.id === id) {
+        const nextState = !item.isCheckedInCart;
+        return { ...item, isCheckedInCart: nextState };
+      }
+      return item;
+    });
+    setItems(updated);
+    saveGroceryItems(updated);
+  };
+
+  // Handler: Pangkas Otomatis Barang Jajan jika Over-Budget
+  const handleAutoTrimOptional = () => {
+    if (trimRec.optionalItems.length === 0) {
+      alert('Tidak ada barang kategori Jajan / Opsional yang dapat dipangkas.');
+      return;
+    }
+
+    const confirmMsg = `Pangkas ${trimRec.optionalItems.length} barang jajan/opsional senilai ${formatRupiah(trimRec.totalOptionalAmount)} agar anggaran belanja kembali aman?`;
+    if (confirm(confirmMsg)) {
+      const updated = items.filter((i) => i.priority !== 'optional');
+      setItems(updated);
+      saveGroceryItems(updated);
+      showToast(`⚡ Berhasil pangkas barang jajan! Hemat ${formatRupiah(trimRec.totalOptionalAmount)}.`);
+    }
   };
 
   // Handler: Update Quantity Realtime (F-02)
@@ -138,14 +187,13 @@ export const App: React.FC = () => {
     setHistory(updatedHistory);
     saveShoppingHistory(updatedHistory);
 
-    // 2. Perbarui patokan harga barang untuk bulan depan
-    // Kosongkan keranjang atau tanyakan pengguna
+    // 2. Kosongkan keranjang
     setItems([]);
     saveGroceryItems([]);
 
     setIsCheckoutModalOpen(false);
     setActiveTab('history');
-    showToast('🎉 Belanja selesai! Struk digital tersimpan rapi di Riwayat.');
+    showToast('🎉 Belanja selesai! Struk kasir tersimpan rapi di Riwayat.');
   };
 
   // Handler: Simpan Anggaran
@@ -203,24 +251,30 @@ export const App: React.FC = () => {
           {/* TAB 1: BELANJA & TROLI AKTIF */}
           {activeTab === 'cart' && (
             <>
-              {/* Pengendali Anggaran (F-05) */}
+              {/* Pengendali Anggaran (F-05) + Auto-Trim Jajan */}
               <BudgetSafetyBanner
                 totalSpent={totalSpent}
                 totalSavings={totalSavings}
                 budgetSettings={budgetSettings}
                 onEditBudget={() => setIsBudgetModalOpen(true)}
+                onAutoTrimOptional={handleAutoTrimOptional}
+                optionalCount={trimRec.optionalItems.length}
+                optionalTotal={trimRec.totalOptionalAmount}
               />
 
-              {/* Daftar Barang Belanjaan (F-01, F-02, F-03, F-04) */}
+              {/* Daftar Barang Belanjaan (F-01 s/d F-04 + Checklist + Presets + Share) */}
               <GroceryList
                 items={items}
                 onAddItem={() => {
                   setItemToEdit(null);
                   setIsAddModalOpen(true);
                 }}
+                onOpenPresets={() => setIsPresetModalOpen(true)}
+                onOpenShare={() => setIsShareModalOpen(true)}
                 onEditItem={handleEditItem}
                 onDeleteItem={handleDeleteItem}
                 onUpdateQuantity={handleUpdateQuantity}
+                onToggleCheckItem={handleToggleCheckItem}
                 onCheckout={() => {
                   if (items.length === 0) {
                     alert('Troli belanja masih kosong!');
@@ -235,7 +289,7 @@ export const App: React.FC = () => {
           {/* TAB 2: KALKULATOR CERDAS (PROMO & KEMASAN) */}
           {activeTab === 'calculator' && <SmartPromoCalculator />}
 
-          {/* TAB 3: RIWAYAT & STRUK DIGITAL (F-06) */}
+          {/* TAB 3: RIWAYAT & STRUK DIGITAL (F-06 + VISUAL ANALYTICS) */}
           {activeTab === 'history' && <ShoppingHistory history={history} />}
 
           {/* TAB 4: PENGATURAN & INTEGRASI CLOUD */}
@@ -268,6 +322,22 @@ export const App: React.FC = () => {
             setItemToEdit(null);
           }}
           onSave={handleSaveItem}
+        />
+
+        <QuickPresetModal
+          isOpen={isPresetModalOpen}
+          cartItems={items}
+          onClose={() => setIsPresetModalOpen(false)}
+          onAddPreset={handleAddPresetItem}
+        />
+
+        <ShareChecklistModal
+          isOpen={isShareModalOpen}
+          items={items}
+          totalSpent={totalSpent}
+          budgetLimit={budgetSettings.monthlyBudget}
+          onClose={() => setIsShareModalOpen(false)}
+          onShowToast={showToast}
         />
 
         <BudgetSettingsModal

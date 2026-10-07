@@ -25,6 +25,12 @@ Aplikasi ini mengatasi 3 dilema belanja utama:
 | **F-04** | **Komparator Harga Realtime vs Bulan Lalu** | ✅ Selesai | Indikator visual seketika: Panah Merah Naik (↑), Panah Hijau Turun (↓), dan Tanda Stabil (=). |
 | **F-05** | **Pengendali Anggaran (Safety Cap)** | ✅ Selesai | Pantauan sisa dompet dengan kartu visual: Hijau (<80%), Kuning (80-99%), dan Merah Bahaya (≥100% / Over Budget). |
 | **F-06** | **Riwayat & Database Belanja** | ✅ Selesai | Fitur *Checkout & Archive* struk digital permanen, ekspor laporan JSON/CSV, serta otomatis memperbarui patokan harga bulan berikutnya. |
+| **F-07** | **Checklist Lorong Toko & Prioritas** | ✅ Selesai | Centang barang interaktif saat mengambil di rak fisik + klasifikasi Wajib (Pokok) vs Jajan (Opsional). |
+| **F-08** | **Auto-Trim Over-Budget Optimizer** | ✅ Selesai | Tombol 1-klik pangkas otomatis barang jajan jika total troli melebihi batas anggaran bulanan. |
+| **F-09** | **Katalog Cepat 1-Tap Produk Rutin** | ✅ Selesai | Modal katalog instan kebutuhan anak kos (Beras, Minyak, Telur, Indomie, Sabun) dengan patokan harga otomatis. |
+| **F-10** | **Bagikan WhatsApp & Salin Catatan** | ✅ Selesai | Ekspor checklist belanja rapi terkelompok per kategori langsung ke chat WhatsApp atau clipboard. |
+| **F-11** | **Kalkulator Biaya Tambahan Kasir** | ✅ Selesai | Simulasi biaya kantong kresek/spunbond, biaya parkir motor/mobil, dan pajak PPN 11% sebelum bayar. |
+| **F-12** | **Grafik & Analisis Visual Kategori** | ✅ Selesai | Dashboard statistik kumulatif, tren pengeluaran antar-trip, dan breakdown visual pengeluaran per kategori. |
 
 ---
 

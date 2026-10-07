@@ -9,6 +9,8 @@ export type CategoryType =
   | 'Kebutuhan Kamar' 
   | 'Lain-lain';
 
+export type ItemPriority = 'essential' | 'optional';
+
 export type DiscountType = 'none' | 'single' | 'stacked' | 'nominal';
 
 export interface GroceryItem {
@@ -23,6 +25,8 @@ export interface GroceryItem {
   discountPercent1?: number; // e.g., 50 for 50%
   discountPercent2?: number; // e.g., 20 for +20%
   discountNominal?: number;  // e.g., Rp 15.000
+  priority?: ItemPriority;   // 'essential' (Wajib) | 'optional' (Jajan/Sekunder)
+  isCheckedInCart?: boolean; // Checklist lorong toko
   notes?: string;
   createdAt: string;
 }
@@ -43,6 +47,13 @@ export interface PriceComparison {
   percentChange: number;     // e.g., +15.5% or -10.0%
 }
 
+export interface CashierExtraCosts {
+  bagFee: number;
+  parkingFee: number;
+  taxPercent: number;
+  taxAmount: number;
+}
+
 export interface ShoppingTrip {
   id: string;
   date: string;
@@ -52,7 +63,22 @@ export interface ShoppingTrip {
   totalItemsCount: number;
   budgetLimit: number;
   itemsSnapshot: GroceryItem[];
+  extraCosts?: CashierExtraCosts;
+  grandTotal?: number;
   notes?: string;
+}
+
+export interface QuickPresetItem {
+  id: string;
+  name: string;
+  category: CategoryType;
+  unit: UnitType;
+  defaultQty: number;
+  estimatedPrice: number;
+  lastMonthPrice?: number;
+  priority: ItemPriority;
+  emoji: string;
+  popularReason?: string;
 }
 
 export interface BudgetSettings {

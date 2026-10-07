@@ -23,6 +23,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     unitPrice: 78000,
     lastMonthPrice: 73000, // Naik Rp 5.000 (indikator merah)
     discountType: 'none',
+    priority: 'essential',
+    isCheckedInCart: true,
     notes: 'Kebutuhan pokok nasi 1 bulan kos',
     createdAt: new Date().toISOString(),
   },
@@ -30,12 +32,14 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     id: 'item-2',
     name: 'Minyak Goreng Sawit (2 Liter)',
     category: 'Bumbu & Dapur',
-    unit: 'pouch' as any,
+    unit: 'botol',
     quantity: 1,
     unitPrice: 34000,
     lastMonthPrice: 38000, // Turun Rp 4.000 (indikator hijau hemat!)
     discountType: 'single',
     discountPercent1: 10, // Promo potongan 10%
+    priority: 'essential',
+    isCheckedInCart: true,
     notes: 'Untuk masak lauk kos',
     createdAt: new Date().toISOString(),
   },
@@ -48,6 +52,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     unitPrice: 28500,
     lastMonthPrice: 28500, // Stabil sama (indikator abu-abu =)
     discountType: 'none',
+    priority: 'essential',
+    isCheckedInCart: false,
     notes: 'Lauk protein harian',
     createdAt: new Date().toISOString(),
   },
@@ -62,6 +68,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     discountType: 'stacked',
     discountPercent1: 50,
     discountPercent2: 20, // Kasus studi: Diskon 50% + 20%
+    priority: 'optional',
+    isCheckedInCart: false,
     notes: 'Promo cuci gudang bertingkat',
     createdAt: new Date().toISOString(),
   },
@@ -75,7 +83,23 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     lastMonthPrice: 3100,
     discountType: 'nominal',
     discountNominal: 300, // Potongan Rp 300 per bungkus
+    priority: 'essential',
+    isCheckedInCart: false,
     notes: 'Cadangan makanan akhir bulan',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'item-6',
+    name: 'Keripik Kentang Balado (68g)',
+    category: 'Makanan & Camilan',
+    unit: 'bungkus',
+    quantity: 2,
+    unitPrice: 13500,
+    lastMonthPrice: 13000,
+    discountType: 'none',
+    priority: 'optional',
+    isCheckedInCart: false,
+    notes: 'Camilan jajan nonton film (Opsional)',
     createdAt: new Date().toISOString(),
   },
 ];

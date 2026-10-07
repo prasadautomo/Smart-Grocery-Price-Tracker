@@ -10,7 +10,14 @@ import {
   Trash2,
   ShoppingCart,
   Receipt,
-  HelpCircle
+  HelpCircle,
+  Zap,
+  Share2,
+  CheckCircle2,
+  Circle,
+  ShieldCheck,
+  Heart,
+  CheckCheck
 } from 'lucide-react';
 import type { GroceryItem, CategoryType } from '../types/grocery';
 import {
@@ -22,9 +29,12 @@ import {
 interface GroceryListProps {
   items: GroceryItem[];
   onAddItem: () => void;
+  onOpenPresets: () => void;
+  onOpenShare: () => void;
   onEditItem: (item: GroceryItem) => void;
   onDeleteItem: (id: string) => void;
   onUpdateQuantity: (id: string, newQty: number) => void;
+  onToggleCheckItem: (id: string) => void;
   onCheckout: () => void;
 }
 
@@ -42,50 +52,164 @@ const FILTER_CATEGORIES: (CategoryType | 'Semua')[] = [
 export const GroceryList: React.FC<GroceryListProps> = ({
   items,
   onAddItem,
+  onOpenPresets,
+  onOpenShare,
   onEditItem,
   onDeleteItem,
   onUpdateQuantity,
+  onToggleCheckItem,
   onCheckout,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'Semua'>('Semua');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'checked'>('all');
+
+  const checkedCount = items.filter((i) => i.isCheckedInCart).length;
+  const progressPercent = items.length > 0 ? Math.round((checkedCount / items.length) * 100) : 0;
 
   // Filter items
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesStatus =
+      statusFilter === 'all' ||
+      (statusFilter === 'checked' && item.isCheckedInCart) ||
+      (statusFilter === 'pending' && !item.isCheckedInCart);
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   return (
     <div className="grocery-list-section">
-      {/* Search Bar & Add Button */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+      {/* Top Action Bar: Search, Quick Preset, Share & Add */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
         <div style={{ position: 'relative', flex: 1 }}>
           <Search
             size={16}
-            style={{ position: 'absolute', left: 12, top: 13, color: '#64748b' }}
+            style={{ position: 'absolute', left: 12, top: 12, color: '#64748b' }}
           />
           <input
             type="text"
             className="form-input"
-            style={{ paddingLeft: 36, height: 42 }}
+            style={{ paddingLeft: 36, height: 40, fontSize: '13px' }}
             placeholder="Cari item di rak belanja..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
+        {/* Tombol Katalog Cepat 1-Tap */}
+        <button
+          className="btn-secondary"
+          style={{
+            height: 40,
+            padding: '0 12px',
+            fontSize: '12px',
+            flexShrink: 0,
+            borderColor: 'rgba(245, 158, 11, 0.4)',
+            color: '#fbbf24',
+            background: 'rgba(245, 158, 11, 0.1)',
+          }}
+          onClick={onOpenPresets}
+          title="Katalog Cepat 1-Tap Barang Rutin Kos"
+        >
+          <Zap size={16} />
+          <span style={{ fontWeight: 600 }}>Cepat</span>
+        </button>
+
+        {/* Tombol Bagikan WhatsApp / Checklist */}
+        <button
+          className="btn-secondary"
+          style={{
+            height: 40,
+            padding: '0 12px',
+            fontSize: '12px',
+            flexShrink: 0,
+            borderColor: 'rgba(34, 197, 94, 0.4)',
+            color: '#4ade80',
+            background: 'rgba(34, 197, 94, 0.1)',
+          }}
+          onClick={onOpenShare}
+          title="Bagikan ke WhatsApp & Salin Checklist"
+        >
+          <Share2 size={16} />
+        </button>
+
+        {/* Tombol Tambah Barang Manual */}
         <button
           className="btn-primary"
-          style={{ height: 42, padding: '0 16px', flexShrink: 0 }}
+          style={{ height: 40, padding: '0 14px', flexShrink: 0, fontSize: '12.5px' }}
           onClick={onAddItem}
-          title="Tambah barang baru"
+          title="Tambah barang manual"
         >
-          <Plus size={18} />
+          <Plus size={16} />
           <span>Tambah</span>
         </button>
       </div>
+
+      {/* Mode Checklist Lorong Toko Status Bar */}
+      {items.length > 0 && (
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '10px 12px',
+            marginBottom: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CheckCheck size={15} color="#34d399" />
+              <span style={{ fontSize: '12px', color: '#e2e8f0', fontWeight: 600 }}>
+                Progress Troli Fisik:
+              </span>
+              <span style={{ fontSize: '12px', color: '#34d399', fontWeight: 700 }}>
+                {checkedCount} / {items.length} Barang ({progressPercent}%)
+              </span>
+            </div>
+
+            {/* Quick Status Filter Tabs */}
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button
+                className={`category-pill ${statusFilter === 'all' ? 'active' : ''}`}
+                style={{ fontSize: '10.5px', padding: '2px 8px', borderRadius: '6px' }}
+                onClick={() => setStatusFilter('all')}
+              >
+                Semua
+              </button>
+              <button
+                className={`category-pill ${statusFilter === 'pending' ? 'active' : ''}`}
+                style={{ fontSize: '10.5px', padding: '2px 8px', borderRadius: '6px' }}
+                onClick={() => setStatusFilter('pending')}
+              >
+                Belum ({items.length - checkedCount})
+              </button>
+              <button
+                className={`category-pill ${statusFilter === 'checked' ? 'active' : ''}`}
+                style={{ fontSize: '10.5px', padding: '2px 8px', borderRadius: '6px' }}
+                onClick={() => setStatusFilter('checked')}
+              >
+                Sudah ({checkedCount})
+              </button>
+            </div>
+          </div>
+
+          {/* Checklist Progress Bar */}
+          <div style={{ height: 4, width: '100%', background: 'rgba(255, 255, 255, 0.08)', borderRadius: 2, overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '100%',
+                width: `${progressPercent}%`,
+                background: 'linear-gradient(90deg, #10b981 0%, #34d399 100%)',
+                transition: 'width 0.3s ease',
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Category Filter Pills */}
       <div className="filter-pills-row">
@@ -134,12 +258,18 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           <p>
             {searchQuery
               ? `Tidak ditemukan barang dengan kata kunci "${searchQuery}".`
-              : 'Belum ada barang di troli Rian. Ketuk tombol di bawah untuk mulai mencatat belanjaan supermarket.'}
+              : 'Belum ada barang di troli Rian. Pilih Katalog Cepat untuk 1-tap tambah barang atau ketuk tombol di bawah.'}
           </p>
-          <button className="btn-primary" onClick={onAddItem}>
-            <Plus size={18} />
-            <span>Catat Barang Pertama</span>
-          </button>
+          <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+            <button className="btn-secondary" onClick={onOpenPresets} style={{ fontSize: '12.5px' }}>
+              <Zap size={15} color="#fbbf24" />
+              <span>Buka Katalog Cepat</span>
+            </button>
+            <button className="btn-primary" onClick={onAddItem} style={{ fontSize: '12.5px' }}>
+              <Plus size={16} />
+              <span>Tambah Manual</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -148,15 +278,86 @@ export const GroceryList: React.FC<GroceryListProps> = ({
         {filteredItems.map((item) => {
           const calc = calculateItemPrice(item);
           const comp = compareWithLastMonth(calc.discountedUnitPrice, item.lastMonthPrice);
+          const isChecked = !!item.isCheckedInCart;
 
           return (
-            <div key={item.id} className="grocery-item-card">
+            <div
+              key={item.id}
+              className={`grocery-item-card ${isChecked ? 'item-checked-card' : ''}`}
+              style={{
+                opacity: isChecked ? 0.78 : 1,
+                borderColor: isChecked ? 'rgba(16, 185, 129, 0.4)' : undefined,
+                transition: 'all 0.2s ease',
+              }}
+            >
               {/* Item Header / Title row */}
               <div className="item-main-row">
-                <div className="item-info-col">
-                  <h3 className="item-name">{item.name}</h3>
-                  
-                  <div className="item-meta-row">
+                {/* Touch Checkbox for in-store checklist */}
+                <button
+                  type="button"
+                  onClick={() => onToggleCheckItem(item.id)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 2,
+                    color: isChecked ? '#34d399' : '#64748b',
+                    flexShrink: 0,
+                  }}
+                  title={isChecked ? 'Tandai belum diambil' : 'Tandai sudah masuk troli'}
+                >
+                  {isChecked ? <CheckCircle2 size={22} /> : <Circle size={22} />}
+                </button>
+
+                <div className="item-info-col" style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <h3
+                      className="item-name"
+                      style={{
+                        textDecoration: isChecked ? 'line-through' : 'none',
+                        color: isChecked ? '#94a3b8' : '#fff',
+                        margin: 0,
+                      }}
+                    >
+                      {item.name}
+                    </h3>
+
+                    {/* Priority Badge */}
+                    <span
+                      style={{
+                        fontSize: '9.5px',
+                        padding: '1px 5px',
+                        borderRadius: '4px',
+                        fontWeight: 700,
+                        background:
+                          item.priority === 'optional'
+                            ? 'rgba(245, 158, 11, 0.15)'
+                            : 'rgba(16, 185, 129, 0.15)',
+                        color: item.priority === 'optional' ? '#fbbf24' : '#34d399',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
+                      }}
+                    >
+                      {item.priority === 'optional' ? (
+                        <>
+                          <Heart size={9} />
+                          <span>Jajan</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck size={9} />
+                          <span>Wajib</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="item-meta-row" style={{ marginTop: 4 }}>
                     <span className="category-tag">{item.category}</span>
 
                     {/* F-04: Komparator Harga vs Bulan Lalu */}

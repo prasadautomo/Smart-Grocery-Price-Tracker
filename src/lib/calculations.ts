@@ -185,3 +185,117 @@ export function getBudgetSafetyStatus(
     advice: `Belanja terkendali. Sisa anggaran aman sebesar ${formatRupiah(remaining)}.`,
   };
 }
+
+/**
+ * Format daftar belanjaan menjadi teks rapi untuk dibagikan ke WhatsApp / Clipboard
+ */
+export function formatGroceryListForSharing(
+  items: GroceryItem[],
+  totalSpent: number,
+  budgetLimit?: number
+): string {
+  const dateStr = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  let text = `🛒 *CATATAN BELANJA - SMART GROCERY*\n`;
+  text += `📅 ${dateStr}\n`;
+  text += `💰 Estimasi Total: *${formatRupiah(totalSpent)}*`;
+  if (budgetLimit && budgetLimit > 0) {
+    text += ` (Limit: ${formatRupiah(budgetLimit)})`;
+  }
+  text += `\n━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+  // Kelompokkan per kategori
+  const grouped: Record<string, GroceryItem[]> = {};
+  items.forEach((item) => {
+    if (!grouped[item.category]) grouped[item.category] = [];
+    grouped[item.category].push(item);
+  });
+
+  Object.entries(grouped).forEach(([cat, catItems]) => {
+    text += `*📂 ${cat.toUpperCase()}*\n`;
+    catItems.forEach((item) => {
+      const calc = calculateItemPrice(item);
+      const checkMark = item.isCheckedInCart ? '✅' : '⬜';
+      const prioMark = item.priority === 'optional' ? ' _(Jajan)_' : '';
+      text += `${checkMark} ${item.name} (${item.quantity} ${item.unit}) - ${formatRupiah(calc.finalTotal)}${prioMark}\n`;
+    });
+    text += `\n`;
+  });
+
+  text += `━━━━━━━━━━━━━━━━━━━━\n`;
+  text += `💡 _Dibuat dengan Smart Grocery & Price Tracker (PWA)_`;
+  return text;
+}
+
+/**
+ * Rekomendasi Pangkas Otomatis untuk Barang Jajan/Opsional jika Over-Budget
+ */
+export function getTrimRecommendations(
+  items: GroceryItem[],
+  currentSpent: number,
+  budgetLimit: number
+): {
+  optionalItems: GroceryItem[];
+  totalOptionalAmount: number;
+  newSpentIfDropped: number;
+  isBackInBudget: boolean;
+} {
+  const optionalItems = items.filter((i) => i.priority === 'optional');
+  let totalOptionalAmount = 0;
+  optionalItems.forEach((item) => {
+    const calc = calculateItemPrice(item);
+    totalOptionalAmount += calc.finalTotal;
+  });
+
+  const newSpentIfDropped = Math.max(0, currentSpent - totalOptionalAmount);
+  const isBackInBudget = newSpentIfDropped <= budgetLimit;
+
+  return {
+    optionalItems,
+    totalOptionalAmount,
+    newSpentIfDropped,
+    isBackInBudget,
+  };
+}
+
+/**
+ * Menghitung Total Biaya Kasir Realtime (Belanja + Kantong + Parkir + PPN)
+ */
+export function calculateCashierGrandTotal(
+  subtotal: number,
+  bagFee = 0,
+  parkingFee = 0,
+  taxPercent = 0
+): {
+  subtotal: number;
+  bagFee: number;
+  parkingFee: number;
+  taxPercent: number;
+  taxAmount: number;
+  extraTotal: number;
+  grandTotal: number;
+} {
+  const safeSubtotal = Math.max(0, subtotal);
+  const safeBag = Math.max(0, bagFee);
+  const safeParking = Math.max(0, parkingFee);
+  const safeTaxPercent = Math.max(0, Math.min(100, taxPercent));
+  const taxAmount = Math.round((safeSubtotal * safeTaxPercent) / 100);
+  const extraTotal = safeBag + safeParking + taxAmount;
+  const grandTotal = safeSubtotal + extraTotal;
+
+  return {
+    subtotal: safeSubtotal,
+    bagFee: safeBag,
+    parkingFee: safeParking,
+    taxPercent: safeTaxPercent,
+    taxAmount,
+    extraTotal,
+    grandTotal,
+  };
+}
+

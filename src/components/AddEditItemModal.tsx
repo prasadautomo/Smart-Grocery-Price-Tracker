@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Sparkles, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import type { GroceryItem, CategoryType, UnitType, DiscountType } from '../types/grocery';
+import { X, Check, Sparkles, TrendingUp, TrendingDown, Minus, ShieldCheck, Heart } from 'lucide-react';
+import type { GroceryItem, CategoryType, UnitType, DiscountType, ItemPriority } from '../types/grocery';
 import { calculateItemPrice, compareWithLastMonth, formatRupiah } from '../lib/calculations';
 import { getHistoricalBenchmarkPrice } from '../lib/storage';
 
@@ -48,6 +48,7 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
   const [discountPercent1, setDiscountPercent1] = useState<number>(0);
   const [discountPercent2, setDiscountPercent2] = useState<number>(0);
   const [discountNominal, setDiscountNominal] = useState<number>(0);
+  const [priority, setPriority] = useState<ItemPriority>('essential');
   const [notes, setNotes] = useState('');
 
   // Sinkronkan state saat modal dibuka atau itemToEdit berubah
@@ -63,6 +64,7 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       setDiscountPercent1(itemToEdit.discountPercent1 ?? 0);
       setDiscountPercent2(itemToEdit.discountPercent2 ?? 0);
       setDiscountNominal(itemToEdit.discountNominal ?? 0);
+      setPriority(itemToEdit.priority ?? 'essential');
       setNotes(itemToEdit.notes ?? '');
     } else {
       setName('');
@@ -75,6 +77,7 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       setDiscountPercent1(0);
       setDiscountPercent2(0);
       setDiscountNominal(0);
+      setPriority('essential');
       setNotes('');
     }
   }, [itemToEdit, isOpen]);
@@ -106,6 +109,8 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
     discountPercent1,
     discountPercent2,
     discountNominal,
+    priority,
+    isCheckedInCart: itemToEdit?.isCheckedInCart ?? false,
     notes,
     createdAt: new Date().toISOString(),
   };
@@ -136,6 +141,8 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       discountPercent1: discountType === 'single' || discountType === 'stacked' ? Number(discountPercent1) || 0 : 0,
       discountPercent2: discountType === 'stacked' ? Number(discountPercent2) || 0 : 0,
       discountNominal: discountType === 'nominal' ? Number(discountNominal) || 0 : 0,
+      priority,
+      isCheckedInCart: itemToEdit?.isCheckedInCart ?? false,
       notes: notes.trim(),
       createdAt: itemToEdit ? itemToEdit.createdAt : new Date().toISOString(),
     };
@@ -197,6 +204,50 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
                   <option key={u} value={u}>{u}</option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* Prioritas Belanja (Wajib vs Jajan/Opsional) */}
+          <div className="form-group">
+            <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Prioritas Kebutuhan</span>
+              <span style={{ fontSize: '11px', color: priority === 'essential' ? '#34d399' : '#fbbf24', fontWeight: 600 }}>
+                {priority === 'essential' ? 'Wajib (Kebutuhan Pokok)' : 'Jajan / Opsional'}
+              </span>
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <button
+                type="button"
+                className={`btn-secondary ${priority === 'essential' ? 'btn-primary' : ''}`}
+                style={{
+                  padding: '8px 10px',
+                  fontSize: '12px',
+                  borderRadius: '10px',
+                  background: priority === 'essential' ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                  borderColor: priority === 'essential' ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
+                  color: priority === 'essential' ? '#34d399' : '#94a3b8',
+                }}
+                onClick={() => setPriority('essential')}
+              >
+                <ShieldCheck size={14} />
+                <span>Wajib (Pokok)</span>
+              </button>
+              <button
+                type="button"
+                className={`btn-secondary ${priority === 'optional' ? 'btn-primary' : ''}`}
+                style={{
+                  padding: '8px 10px',
+                  fontSize: '12px',
+                  borderRadius: '10px',
+                  background: priority === 'optional' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                  borderColor: priority === 'optional' ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)',
+                  color: priority === 'optional' ? '#fbbf24' : '#94a3b8',
+                }}
+                onClick={() => setPriority('optional')}
+              >
+                <Heart size={14} />
+                <span>Jajan (Opsional)</span>
+              </button>
             </div>
           </div>
 
