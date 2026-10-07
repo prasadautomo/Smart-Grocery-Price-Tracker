@@ -239,52 +239,51 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Header Mobile */}
+        {/* Header Mobile (Sleek Stitch Green Hero) */}
         <Header
           isSupabaseConnected={isSupabaseConnected}
           onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
           onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
-        />
+          activeTab={activeTab}
+        >
+          {activeTab === 'cart' && (
+            <BudgetSafetyBanner
+              totalSpent={totalSpent}
+              totalSavings={totalSavings}
+              budgetSettings={budgetSettings}
+              onEditBudget={() => setIsBudgetModalOpen(true)}
+              onAutoTrimOptional={handleAutoTrimOptional}
+              optionalCount={trimRec.optionalItems.length}
+              optionalTotal={trimRec.totalOptionalAmount}
+            />
+          )}
+        </Header>
 
         {/* Scrollable Main Content */}
         <main className="app-content-scroll">
           {/* TAB 1: BELANJA & TROLI AKTIF */}
           {activeTab === 'cart' && (
-            <>
-              {/* Pengendali Anggaran (F-05) + Auto-Trim Jajan */}
-              <BudgetSafetyBanner
-                totalSpent={totalSpent}
-                totalSavings={totalSavings}
-                budgetSettings={budgetSettings}
-                onEditBudget={() => setIsBudgetModalOpen(true)}
-                onAutoTrimOptional={handleAutoTrimOptional}
-                optionalCount={trimRec.optionalItems.length}
-                optionalTotal={trimRec.totalOptionalAmount}
-              />
-
-              {/* Daftar Barang Belanjaan (F-01 s/d F-04 + Checklist + Presets + Share) */}
-              <GroceryList
-                items={items}
-                budgetLimit={budgetSettings.monthlyBudget}
-                onAddItem={() => {
-                  setItemToEdit(null);
-                  setIsAddModalOpen(true);
-                }}
-                onOpenPresets={() => setIsPresetModalOpen(true)}
-                onOpenShare={() => setIsShareModalOpen(true)}
-                onEditItem={handleEditItem}
-                onDeleteItem={handleDeleteItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onToggleCheckItem={handleToggleCheckItem}
-                onCheckout={() => {
-                  if (items.length === 0) {
-                    alert('Troli belanja masih kosong!');
-                    return;
-                  }
-                  setIsCheckoutModalOpen(true);
-                }}
-              />
-            </>
+            <GroceryList
+              items={items}
+              budgetLimit={budgetSettings.monthlyBudget}
+              onAddItem={() => {
+                setItemToEdit(null);
+                setIsAddModalOpen(true);
+              }}
+              onOpenPresets={() => setIsPresetModalOpen(true)}
+              onOpenShare={() => setIsShareModalOpen(true)}
+              onEditItem={handleEditItem}
+              onDeleteItem={handleDeleteItem}
+              onUpdateQuantity={handleUpdateQuantity}
+              onToggleCheckItem={handleToggleCheckItem}
+              onCheckout={() => {
+                if (items.length === 0) {
+                  alert('Troli belanja masih kosong!');
+                  return;
+                }
+                setIsCheckoutModalOpen(true);
+              }}
+            />
           )}
 
           {/* TAB 2: KALKULATOR CERDAS (PROMO & KEMASAN) */}

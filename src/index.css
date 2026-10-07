@@ -125,12 +125,23 @@ html, body {
 
 .stitch-hero-header {
   background: linear-gradient(180deg, #10b981 0%, #059669 100%);
-  padding: 16px 18px 28px;
+  padding: 16px 16px 20px 16px;
   color: #fff;
   position: relative;
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
-  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.2);
+  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10;
+}
+
+.stitch-hero-header.compact {
+  padding: 14px 16px 16px 16px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  gap: 0;
 }
 
 .stitch-hero-top {
@@ -242,22 +253,32 @@ html, body {
    ============================================================ */
 
 .stitch-budget-card {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: 16px 18px;
-  border: 1px solid #e2e8f0;
-  box-shadow: var(--shadow-md);
-  margin-top: -18px;
+  background: #ffffff !important;
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  margin-top: 0;
   position: relative;
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+}
+
+.stitch-budget-card.safe {
+  border-color: rgba(226, 232, 240, 0.8);
+  background: #ffffff !important;
+}
+
+.stitch-budget-card.warning {
+  border-color: #fde68a;
+  background: #ffffff !important;
 }
 
 .stitch-budget-card.danger {
-  border-color: #fca5a5;
-  background: #fff5f5;
+  border-color: #fecaca;
+  background: #ffffff !important;
 }
 
 .stitch-budget-header {

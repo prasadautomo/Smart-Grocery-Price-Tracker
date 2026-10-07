@@ -1,30 +1,47 @@
 import React from 'react';
-import { ShoppingCart, Cloud, HardDrive } from 'lucide-react';
+import { ShoppingCart, Cloud, HardDrive, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   isSupabaseConnected: boolean;
   onOpenSupabaseModal: () => void;
   onOpenBudgetModal: () => void;
+  activeTab?: string;
+  children?: React.ReactNode;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   isSupabaseConnected,
   onOpenSupabaseModal,
   onOpenBudgetModal,
+  activeTab = 'cart',
+  children,
 }) => {
+  const isCartTab = activeTab === 'cart';
+
   return (
-    <header className="stitch-hero-header">
+    <header className={`stitch-hero-header ${!children ? 'compact' : ''}`}>
       <div className="stitch-hero-top">
         <div className="stitch-user-profile">
           <div className="stitch-avatar" onClick={onOpenBudgetModal} title="Atur Anggaran">
-            <ShoppingCart size={22} strokeWidth={2.4} />
+            {isCartTab ? (
+              <ShoppingCart size={22} strokeWidth={2.4} />
+            ) : (
+              <Sparkles size={20} strokeWidth={2.4} />
+            )}
           </div>
           <div className="stitch-user-info">
             <h1>
-              <span>Halo, Rian</span>
-              <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.9 }}>(Anak Kos)</span>
+              <span>{isCartTab ? 'Halo, Rian' : 'SafeGrocer'}</span>
+              <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.9 }}>
+                (Anak Kos)
+              </span>
             </h1>
-            <p>Troli Belanja Supermarket</p>
+            <p>
+              {activeTab === 'cart' && 'Troli Belanja Supermarket'}
+              {activeTab === 'calculator' && 'Kalkulator Promo & Diskon (F-03)'}
+              {activeTab === 'history' && 'Riwayat & Database Belanja (F-06)'}
+              {activeTab === 'settings' && 'Pengaturan & Cloud Sync'}
+            </p>
           </div>
         </div>
 
@@ -57,6 +74,9 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Hero Child (Budget Safety Banner on Cart tab) */}
+      {children}
     </header>
   );
 };
