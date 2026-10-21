@@ -244,23 +244,27 @@ export function loadGroceryItems(): GroceryItem[] {
 }
 
 /**
- * Menyimpan item belanja aktif ke LocalStorage & Supabase jika aktif
+ * Menyimpan item belanja aktif ke LocalStorage & OTOMATIS Realtime Unggah ke Supabase Cloud
  */
 export async function saveGroceryItems(items: GroceryItem[]): Promise<void> {
+  // 1. Simpan ke local cache untuk performa responsif
   try {
     localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(items));
   } catch (e) {
     console.error('Error saving items to localStorage:', e);
   }
 
-  // Sync ke Supabase secara background
+  // 2. OTOMATIS REALTIME SYNC KE CLOUD SUPABASE (Tanpa Tekan Tombol Manual)
   const client = getSupabaseClient();
   if (client) {
     try {
-      // Hapus & timpa keranjang saat ini
-      await client.from('grocery_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      // Hapus item keranjang user saat ini
+      await client.from('grocery_items').delete().eq('user_id', 'user_rian');
+
       if (items.length > 0) {
         const records = items.map((i) => ({
+          id: i.id,
+          user_id: 'user_rian',
           name: i.name,
           category: i.category,
           unit: i.unit,
@@ -271,12 +275,17 @@ export async function saveGroceryItems(items: GroceryItem[]): Promise<void> {
           discount_percent_1: i.discountPercent1 || 0,
           discount_percent_2: i.discountPercent2 || 0,
           discount_nominal: i.discountNominal || 0,
+          priority: i.priority || 'essential',
+          is_checked_in_cart: i.isCheckedInCart || false,
           notes: i.notes || '',
+          image_url: i.imageUrl || null,
+          source: i.source || 'Astronauts.id',
         }));
         await client.from('grocery_items').insert(records);
       }
+      console.log('☁️ [Realtime Cloud] Perubahan keranjang belanja otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('Sync grocery items to Supabase background error:', err);
+      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron keranjang ke Supabase:', err);
     }
   }
 }
@@ -301,7 +310,7 @@ export function loadShoppingHistory(): ShoppingTrip[] {
 }
 
 /**
- * Menyimpan Riwayat Belanja ke LocalStorage & Supabase
+ * Menyimpan Riwayat Belanja ke LocalStorage & OTOMATIS Realtime Unggah ke Supabase Cloud
  */
 export async function saveShoppingHistory(trips: ShoppingTrip[]): Promise<void> {
   try {
@@ -310,25 +319,29 @@ export async function saveShoppingHistory(trips: ShoppingTrip[]): Promise<void> 
     console.error('Error saving history to localStorage:', e);
   }
 
+  // OTOMATIS REALTIME SYNC KE CLOUD SUPABASE
   const client = getSupabaseClient();
   if (client) {
     try {
-      // Upsert trips
       for (const trip of trips) {
         await client.from('shopping_trips').upsert({
-          id: trip.id.includes('-') && trip.id.length === 36 ? trip.id : undefined,
+          id: trip.id,
+          user_id: 'user_rian',
           store_name: trip.storeName,
           trip_date: trip.date,
           total_spent: trip.totalSpent,
           total_savings: trip.totalSavings,
           total_items_count: trip.totalItemsCount,
           budget_limit: trip.budgetLimit,
+          grand_total: trip.grandTotal || trip.totalSpent,
           items_snapshot: trip.itemsSnapshot,
+          extra_costs: trip.extraCosts || {},
           notes: trip.notes || '',
         });
       }
+      console.log('☁️ [Realtime Cloud] Struk belanja otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('Sync history to Supabase error:', err);
+      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron riwayat ke Supabase:', err);
     }
   }
 }
@@ -349,7 +362,7 @@ export function loadBudgetSettings(): BudgetSettings {
 }
 
 /**
- * Menyimpan Pengaturan Anggaran ke LocalStorage & Supabase
+ * Menyimpan Pengaturan Anggaran ke LocalStorage & OTOMATIS Realtime Unggah ke Supabase Cloud
  */
 export async function saveBudgetSettings(settings: BudgetSettings): Promise<void> {
   try {
@@ -358,17 +371,20 @@ export async function saveBudgetSettings(settings: BudgetSettings): Promise<void
     console.error('Error saving budget settings:', e);
   }
 
+  // OTOMATIS REALTIME SYNC KE CLOUD SUPABASE
   const client = getSupabaseClient();
   if (client) {
     try {
       await client.from('user_budget_settings').upsert({
         id: 'default_user',
+        user_id: 'user_rian',
         monthly_budget: settings.monthlyBudget,
         warning_threshold_percent: settings.warningThresholdPercent,
         updated_at: new Date().toISOString(),
       });
+      console.log('☁️ [Realtime Cloud] Pengaturan anggaran otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('Sync budget to Supabase error:', err);
+      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron budget ke Supabase:', err);
     }
   }
 }

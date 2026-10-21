@@ -7,6 +7,8 @@ import {
   saveShoppingHistory,
   loadBudgetSettings,
   saveBudgetSettings,
+  pullDataFromSupabase,
+  pushAllDataToCloud,
   INITIAL_ITEMS,
   INITIAL_HISTORY,
   INITIAL_BUDGET,
@@ -56,11 +58,24 @@ export const App: React.FC = () => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Inisialisasi status koneksi Supabase & PWA listener
+  // Inisialisasi status koneksi Supabase & Tarik data Cloud otomatis saat aplikasi dibuka
   useEffect(() => {
     const client = getSupabaseClient();
     if (client) {
       setIsSupabaseConnected(true);
+      pullDataFromSupabase().then((res) => {
+        if (res.success) {
+          if (res.itemsCount && res.itemsCount > 0) {
+            setItems(loadGroceryItems());
+          } else {
+            // Jika Cloud belum ada data, otomatis unggah data awal kasus Rian
+            pushAllDataToCloud();
+          }
+          setHistory(loadShoppingHistory());
+          setBudgetSettings(loadBudgetSettings());
+          showToast('☁️ Terhubung ke Cloud Supabase (Auto Realtime Sync)');
+        }
+      });
     }
 
     // PWA install prompt handler
@@ -205,7 +220,7 @@ export const App: React.FC = () => {
     showToast('Batas anggaran berhasil diperbarui!');
   };
 
-  // Handler: Reset ke Data Kasus Rian
+  // Handler: Reset ke Data Kasus Rian (Lokal & Cloud)
   const handleResetDemoData = () => {
     setItems(INITIAL_ITEMS);
     saveGroceryItems(INITIAL_ITEMS);
@@ -213,7 +228,8 @@ export const App: React.FC = () => {
     saveShoppingHistory(INITIAL_HISTORY);
     setBudgetSettings(INITIAL_BUDGET);
     saveBudgetSettings(INITIAL_BUDGET);
-    showToast('Data kasus Rian berhasil dipulihkan.');
+    pushAllDataToCloud();
+    showToast('Data kasus Rian berhasil dipulihkan di Cloud Supabase!');
   };
 
   // Handler: Pasang PWA
