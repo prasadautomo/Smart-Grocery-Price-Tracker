@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, BarChart3, Receipt, Sliders } from 'lucide-react';
+import { ShoppingCart, BarChart3, Receipt } from 'lucide-react';
 
 export type ActiveTab = 'cart' | 'history' | 'calculator' | 'settings';
 
@@ -23,7 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         onClick={() => onTabChange('cart')}
       >
         <div style={{ position: 'relative' }} className="nav-icon-wrap">
-          <ShoppingCart size={20} strokeWidth={activeTab === 'cart' ? 2.5 : 2} />
+          <ShoppingCart size={21} strokeWidth={activeTab === 'cart' ? 2.5 : 2} />
           {itemCount > 0 && <span className="nav-badge">{itemCount}</span>}
         </div>
         <span className="nav-label">Belanja</span>
@@ -36,7 +36,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
         onClick={() => onTabChange('history')}
       >
         <div className="nav-icon-wrap">
-          <Receipt size={20} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
+          <Receipt size={21} strokeWidth={activeTab === 'history' ? 2.5 : 2} />
         </div>
         <span className="nav-label">Riwayat</span>
       </button>
@@ -44,26 +44,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({
       {/* Tab 3: Anggaran */}
       <button
         type="button"
-        className={`nav-item-btn ${activeTab === 'calculator' ? 'active' : ''}`}
+        className={`nav-item-btn ${activeTab === 'calculator' || activeTab === 'settings' ? 'active' : ''}`}
         onClick={() => onTabChange('calculator')}
       >
         <div className="nav-icon-wrap">
-          <BarChart3 size={20} strokeWidth={activeTab === 'calculator' ? 2.5 : 2} />
+          <BarChart3 size={21} strokeWidth={activeTab === 'calculator' || activeTab === 'settings' ? 2.5 : 2} />
         </div>
         <span className="nav-label">Anggaran</span>
-      </button>
-
-      {/* Tab 4: Pengaturan */}
-      <button
-        type="button"
-        className={`nav-item-btn ${activeTab === 'settings' ? 'active' : ''}`}
-        onClick={() => onTabChange('settings')}
-      >
-        <div className="nav-icon-wrap">
-          <Sliders size={20} strokeWidth={activeTab === 'settings' ? 2.5 : 2} />
-        </div>
-        <span className="nav-label">Pengaturan</span>
       </button>
     </nav>
   );
 };
+

@@ -80,10 +80,10 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Riwayat & Database Belanja
+            Riwayat & Struk Belanja
           </h2>
           <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0' }}>
-            🗂️ Arsip Struk Digital & Tren Harga (F-06)
+            🗂️ Arsip Struk Digital & Tren Harga
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
               Deteksi Fluktuasi Harga
             </h3>
             <p style={{ fontSize: '10.5px', color: '#64748b', margin: '2px 0 0' }}>
-              Modul Cerdas Rian (F-04)
+              Perbandingan harga bulan ini vs bulan lalu
             </p>
           </div>
 

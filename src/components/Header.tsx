@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Cloud, Sparkles } from 'lucide-react';
+import { ShoppingCart, Cloud, SlidersHorizontal } from 'lucide-react';
 
 interface HeaderProps {
   isSupabaseConnected: boolean;
@@ -16,55 +16,33 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab = 'cart',
   children,
 }) => {
-  const isCartTab = activeTab === 'cart';
-
   return (
     <header className={`stitch-hero-header ${!children ? 'compact' : ''}`}>
       <div className="stitch-hero-top">
         <div className="stitch-user-profile">
           <div className="stitch-avatar" onClick={onOpenBudgetModal} title="Atur Anggaran">
-            {isCartTab ? (
-              <ShoppingCart size={22} strokeWidth={2.4} />
-            ) : (
-              <Sparkles size={20} strokeWidth={2.4} />
-            )}
+            <ShoppingCart size={20} strokeWidth={2.4} />
           </div>
           <div className="stitch-user-info">
-            <h1>
-              <span>{isCartTab ? 'Halo, Rian' : 'SafeGrocer'}</span>
-              <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.9 }}>
-                (Anak Kos)
-              </span>
-            </h1>
+            <h1>SafeGrocer</h1>
             <p>
               {activeTab === 'cart' && 'Troli Belanja Supermarket'}
-              {activeTab === 'calculator' && 'Kalkulator Promo & Diskon (F-03)'}
-              {activeTab === 'history' && 'Riwayat & Database Belanja (F-06)'}
-              {activeTab === 'settings' && 'Pengaturan & Cloud Sync'}
+              {activeTab === 'history' && 'Riwayat & Struk Belanja'}
+              {activeTab === 'calculator' && 'Pengendali Anggaran & Promo'}
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {/* PWA Aktif Badge */}
-          <div className="stitch-header-badge">
-            <span className="stitch-header-badge-dot" />
-            <span>PWA Aktif</span>
-          </div>
-
-          {/* Cloud Database Indicator Pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Cloud Database Status */}
           <button
             type="button"
             onClick={onOpenSupabaseModal}
             style={{
-              background: isSupabaseConnected
-                ? 'rgba(16, 185, 129, 0.35)'
-                : 'rgba(255, 255, 255, 0.25)',
-              border: isSupabaseConnected
-                ? '1px solid #a7f3d0'
-                : '1px solid rgba(255, 255, 255, 0.4)',
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '20px',
-              padding: '4px 10px',
+              padding: '5px 10px',
               display: 'flex',
               alignItems: 'center',
               gap: 5,
@@ -74,10 +52,41 @@ export const Header: React.FC<HeaderProps> = ({
               cursor: 'pointer',
               backdropFilter: 'blur(8px)',
             }}
-            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud Database' : 'Klik untuk hubungkan database Cloud'}
+            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud' : 'Klik untuk hubungkan database Cloud'}
           >
-            <Cloud size={14} color={isSupabaseConnected ? '#a7f3d0' : '#fff'} />
-            <span>{isSupabaseConnected ? 'Cloud Aktif' : 'Setup Cloud'}</span>
+            <Cloud size={14} color={isSupabaseConnected ? '#a7f3d0' : '#ffffff'} />
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: isSupabaseConnected ? '#10b981' : '#f59e0b',
+                boxShadow: isSupabaseConnected ? '0 0 6px #10b981' : 'none',
+              }}
+            />
+            <span>{isSupabaseConnected ? 'Cloud' : 'Offline'}</span>
+          </button>
+
+          {/* Settings / Budget trigger button */}
+          <button
+            type="button"
+            onClick={onOpenBudgetModal}
+            style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              borderRadius: '50%',
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
+            }}
+            title="Pengaturan Anggaran"
+          >
+            <SlidersHorizontal size={15} />
           </button>
         </div>
       </div>
@@ -87,3 +96,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

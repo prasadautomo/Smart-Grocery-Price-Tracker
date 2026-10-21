@@ -3,15 +3,14 @@ import {
   Plus,
   Search,
   Zap,
-  Share2,
   CheckCircle2,
   Circle,
   Edit2,
   Trash2,
   ShoppingCart,
   ArrowRight,
-  CheckCheck,
-  Scale
+  Scale,
+  Share2
 } from 'lucide-react';
 import type { GroceryItem, CategoryType } from '../types/grocery';
 import {
@@ -71,12 +70,10 @@ export const GroceryList: React.FC<GroceryListProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'Semua'>('Semua');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'checked'>('all');
 
   const checkedCount = items.filter((i) => i.isCheckedInCart).length;
-  const progressPercent = items.length > 0 ? Math.round((checkedCount / items.length) * 100) : 0;
 
-  // Total perhitungan aktif
+  // Total belanja aktif
   let totalSpent = 0;
   items.forEach((item) => {
     const calc = calculateItemPrice(item);
@@ -88,14 +85,10 @@ export const GroceryList: React.FC<GroceryListProps> = ({
   const filteredItems = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
-    const matchesStatus =
-      statusFilter === 'all' ||
-      (statusFilter === 'checked' && item.isCheckedInCart) ||
-      (statusFilter === 'pending' && !item.isCheckedInCart);
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory;
   });
 
-  // Helper untuk emoji barang
+  // Helper emoji barang
   const getItemEmoji = (name: string, category: string): string => {
     const n = name.toLowerCase();
     if (n.includes('beras')) return '🍚';
@@ -114,26 +107,25 @@ export const GroceryList: React.FC<GroceryListProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {/* Primary Action Button: + Catat Barang Baru ke Troli (Stitch Screen 2) */}
-      <button className="btn-primary-stitch" onClick={onAddItem}>
-        <div className="stitch-plus-circle">
-          <Plus size={16} strokeWidth={3} />
-        </div>
-        <span>Catat Barang Baru ke Troli</span>
-      </button>
-
-      {/* Action Toolbar: Search + Quick Presets + Share WA */}
-      <div className="stitch-toolbar">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* 1. Clean Compact Action Bar: Search + Katalog + Tambah */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <div style={{ position: 'relative', flex: 1 }}>
           <Search
             size={15}
-            style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }}
+            style={{ position: 'absolute', left: 11, top: 12, color: '#94a3b8' }}
           />
           <input
             type="text"
             className="form-input"
-            style={{ paddingLeft: 34, height: 38, fontSize: '12.5px', borderRadius: 10 }}
+            style={{
+              paddingLeft: 34,
+              paddingRight: 10,
+              height: 38,
+              fontSize: '12.5px',
+              borderRadius: 12,
+              background: '#ffffff',
+            }}
             placeholder="Cari barang di troli..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -142,166 +134,160 @@ export const GroceryList: React.FC<GroceryListProps> = ({
 
         <button
           type="button"
-          className="stitch-tool-btn"
           onClick={onOpenPresets}
-          title="Katalog Cepat 1-Tap Kebutuhan Kos"
-          style={{ background: '#fef3c7', borderColor: '#fde68a', color: '#b45309' }}
+          style={{
+            height: 38,
+            padding: '0 12px',
+            borderRadius: 12,
+            border: '1px solid #fde68a',
+            background: '#fef3c7',
+            color: '#b45309',
+            fontSize: '12px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+          title="Buka Katalog Cepat"
         >
-          <Zap size={15} />
+          <Zap size={14} />
           <span>Katalog</span>
         </button>
 
+        <button
+          type="button"
+          onClick={onAddItem}
+          style={{
+            height: 38,
+            padding: '0 12px',
+            borderRadius: 12,
+            border: 'none',
+            background: '#10b981',
+            color: '#ffffff',
+            fontSize: '12px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 5,
+            cursor: 'pointer',
+            flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(16, 185, 129, 0.3)',
+          }}
+          title="Tambah Barang Baru"
+        >
+          <Plus size={15} strokeWidth={2.8} />
+          <span>Tambah</span>
+        </button>
+      </div>
+
+      {/* 2. Category Pills + Trolley Counter Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+        <div className="stitch-category-row" style={{ margin: 0, flex: 1, paddingBottom: 2 }}>
+          {FILTER_CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              className={`stitch-category-pill ${selectedCategory === cat ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat)}
+              style={{ fontSize: '11px', padding: '4px 10px' }}
+            >
+              <span>{CATEGORY_ICONS[cat] || '📦'}</span>
+              <span>{cat === 'Semua' ? 'Semua' : cat}</span>
+            </button>
+          ))}
+        </div>
+
+        {items.length > 0 && (
+          <div
+            style={{
+              fontSize: '11px',
+              color: checkedCount === items.length ? '#059669' : '#64748b',
+              fontWeight: 700,
+              paddingLeft: 8,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            ✓ {checkedCount}/{items.length} di troli
+          </div>
+        )}
+      </div>
+
+      {/* Quick Helper Tools (Bandingkan & Bagikan WhatsApp) */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: -4 }}>
         {onOpenComparator && (
           <button
             type="button"
-            className="stitch-tool-btn"
             onClick={onOpenComparator}
-            title="Bandingkan Kemasan & Promo Hemat (F-03)"
-            style={{ background: '#eff6ff', borderColor: '#bfdbfe', color: '#1d4ed8' }}
+            style={{
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              color: '#1d4ed8',
+              borderRadius: 8,
+              padding: '3px 8px',
+              fontSize: '10.5px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              cursor: 'pointer',
+            }}
           >
-            <Scale size={15} />
-            <span>Bandingkan</span>
+            <Scale size={12} />
+            <span>Kalkulator Kemasan</span>
           </button>
         )}
 
         <button
           type="button"
-          className="stitch-tool-btn"
           onClick={onOpenShare}
-          title="Bagikan Checklist ke WhatsApp"
-          style={{ background: '#ecfdf5', borderColor: '#a7f3d0', color: '#047857' }}
-        >
-          <Share2 size={15} />
-        </button>
-      </div>
-
-      {/* Mode Checklist Lorong Toko Status Bar */}
-      {items.length > 0 && (
-        <div
           style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 14,
-            padding: '10px 14px',
+            background: '#ecfdf5',
+            border: '1px solid #a7f3d0',
+            color: '#047857',
+            borderRadius: 8,
+            padding: '3px 8px',
+            fontSize: '10.5px',
+            fontWeight: 600,
             display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-            boxShadow: 'var(--shadow-sm)',
+            alignItems: 'center',
+            gap: 4,
+            cursor: 'pointer',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '12px' }}>
-              <CheckCheck size={16} color="#10b981" />
-              <span style={{ fontWeight: 600, color: '#475569' }}>Progress Troli Fisik:</span>
-              <strong style={{ color: '#10b981' }}>
-                {checkedCount} / {items.length} ({progressPercent}%)
-              </strong>
-            </div>
-
-            <div style={{ display: 'flex', gap: 4 }}>
-              <button
-                type="button"
-                onClick={() => setStatusFilter('all')}
-                style={{
-                  fontSize: '10.5px',
-                  padding: '2px 8px',
-                  borderRadius: 6,
-                  border: statusFilter === 'all' ? '1px solid #10b981' : '1px solid #e2e8f0',
-                  background: statusFilter === 'all' ? '#ecfdf5' : '#fff',
-                  color: statusFilter === 'all' ? '#047857' : '#64748b',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                Semua
-              </button>
-              <button
-                type="button"
-                onClick={() => setStatusFilter('pending')}
-                style={{
-                  fontSize: '10.5px',
-                  padding: '2px 8px',
-                  borderRadius: 6,
-                  border: statusFilter === 'pending' ? '1px solid #10b981' : '1px solid #e2e8f0',
-                  background: statusFilter === 'pending' ? '#ecfdf5' : '#fff',
-                  color: statusFilter === 'pending' ? '#047857' : '#64748b',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                Belum ({items.length - checkedCount})
-              </button>
-              <button
-                type="button"
-                onClick={() => setStatusFilter('checked')}
-                style={{
-                  fontSize: '10.5px',
-                  padding: '2px 8px',
-                  borderRadius: 6,
-                  border: statusFilter === 'checked' ? '1px solid #10b981' : '1px solid #e2e8f0',
-                  background: statusFilter === 'checked' ? '#ecfdf5' : '#fff',
-                  color: statusFilter === 'checked' ? '#047857' : '#64748b',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
-                Sudah ({checkedCount})
-              </button>
-            </div>
-          </div>
-
-          <div className="stitch-progress-bar-wrap" style={{ height: 5 }}>
-            <div
-              className="stitch-progress-bar-fill safe"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Category Filter Pills (Stitch Screen 2 Style) */}
-      <div className="stitch-category-row">
-        {FILTER_CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            className={`stitch-category-pill ${selectedCategory === cat ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(cat)}
-          >
-            <span>{CATEGORY_ICONS[cat] || '📦'}</span>
-            <span>
-              {cat === 'Semua' ? `Semua (${items.length})` : cat}
-            </span>
-          </button>
-        ))}
+          <Share2 size={12} />
+          <span>Bagikan WA</span>
+        </button>
       </div>
 
       {/* Empty State */}
       {filteredItems.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon-circle">
-            <ShoppingCart size={30} />
+        <div className="empty-state" style={{ padding: '32px 16px', background: '#ffffff', borderRadius: 18, border: '1px solid #e2e8f0' }}>
+          <div className="empty-icon-circle" style={{ width: 50, height: 50 }}>
+            <ShoppingCart size={24} color="#94a3b8" />
           </div>
-          <h3>Keranjang Masih Kosong</h3>
-          <p>
+          <h3 style={{ fontSize: '15px', color: '#0f172a', margin: '8px 0 4px' }}>Keranjang Masih Kosong</h3>
+          <p style={{ fontSize: '12px', color: '#64748b', maxWidth: 280, margin: '0 auto 14px' }}>
             {searchQuery
-              ? `Tidak ada barang dengan kata kunci "${searchQuery}".`
-              : 'Belum ada barang di troli belanja Rian. Buka Katalog Cepat atau catat barang baru di atas.'}
+              ? `Tidak ada barang dengan kata "${searchQuery}".`
+              : 'Pilih barang dari Katalog Cepat atau catat manual dengan satu tangan.'}
           </p>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-            <button className="btn-secondary" onClick={onOpenPresets} style={{ fontSize: '12px' }}>
-              <Zap size={14} color="#f59e0b" />
-              <span>Buka Katalog Cepat</span>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <button className="btn-secondary" onClick={onOpenPresets} style={{ fontSize: '11.5px', padding: '7px 12px' }}>
+              <Zap size={13} color="#f59e0b" />
+              <span>Buka Katalog</span>
             </button>
-            <button className="btn-primary" onClick={onAddItem} style={{ fontSize: '12px' }}>
-              <Plus size={15} />
-              <span>Tambah Manual</span>
+            <button className="btn-primary" onClick={onAddItem} style={{ fontSize: '11.5px', padding: '7px 12px' }}>
+              <Plus size={14} />
+              <span>Tambah Baru</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Product Cards List (Stitch Screen 2 Style) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {/* 3. Product Cards List: Clean, High-Contrast & Simple */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {filteredItems.map((item) => {
           const calc = calculateItemPrice(item);
           const comp = compareWithLastMonth(calc.discountedUnitPrice, item.lastMonthPrice);
@@ -312,8 +298,17 @@ export const GroceryList: React.FC<GroceryListProps> = ({
             <div
               key={item.id}
               className={`stitch-product-card ${isChecked ? 'checked' : ''}`}
+              style={{
+                padding: '12px',
+                borderRadius: 16,
+                gap: 8,
+                background: isChecked ? '#f8fafc' : '#ffffff',
+                border: isChecked ? '1px solid #e2e8f0' : '1px solid #e2e8f0',
+                boxShadow: isChecked ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.03)',
+              }}
             >
-              <div className="stitch-product-top">
+              {/* Product Top Info Row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {/* Touch Checkbox */}
                 <button
                   type="button"
@@ -328,27 +323,33 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                     justifyContent: 'center',
                     color: isChecked ? '#10b981' : '#cbd5e1',
                     flexShrink: 0,
-                    marginTop: 10,
                   }}
-                  title={isChecked ? 'Tandai belum diambil' : 'Tandai sudah masuk troli'}
+                  title={isChecked ? 'Tandai belum diambil' : 'Tandai sudah di troli'}
                 >
-                  {isChecked ? <CheckCircle2 size={22} /> : <Circle size={22} />}
+                  {isChecked ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                 </button>
 
-                {/* Product Photo / Emoji Icon Wrap */}
+                {/* Product Photo or Emoji Icon */}
                 <div
-                  className="stitch-product-icon-wrap"
                   style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: '#f1f5f9',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '22px',
+                    flexShrink: 0,
                     overflow: 'hidden',
-                    background: item.imageUrl ? '#ffffff' : undefined,
-                    padding: item.imageUrl ? 2 : undefined,
+                    border: '1px solid #e2e8f0',
                   }}
                 >
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}
                       alt={item.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       loading="lazy"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
@@ -362,152 +363,170 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                   )}
                 </div>
 
-                {/* Info Col */}
-                <div className="stitch-product-info">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
-                    <div>
-                      <h3 className="stitch-product-name">{item.name}</h3>
-                      <div className="stitch-product-meta">
-                        Satuan: {item.unit} • {formatRupiah(item.unitPrice)}
-                        {item.source && (
-                          <span
-                            style={{
-                              marginLeft: 6,
-                              fontSize: '9.5px',
-                              background: 'rgba(37, 99, 235, 0.15)',
-                              color: '#2563eb',
-                              padding: '1px 5px',
-                              borderRadius: 4,
-                              fontWeight: 700,
-                            }}
-                          >
-                            🚀 {item.source}
-                          </span>
-                        )}
-                        {item.priority === 'optional' && (
-                          <span
-                            style={{
-                              marginLeft: 6,
-                              fontSize: '9.5px',
-                              background: '#fef3c7',
-                              color: '#b45309',
-                              padding: '1px 5px',
-                              borderRadius: 4,
-                              fontWeight: 700,
-                            }}
-                          >
-                            Jajan
-                          </span>
-                        )}
-                      </div>
-                    </div>
+                {/* Name & Unit Price */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    <h3
+                      style={{
+                        fontSize: '13.5px',
+                        fontWeight: 700,
+                        color: isChecked ? '#94a3b8' : '#0f172a',
+                        textDecoration: isChecked ? 'line-through' : 'none',
+                        margin: 0,
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {item.name}
+                    </h3>
 
-
-                    {/* Trend Badge & Advisory (F-04) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
-                      {comp.trend === 'up' && (
-                        <>
-                          <span className="stitch-trend-badge up">
-                            ↑ Naik {formatRupiah(comp.difference)} (+{comp.percentChange}%)
-                          </span>
-                          <span style={{ fontSize: '9px', color: '#dc2626', fontWeight: 600, textAlign: 'right', lineHeight: 1.2 }}>
-                            ⚠️ Harga melonjak! Pertimbangkan tunda/kurangi
-                          </span>
-                        </>
-                      )}
-                      {comp.trend === 'down' && (
-                        <>
-                          <span className="stitch-trend-badge down">
-                            ↓ Turun {formatRupiah(Math.abs(comp.difference))} ({comp.percentChange}%)
-                          </span>
-                          <span style={{ fontSize: '9px', color: '#15803d', fontWeight: 600, textAlign: 'right', lineHeight: 1.2 }}>
-                            🎉 Harga turun! Layak diborong
-                          </span>
-                        </>
-                      )}
-                      {comp.trend === 'equal' && (
-                        <span className="stitch-trend-badge equal">
-                          = Harga Stabil
-                        </span>
-                      )}
-                      {comp.trend === 'new' && (
-                        <span className="stitch-trend-badge new">
-                          Barang Baru
-                        </span>
-                      )}
-                    </div>
+                    {item.priority === 'optional' && (
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          background: '#fef3c7',
+                          color: '#b45309',
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                          fontWeight: 700,
+                        }}
+                      >
+                        Jajan
+                      </span>
+                    )}
                   </div>
 
-                  {/* Promo Banner if applicable */}
-                  {item.discountType === 'stacked' && (
-                    <div className="stitch-promo-banner" style={{ marginTop: 8 }}>
-                      <span>🏷️ Promo {item.discountPercent1}% + {item.discountPercent2}%</span>
-                      <span>Hemat {formatRupiah(calc.totalDiscountAmount)}</span>
-                    </div>
-                  )}
-                  {item.discountType === 'single' && (
-                    <div className="stitch-promo-banner" style={{ marginTop: 8 }}>
-                      <span>🏷️ Diskon {item.discountPercent1}%</span>
-                      <span>Hemat {formatRupiah(calc.totalDiscountAmount)}</span>
-                    </div>
-                  )}
-                  {item.discountType === 'nominal' && (
-                    <div className="stitch-promo-banner" style={{ marginTop: 8 }}>
-                      <span>🏷️ Potongan Tunai {formatRupiah(item.discountNominal || 0)}</span>
-                      <span>Hemat {formatRupiah(calc.totalDiscountAmount)}</span>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                    <span style={{ fontSize: '11px', color: '#64748b' }}>
+                      {formatRupiah(item.unitPrice)} / {item.unit}
+                    </span>
 
-                  {item.notes && (
-                    <p style={{ fontSize: '11px', color: '#64748b', margin: '6px 0 0' }}>
-                      📝 {item.notes}
-                    </p>
-                  )}
+                    {/* Trend Pill Ringkas (Hanya jika ada selisih) */}
+                    {comp.trend === 'up' && (
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          color: '#dc2626',
+                          background: '#fee2e2',
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                        }}
+                      >
+                        ↑ +{formatRupiah(comp.difference)}
+                      </span>
+                    )}
+                    {comp.trend === 'down' && (
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          color: '#15803d',
+                          background: '#dcfce7',
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                        }}
+                      >
+                        ↓ -{formatRupiah(Math.abs(comp.difference))}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Edit & Delete Action Buttons */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {/* Edit & Delete Quick Icons */}
+                <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
                   <button
-                    className="icon-action-btn"
+                    type="button"
                     onClick={() => onEditItem(item)}
-                    title="Ubah barang"
-                    style={{ width: 28, height: 28 }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 6,
+                      cursor: 'pointer',
+                      color: '#94a3b8',
+                      borderRadius: 6,
+                    }}
+                    title="Ubah"
                   >
                     <Edit2 size={13} />
                   </button>
                   <button
-                    className="icon-action-btn delete"
+                    type="button"
                     onClick={() => onDeleteItem(item.id)}
-                    title="Hapus barang"
-                    style={{ width: 28, height: 28 }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 6,
+                      cursor: 'pointer',
+                      color: '#cbd5e1',
+                      borderRadius: 6,
+                    }}
+                    title="Hapus"
                   >
                     <Trash2 size={13} />
                   </button>
                 </div>
               </div>
 
-              {/* Bottom Row: Subtotal & Touch Stepper (Stitch Screen 2) */}
-              <div className="stitch-product-bottom">
-                <div className="stitch-product-subtotal">
-                  <span>Subtotal:</span>
+              {/* Promo Banner if applicable (Satu baris ringkas) */}
+              {calc.totalDiscountAmount > 0 && (
+                <div
+                  style={{
+                    background: '#ecfdf5',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontSize: '10.5px',
+                    color: '#065f46',
+                    fontWeight: 700,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <span>
+                    🏷️ Promo{' '}
+                    {item.discountType === 'stacked'
+                      ? `${item.discountPercent1}% + ${item.discountPercent2}%`
+                      : item.discountType === 'single'
+                      ? `${item.discountPercent1}%`
+                      : 'Potongan Tunai'}
+                  </span>
+                  <span>Hemat {formatRupiah(calc.totalDiscountAmount)}</span>
+                </div>
+              )}
+
+              {/* Bottom Row: Subtotal & One-Handed Touch Stepper */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingTop: 6,
+                  borderTop: '1px solid #f1f5f9',
+                }}
+              >
+                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
+                  <span style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 500, marginRight: 4 }}>
+                    Subtotal:
+                  </span>
                   {formatRupiah(calc.finalTotal)}
                 </div>
 
-                <div className="stitch-stepper">
+                <div className="stitch-stepper" style={{ padding: '2px 4px' }}>
                   <button
                     type="button"
                     className="stitch-stepper-btn"
                     onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
+                    style={{ width: 26, height: 26, fontSize: '14px' }}
                   >
                     -
                   </button>
-                  <span className="stitch-stepper-value">
+                  <span className="stitch-stepper-value" style={{ fontSize: '12.5px', minWidth: 20 }}>
                     {item.quantity}
                   </span>
                   <button
                     type="button"
                     className="stitch-stepper-btn plus"
                     onClick={() => onUpdateQuantity(item.id, Number(item.quantity) + 1)}
+                    style={{ width: 26, height: 26, fontSize: '14px' }}
                   >
                     +
                   </button>
@@ -518,29 +537,34 @@ export const GroceryList: React.FC<GroceryListProps> = ({
         })}
       </div>
 
-      {/* Sticky Bottom Floating Checkout Bar (Stitch Screen 2) */}
+      {/* 4. Sticky Bottom Checkout Bar: Simple & High Contrast */}
       {items.length > 0 && (
-        <div className="stitch-sticky-checkout">
+        <div className="stitch-sticky-checkout" style={{ padding: '12px 16px', gap: 8, borderRadius: 16 }}>
           <div className="stitch-checkout-info-row">
             <div>
-              <div className="stitch-checkout-label">Total Estimasi ({items.length} pcs)</div>
-              <div className="stitch-checkout-price">{formatRupiah(totalSpent)}</div>
+              <div className="stitch-checkout-label" style={{ fontSize: '10.5px' }}>
+                Total Belanja ({items.length} item)
+              </div>
+              <div className="stitch-checkout-price" style={{ fontSize: '18px' }}>
+                {formatRupiah(totalSpent)}
+              </div>
             </div>
 
             <div
               className={`stitch-status-pill ${isOverBudget ? 'danger' : 'safe'}`}
-              style={{ fontSize: '11.5px', padding: '4px 10px' }}
+              style={{ fontSize: '11px', padding: '3px 8px' }}
             >
-              {isOverBudget ? '⚠️ Over Budget' : '✓ Sesuai Anggaran'}
+              {isOverBudget ? '⚠️ Over Budget' : '✓ Aman'}
             </div>
           </div>
 
-          <button className="stitch-checkout-btn" onClick={onCheckout}>
-            <span>Checkout & Simpan ke Riwayat</span>
-            <ArrowRight size={17} />
+          <button className="stitch-checkout-btn" onClick={onCheckout} style={{ padding: '10px 16px', borderRadius: 10 }}>
+            <span>Checkout & Bayar</span>
+            <ArrowRight size={16} />
           </button>
         </div>
       )}
     </div>
   );
 };
+

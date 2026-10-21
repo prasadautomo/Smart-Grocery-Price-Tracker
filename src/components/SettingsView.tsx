@@ -155,11 +155,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </button>
       </div>
 
-      {/* Info Kurikulum */}
-      <div style={{ display: 'flex', gap: 8, padding: '12px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
-        <Info size={16} color="#64748b" style={{ flexShrink: 0, marginTop: 2 }} />
-        <p style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.4 }}>
-          ICT Codehub Kelas 12 • Pertemuan 12 - 14: Rekayasa Perangkat Lunak Mobile PWA, Formula Perhitungan Cerdas, dan Integrasi Database Cloud Supabase + Deployment Vercel.
+      {/* App Info Footer */}
+      <div style={{ display: 'flex', gap: 8, padding: '10px 14px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px solid var(--border-subtle)', alignItems: 'center' }}>
+        <Info size={14} color="#64748b" style={{ flexShrink: 0 }} />
+        <p style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.4, margin: 0 }}>
+          SafeGrocer Mobile • Smart Grocery & Budget Safety Tracker.
         </p>
       </div>
     </div>

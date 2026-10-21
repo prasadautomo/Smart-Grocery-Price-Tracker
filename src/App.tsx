@@ -314,6 +314,8 @@ export const App: React.FC = () => {
               onEditBudget={() => setIsBudgetModalOpen(true)}
               onApplyToCart={handleSaveItem}
               onResetDemoData={handleResetDemoData}
+              onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
+              isSupabaseConnected={isSupabaseConnected}
             />
           )}
 
