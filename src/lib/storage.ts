@@ -629,6 +629,12 @@ export async function pushAllDataToCloud(): Promise<{
     };
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
+    if (errorMsg.includes('Could not find the table') || errorMsg.includes('relation') || errorMsg.includes('does not exist')) {
+      return {
+        success: false,
+        message: 'Tabel database belum dibuat di Supabase Cloud. Silakan buka SQL Editor di Supabase Dashboard, copy isi file supabase_schema.sql, dan klik Run.',
+      };
+    }
     return {
       success: false,
       message: `Gagal menyimpan ke Cloud: ${errorMsg}`,
