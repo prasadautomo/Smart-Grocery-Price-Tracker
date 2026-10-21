@@ -221,7 +221,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
               {formatRupiah(Math.max(0, remainingBudget))}
             </div>
             <div style={{ fontSize: '10.5px', color: '#059669', fontWeight: 600 }}>
-              🌱 Cukup s/d akhir bulan
+              Cukup hingga akhir bulan
             </div>
           </div>
         </div>
@@ -481,7 +481,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
           className="btn-primary"
           style={{ width: '100%', borderRadius: 12, padding: '12px', fontSize: '13px' }}
         >
-          <span>🛒 Terapkan Hasil ke Troli Belanja</span>
+          <span>Terapkan Hasil ke Troli Belanja</span>
         </button>
       </div>
 
@@ -527,7 +527,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
-            🍳 {productName} (Studi Kasus)
+            {productName} (Studi Kasus)
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <button
@@ -681,7 +681,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
           }}
         >
           <div style={{ fontSize: '11.5px', color: '#047857', lineHeight: 1.4 }}>
-            💡 <strong>Rekomendasi Cerdas Anak Kos:</strong> Beli Jerigen 5L lebih hemat{' '}
+            <strong>Rekomendasi Hemat:</strong> Beli Jerigen 5L lebih hemat{' '}
             <strong>{formatRupiah(unitComparison.savingsNominalPerUnit)}</strong> tiap liternya!
           </div>
 
@@ -732,7 +732,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
                 Cloud Database
               </div>
               <div style={{ fontSize: '11px', color: isSupabaseConnected ? '#059669' : '#64748b', fontWeight: 600 }}>
-                {isSupabaseConnected ? '✓ Tersambung (Realtime Sync)' : 'Mode Lokal (Offline)'}
+                {isSupabaseConnected ? 'Tersambung (Realtime Sync)' : 'Mode Lokal (Offline)'}
               </div>
             </div>
           </div>

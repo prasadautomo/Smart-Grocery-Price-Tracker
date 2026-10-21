@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search, Plus, Check, Zap } from 'lucide-react';
+import { X, Search, Plus, Check, Zap, Package } from 'lucide-react';
 import { POPULAR_PRESETS, convertPresetToGroceryItem } from '../lib/quickPresets';
 import { ASTRO_CATALOG_PRESETS } from '../lib/astroPresets';
 import type { GroceryItem, QuickPresetItem } from '../types/grocery';
@@ -138,7 +138,6 @@ export const QuickPresetModal: React.FC<QuickPresetModalProps> = ({
               gap: 6,
             }}
           >
-            <span>🚀</span>
             <span>Astro Live ({ASTRO_CATALOG_PRESETS.length} Produk)</span>
           </button>
 
@@ -292,15 +291,10 @@ export const QuickPresetModal: React.FC<QuickPresetModalProps> = ({
                           loading="lazy"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            if (e.currentTarget.parentElement) {
-                              e.currentTarget.parentElement.innerText = preset.emoji;
-                              e.currentTarget.parentElement.style.fontSize = '24px';
-                              e.currentTarget.parentElement.style.background = 'rgba(255,255,255,0.05)';
-                            }
                           }}
                         />
                       ) : (
-                        <span style={{ fontSize: '26px' }}>{preset.emoji}</span>
+                        <Package size={22} color="#94a3b8" />
                       )}
                     </div>
 
@@ -330,7 +324,7 @@ export const QuickPresetModal: React.FC<QuickPresetModalProps> = ({
                               fontWeight: 700,
                             }}
                           >
-                            🚀 {preset.source}
+                            {preset.source}
                           </span>
                         )}
                         <span

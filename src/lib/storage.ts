@@ -283,9 +283,9 @@ export async function saveGroceryItems(items: GroceryItem[]): Promise<void> {
         }));
         await client.from('grocery_items').insert(records);
       }
-      console.log('☁️ [Realtime Cloud] Perubahan keranjang belanja otomatis tersimpan di Cloud Supabase!');
+      console.log('[Realtime Cloud] Perubahan keranjang belanja otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron keranjang ke Supabase:', err);
+      console.warn('[Realtime Cloud] Gagal otomatis sinkron keranjang ke Supabase:', err);
     }
   }
 }
@@ -339,9 +339,9 @@ export async function saveShoppingHistory(trips: ShoppingTrip[]): Promise<void> 
           notes: trip.notes || '',
         });
       }
-      console.log('☁️ [Realtime Cloud] Struk belanja otomatis tersimpan di Cloud Supabase!');
+      console.log('[Realtime Cloud] Struk belanja otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron riwayat ke Supabase:', err);
+      console.warn('[Realtime Cloud] Gagal otomatis sinkron riwayat ke Supabase:', err);
     }
   }
 }
@@ -382,9 +382,9 @@ export async function saveBudgetSettings(settings: BudgetSettings): Promise<void
         warning_threshold_percent: settings.warningThresholdPercent,
         updated_at: new Date().toISOString(),
       });
-      console.log('☁️ [Realtime Cloud] Pengaturan anggaran otomatis tersimpan di Cloud Supabase!');
+      console.log('[Realtime Cloud] Pengaturan anggaran otomatis tersimpan di Cloud Supabase!');
     } catch (err) {
-      console.warn('⚠️ [Realtime Cloud] Gagal otomatis sinkron budget ke Supabase:', err);
+      console.warn('[Realtime Cloud] Gagal otomatis sinkron budget ke Supabase:', err);
     }
   }
 }

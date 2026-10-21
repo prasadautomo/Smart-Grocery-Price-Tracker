@@ -10,7 +10,10 @@ import {
   ShoppingCart,
   ArrowRight,
   Scale,
-  Share2
+  Share2,
+  Package,
+  Tag,
+  Check
 } from 'lucide-react';
 import type { GroceryItem, CategoryType } from '../types/grocery';
 import {
@@ -32,17 +35,6 @@ interface GroceryListProps {
   onToggleCheckItem: (id: string) => void;
   onCheckout: () => void;
 }
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'Semua': '🛒',
-  'Bahan Pokok': '🌾',
-  'Bumbu & Dapur': '🍳',
-  'Mandi & Kebersihan': '🧼',
-  'Makanan & Camilan': '🍜',
-  'Minuman': '🚰',
-  'Kebutuhan Kamar': '🛏️',
-  'Lain-lain': '📦',
-};
 
 const FILTER_CATEGORIES: (CategoryType | 'Semua')[] = [
   'Semua',
@@ -87,24 +79,6 @@ export const GroceryList: React.FC<GroceryListProps> = ({
     const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
-  // Helper emoji barang
-  const getItemEmoji = (name: string, category: string): string => {
-    const n = name.toLowerCase();
-    if (n.includes('beras')) return '🍚';
-    if (n.includes('minyak')) return '🍳';
-    if (n.includes('telur')) return '🥚';
-    if (n.includes('sabun') || n.includes('lantai')) return '🧼';
-    if (n.includes('mie') || n.includes('indomie')) return '🍜';
-    if (n.includes('kopi')) return '☕';
-    if (n.includes('teh')) return '🍵';
-    if (n.includes('gula')) return '🧂';
-    if (n.includes('shampoo')) return '🧴';
-    if (n.includes('pasta') || n.includes('gigi')) return '🪥';
-    if (n.includes('keripik') || n.includes('biskuit')) return '🍪';
-    if (n.includes('air') || n.includes('galon')) return '🚰';
-    return CATEGORY_ICONS[category] || '📦';
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -190,9 +164,8 @@ export const GroceryList: React.FC<GroceryListProps> = ({
               key={cat}
               className={`stitch-category-pill ${selectedCategory === cat ? 'active' : ''}`}
               onClick={() => setSelectedCategory(cat)}
-              style={{ fontSize: '11px', padding: '4px 10px' }}
+              style={{ fontSize: '11px', padding: '5px 12px', fontWeight: 600 }}
             >
-              <span>{CATEGORY_ICONS[cat] || '📦'}</span>
               <span>{cat === 'Semua' ? 'Semua' : cat}</span>
             </button>
           ))}
@@ -207,9 +180,13 @@ export const GroceryList: React.FC<GroceryListProps> = ({
               paddingLeft: 8,
               whiteSpace: 'nowrap',
               flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            ✓ {checkedCount}/{items.length} di troli
+            <Check size={13} strokeWidth={2.5} color={checkedCount === items.length ? '#059669' : '#64748b'} />
+            <span>{checkedCount}/{items.length} di troli</span>
           </div>
         )}
       </div>
@@ -292,7 +269,6 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           const calc = calculateItemPrice(item);
           const comp = compareWithLastMonth(calc.discountedUnitPrice, item.lastMonthPrice);
           const isChecked = !!item.isCheckedInCart;
-          const emoji = getItemEmoji(item.name, item.category);
 
           return (
             <div
@@ -329,7 +305,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                   {isChecked ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                 </button>
 
-                {/* Product Photo or Emoji Icon */}
+                {/* Product Photo or Professional Package Icon */}
                 <div
                   style={{
                     width: 44,
@@ -339,7 +315,6 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '22px',
                     flexShrink: 0,
                     overflow: 'hidden',
                     border: '1px solid #e2e8f0',
@@ -353,13 +328,10 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                       loading="lazy"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.parentElement) {
-                          e.currentTarget.parentElement.innerText = emoji;
-                        }
                       }}
                     />
                   ) : (
-                    emoji
+                    <Package size={20} color="#64748b" />
                   )}
                 </div>
 
@@ -482,7 +454,8 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                   }}
                 >
                   <span>
-                    🏷️ Promo{' '}
+                    <Tag size={11} style={{ marginRight: 4, display: 'inline', verticalAlign: '-1px' }} />
+                    Promo{' '}
                     {item.discountType === 'stacked'
                       ? `${item.discountPercent1}% + ${item.discountPercent2}%`
                       : item.discountType === 'single'
@@ -554,7 +527,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
               className={`stitch-status-pill ${isOverBudget ? 'danger' : 'safe'}`}
               style={{ fontSize: '11px', padding: '3px 8px' }}
             >
-              {isOverBudget ? '⚠️ Over Budget' : '✓ Aman'}
+              {isOverBudget ? 'Over Budget' : 'Aman'}
             </div>
           </div>
 

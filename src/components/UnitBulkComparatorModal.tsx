@@ -170,7 +170,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
           {/* Preset Buttons Kasus Nyata Rian */}
           <div>
             <div style={{ fontSize: '11px', color: '#64748b', marginBottom: 6, fontWeight: 600 }}>
-              ⚡ Contoh Kasus Nyata di Rak Supermarket:
+              Contoh Perbandingan Rak Supermarket:
             </div>
             <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
               <button
@@ -179,7 +179,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
                 className="btn-secondary"
                 style={{ fontSize: '11px', padding: '5px 10px', whiteSpace: 'nowrap', borderRadius: 8 }}
               >
-                🍳 3x 1L vs 1x Jerigen 5L
+                Minyak 3x 1L vs Jerigen 5L
               </button>
               <button
                 type="button"
@@ -187,7 +187,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
                 className="btn-secondary"
                 style={{ fontSize: '11px', padding: '5px 10px', whiteSpace: 'nowrap', borderRadius: 8 }}
               >
-                🏷️ 50%+20% vs Potong Rp15rb
+                Diskon 50%+20% vs Tunai Rp 15.000
               </button>
               <button
                 type="button"
@@ -195,7 +195,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
                 className="btn-secondary"
                 style={{ fontSize: '11px', padding: '5px 10px', whiteSpace: 'nowrap', borderRadius: 8 }}
               >
-                🌾 Beras 5x1kg vs 1x5kg
+                Beras 5x 1kg vs 1x 5kg
               </button>
             </div>
           </div>
@@ -217,7 +217,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
                 boxShadow: mode === 'unit' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              📦 Beda Ukuran / Kemasan
+              Ukuran Kemasan
             </button>
             <button
               type="button"
@@ -234,7 +234,7 @@ export const UnitBulkComparatorModal: React.FC<UnitBulkComparatorModalProps> = (
                 boxShadow: mode === 'promo' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
               }}
             >
-              🏷️ Promo Bertingkat vs Tunai
+              Promo Bertingkat vs Tunai
             </button>
           </div>
 

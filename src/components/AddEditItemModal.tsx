@@ -212,7 +212,7 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
             <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Nama Produk / Barang *</span>
               <span style={{ fontSize: '10.5px', color: '#10b981', fontWeight: 600 }}>
-                💡 Auto-Suggest Aktif
+                Auto-Suggest Riwayat
               </span>
             </label>
             <input
@@ -484,20 +484,20 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
                 </div>
 
                 {/* Saran F-04 */}
-                <div style={{ fontSize: '10.5px', textAlign: 'right', fontStyle: 'italic' }}>
+                <div style={{ fontSize: '10.5px', textAlign: 'right' }}>
                   {comparison.trend === 'up' && (
                     <span style={{ color: '#fca5a5' }}>
-                      ⚠️ "Harga melonjak! Pertimbangkan tunda/kurangi"
+                      Harga naik dibandingkan bulan lalu
                     </span>
                   )}
                   {comparison.trend === 'down' && (
                     <span style={{ color: '#86efac' }}>
-                      🎉 "Harga turun! Layak diborong"
+                      Harga lebih hemat dari bulan lalu
                     </span>
                   )}
                   {comparison.trend === 'equal' && (
                     <span style={{ color: '#cbd5e1' }}>
-                      ✓ "Harga stabil sama dengan bulan lalu"
+                      Harga stabil sama dengan bulan lalu
                     </span>
                   )}
                 </div>

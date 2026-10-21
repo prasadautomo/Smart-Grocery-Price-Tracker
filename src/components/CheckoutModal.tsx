@@ -322,14 +322,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: '15px' }}>🚀</span>
+                  <Truck size={15} color="#38bdf8" />
                   <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>Astro 15 Menit</span>
                 </div>
                 <div style={{ fontSize: '10.5px', color: '#94a3b8', lineHeight: 1.3 }}>
                   Kurir kilat Astronauts.id tiba di kosan
                 </div>
                 <div style={{ marginTop: 6, fontSize: '11px', fontWeight: 700, color: isFreeShipping ? '#10b981' : '#38bdf8' }}>
-                  {isFreeShipping ? '🎉 GRATIS ONGKIR' : '+ Rp 9.000'}
+                  {isFreeShipping ? 'GRATIS ONGKIR' : '+ Rp 9.000'}
                 </div>
               </div>
 

@@ -73,7 +73,7 @@ export const App: React.FC = () => {
           }
           setHistory(loadShoppingHistory());
           setBudgetSettings(loadBudgetSettings());
-          showToast('☁️ Terhubung ke Cloud Supabase (Auto Realtime Sync)');
+          showToast('Terhubung ke Cloud Supabase (Auto Realtime Sync)');
         }
       });
     }
@@ -136,7 +136,7 @@ export const App: React.FC = () => {
     const updated = [presetItem, ...items];
     setItems(updated);
     saveGroceryItems(updated);
-    showToast(`⚡ "${presetItem.name}" ditambahkan dari Katalog Cepat!`);
+    showToast(`"${presetItem.name}" ditambahkan dari Katalog Cepat!`);
   };
 
   // Handler: Checklist Lorong Toko (Centang barang di troli fisik)
@@ -164,7 +164,7 @@ export const App: React.FC = () => {
       const updated = items.filter((i) => i.priority !== 'optional');
       setItems(updated);
       saveGroceryItems(updated);
-      showToast(`⚡ Berhasil pangkas barang jajan! Hemat ${formatRupiah(trimRec.totalOptionalAmount)}.`);
+      showToast(`Berhasil pangkas barang jajan! Hemat ${formatRupiah(trimRec.totalOptionalAmount)}.`);
     }
   };
 
@@ -210,7 +210,7 @@ export const App: React.FC = () => {
 
     setIsCheckoutModalOpen(false);
     setActiveTab('history');
-    showToast('🎉 Belanja selesai! Struk kasir tersimpan rapi di Riwayat.');
+    showToast('Belanja selesai! Struk kasir tersimpan rapi di Riwayat.');
   };
 
   // Handler: Simpan Anggaran

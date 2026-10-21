@@ -41,7 +41,7 @@ export const ShareChecklistModal: React.FC<ShareChecklistModalProps> = ({
     const encoded = encodeURIComponent(formattedText);
     const waUrl = `https://api.whatsapp.com/send?text=${encoded}`;
     window.open(waUrl, '_blank', 'noopener,noreferrer');
-    onShowToast('🚀 Membuka WhatsApp...');
+    onShowToast('Membuka WhatsApp...');
   };
 
   return (

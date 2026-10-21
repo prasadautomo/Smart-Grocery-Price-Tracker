@@ -61,9 +61,9 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
           className={`stitch-status-pill ${statusClass}`}
           style={{ border: 'none', cursor: 'pointer', fontSize: '11px', padding: '4px 10px' }}
         >
-          {isSafe && '✓ Aman'}
-          {isWarning && `⚠️ Waspada (${safety.percentage}%)`}
-          {isDanger && `🚨 Over Budget`}
+          {isSafe && 'Aman'}
+          {isWarning && `Waspada (${safety.percentage}%)`}
+          {isDanger && `Over Budget`}
         </button>
       </div>
 

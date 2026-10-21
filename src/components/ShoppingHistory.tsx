@@ -6,7 +6,9 @@ import {
   FileText,
   Search,
   Camera,
-  CheckCircle
+  CheckCircle,
+  Package,
+  Calendar
 } from 'lucide-react';
 import type { ShoppingTrip } from '../types/grocery';
 import { formatRupiah, calculateItemPrice } from '../lib/calculations';
@@ -83,7 +85,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
             Riwayat & Struk Belanja
           </h2>
           <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0' }}>
-            🗂️ Arsip Struk Digital & Tren Harga
+            Arsip Struk Digital & Tren Harga
           </p>
         </div>
 
@@ -252,7 +254,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                🍚 Beras Premium 5kg
+                Beras Premium 5kg
               </div>
               <div style={{ fontSize: '11px', color: '#64748b' }}>
                 Bulan lalu: Rp 68.000
@@ -271,7 +273,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #fecaca', paddingTop: 6 }}>
             <span style={{ color: '#b45309', fontWeight: 700 }}>
-              💡 Saran: Beli secukupnya
+              Saran: Beli secukupnya
             </span>
             <span style={{ color: '#dc2626', fontWeight: 700 }}>
               +5.8% inflasi
@@ -294,7 +296,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                🧼 Sabun Pembersih Lantai 800ml
+                Sabun Pembersih Lantai 800ml
               </div>
               <div style={{ fontSize: '11px', color: '#64748b' }}>
                 Bulan lalu: Rp 14.000
@@ -313,7 +315,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #bbf7d0', paddingTop: 6 }}>
             <span style={{ color: '#047857', fontWeight: 700 }}>
-              🏷️ Saran: Borong, harga terendah!
+              Saran: Harga terendah
             </span>
             <span style={{ color: '#15803d', fontWeight: 700 }}>
               -28.5% diskon
@@ -336,7 +338,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                🍳 Minyak Goreng 2L
+                Minyak Goreng 2L
               </div>
               <div style={{ fontSize: '11px', color: '#64748b' }}>
                 Bulan lalu: Rp 34.000
@@ -355,7 +357,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #e2e8f0', paddingTop: 6 }}>
             <span style={{ color: '#64748b', fontWeight: 700 }}>
-              ⚖️ Stabil di Rp 34.000
+              Stabil di Rp 34.000
             </span>
             <span style={{ color: '#64748b', fontWeight: 700 }}>
               0% perubahan
@@ -412,8 +414,9 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                     <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                       {trip.storeName}
                     </h4>
-                    <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: 3 }}>
-                      📅 {formattedDate} • {trip.totalItemsCount} barang
+                    <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <Calendar size={12} color="#64748b" />
+                      <span>{formattedDate} • {trip.totalItemsCount} barang</span>
                     </div>
                   </div>
 
@@ -430,7 +433,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                           border: '1px solid #a7f3d0',
                         }}
                       >
-                        🚀 {trip.paymentMethod.split(' ')[0]}
+                        {trip.paymentMethod.split(' ')[0]}
                       </span>
                     ) : (
                       <span
@@ -444,7 +447,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                           border: '1px solid #bfdbfe',
                         }}
                       >
-                        ☁️ Tersimpan di Cloud
+                        Cloud Sync
                       </span>
                     )}
                     {trip.astroOrderId && (
@@ -469,7 +472,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
 
                   {/* Category Avatars */}
                   <div style={{ display: 'flex', gap: 4 }}>
-                    {trip.itemsSnapshot.slice(0, 3).map((item, idx) => (
+                    {trip.itemsSnapshot.slice(0, 3).map((_item, idx) => (
                       <span
                         key={idx}
                         style={{
@@ -480,10 +483,9 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '12px',
                         }}
                       >
-                        {item.name.toLowerCase().includes('beras') ? '🍚' : item.name.toLowerCase().includes('sabun') ? '🧼' : '🛒'}
+                        <Package size={13} color="#64748b" />
                       </span>
                     ))}
                     {trip.itemsSnapshot.length > 3 && (
@@ -652,17 +654,17 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                 </p>
                 {selectedTrip.astroOrderId && (
                   <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 800, marginTop: 4 }}>
-                    🚀 Order Astro: {selectedTrip.astroOrderId} ({selectedTrip.deliveryMode === 'astro_instant' ? 'Astro Instant 15 Menit' : 'Belanja Fisik'})
+                    Order ID: {selectedTrip.astroOrderId} ({selectedTrip.deliveryMode === 'astro_instant' ? 'Instant 15 Menit' : 'Belanja Fisik'})
                   </div>
                 )}
                 {selectedTrip.paymentMethod && (
                   <div style={{ fontSize: '11px', color: '#047857', fontWeight: 700, marginTop: 2 }}>
-                    💳 Pembayaran: {selectedTrip.paymentMethod} {selectedTrip.paymentChannel ? `(${selectedTrip.paymentChannel})` : ''}
+                    Pembayaran: {selectedTrip.paymentMethod} {selectedTrip.paymentChannel ? `(${selectedTrip.paymentChannel})` : ''}
                   </div>
                 )}
                 {selectedTrip.notes && (
                   <p style={{ fontSize: '11px', color: '#10b981', marginTop: 4 }}>
-                    📝 {selectedTrip.notes}
+                    Catatan: {selectedTrip.notes}
                   </p>
                 )}
               </div>
