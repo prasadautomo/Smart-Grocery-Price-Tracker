@@ -12,20 +12,23 @@ const STORAGE_KEYS = {
   BENCHMARKS: 'smart_grocery_benchmarks_v1',
 };
 
-// Data Awal Realistis Sesuai Cerita Kasus Rian (Pertemuan 12 - 14)
+// Data Awal Realistis Sesuai Kasus Rian & Katalog Astro (astronauts.id)
 export const INITIAL_ITEMS: GroceryItem[] = [
   {
     id: 'item-1',
-    name: 'Beras Ramos Super (5 kg)',
+    name: 'Bundle Beras Ramos Astro 5kg + Indomie',
     category: 'Bahan Pokok',
     unit: 'pack',
     quantity: 1,
-    unitPrice: 78000,
-    lastMonthPrice: 73000, // Naik Rp 5.000 (indikator merah)
-    discountType: 'none',
+    unitPrice: 88799,
+    lastMonthPrice: 91300, // Turun hemat!
+    discountType: 'nominal',
+    discountNominal: 2501,
     priority: 'essential',
     isCheckedInCart: true,
-    notes: 'Kebutuhan pokok nasi 1 bulan kos',
+    notes: 'Kebutuhan pokok nasi 1 bulan kos via Astro Goods',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/10/Untitled20261015T103343658_f2c66217-cdc9-4eee-9880-99267097b786_400x400.png',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
@@ -41,20 +44,24 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'essential',
     isCheckedInCart: true,
     notes: 'Untuk masak lauk kos',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/RestockBahanWajibdiDapur_04b8c552-e833-4f30-b13c-e09a7d5ea68e_400x400.jpg',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'item-3',
-    name: 'Telur Ayam Negeri (1 kg)',
-    category: 'Bahan Pokok',
-    unit: 'kg',
+    name: 'Telur Ayam Negeri Astro Farm',
+    category: 'Telur, Tahu & Tempe',
+    unit: 'pack',
     quantity: 1,
     unitPrice: 28500,
     lastMonthPrice: 28500, // Stabil sama (indikator abu-abu =)
     discountType: 'none',
     priority: 'essential',
     isCheckedInCart: false,
-    notes: 'Lauk protein harian',
+    notes: 'Lauk protein harian terjamin segar',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/TelurAyamNegeriAstroFarm1_55ce9dfb-31de-4afb-b36d-1ea35f75105c_400x400.jpg',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
@@ -71,21 +78,24 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'optional',
     isCheckedInCart: false,
     notes: 'Promo cuci gudang bertingkat',
+    imageUrl: 'https://image.astronauts.cloud/homepage-category/2026/10/cattiles02_85172688-a7e5-413d-84bd-f2d96f715791_239x306.png',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'item-5',
-    name: 'Mie Instan Goreng Spesial',
-    category: 'Makanan & Camilan',
-    unit: 'pcs',
-    quantity: 10,
-    unitPrice: 3100,
-    lastMonthPrice: 3100,
-    discountType: 'nominal',
-    discountNominal: 300, // Potongan Rp 300 per bungkus
+    name: 'Samyang Hot Ramen Carbonara Cup',
+    category: 'Bahan Pokok',
+    unit: 'cup',
+    quantity: 3,
+    unitPrice: 19800,
+    lastMonthPrice: 19800,
+    discountType: 'none',
     priority: 'essential',
     isCheckedInCart: false,
-    notes: 'Cadangan makanan akhir bulan',
+    notes: 'Cadangan makanan cepat saji akhir bulan',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/AL20260911T092823558_a46bd4e1-8c9c-48ad-983e-394efe2f41ce_400x400.png',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
@@ -100,9 +110,12 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'optional',
     isCheckedInCart: false,
     notes: 'Camilan jajan nonton film (Opsional)',
+    imageUrl: 'https://image.astronauts.cloud/homepage-category/2026/10/snack_04b0794c-7746-4167-bd41-a9c2fb123862_239x306.jpg',
+    source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
 ];
+
 
 export const INITIAL_BUDGET: BudgetSettings = {
   monthlyBudget: 350000, // Jatah ketat belanja bulanan Rian

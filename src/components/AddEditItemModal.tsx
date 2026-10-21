@@ -50,6 +50,8 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
   const [discountNominal, setDiscountNominal] = useState<number>(0);
   const [priority, setPriority] = useState<ItemPriority>('essential');
   const [notes, setNotes] = useState('');
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [source, setSource] = useState<string>('');
 
   // Sinkronkan state saat modal dibuka atau itemToEdit berubah
   useEffect(() => {
@@ -66,6 +68,8 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       setDiscountNominal(itemToEdit.discountNominal ?? 0);
       setPriority(itemToEdit.priority ?? 'essential');
       setNotes(itemToEdit.notes ?? '');
+      setImageUrl(itemToEdit.imageUrl || '');
+      setSource(itemToEdit.source || '');
     } else {
       setName('');
       setCategory('Bahan Pokok');
@@ -79,8 +83,11 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       setDiscountNominal(0);
       setPriority('essential');
       setNotes('');
+      setImageUrl('');
+      setSource('');
     }
   }, [itemToEdit, isOpen]);
+
 
   // Cek apakah ada benchmark otomatis saat user mengetik nama barang baru
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,8 +151,11 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       priority,
       isCheckedInCart: itemToEdit?.isCheckedInCart ?? false,
       notes: notes.trim(),
+      imageUrl: imageUrl.trim() || undefined,
+      source: source.trim() || undefined,
       createdAt: itemToEdit ? itemToEdit.createdAt : new Date().toISOString(),
     };
+
 
     onSave(finalItem);
     onClose();

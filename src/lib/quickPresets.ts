@@ -265,6 +265,7 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
 ];
 
 export function convertPresetToGroceryItem(preset: QuickPresetItem): GroceryItem {
+  const hasDiscount = !!(preset.originalPrice && preset.originalPrice > preset.estimatedPrice);
   return {
     id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     name: preset.name,
@@ -273,10 +274,14 @@ export function convertPresetToGroceryItem(preset: QuickPresetItem): GroceryItem
     quantity: preset.defaultQty,
     unitPrice: preset.estimatedPrice,
     lastMonthPrice: preset.lastMonthPrice ?? null,
-    discountType: 'none',
+    discountType: hasDiscount ? 'nominal' : 'none',
+    discountNominal: hasDiscount && preset.originalPrice ? (preset.originalPrice - preset.estimatedPrice) : 0,
     priority: preset.priority,
     isCheckedInCart: false,
-    notes: preset.popularReason || 'Ditambahkan via Katalog Cepat',
+    notes: preset.popularReason || (preset.source ? `Produk resmi ${preset.source}` : 'Ditambahkan via Katalog Cepat'),
+    imageUrl: preset.imageUrl,
+    source: preset.source,
     createdAt: new Date().toISOString(),
   };
 }
+

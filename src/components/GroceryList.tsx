@@ -319,9 +319,31 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                   {isChecked ? <CheckCircle2 size={22} /> : <Circle size={22} />}
                 </button>
 
-                {/* Product Emoji Icon Wrap */}
-                <div className="stitch-product-icon-wrap">
-                  {emoji}
+                {/* Product Photo / Emoji Icon Wrap */}
+                <div
+                  className="stitch-product-icon-wrap"
+                  style={{
+                    overflow: 'hidden',
+                    background: item.imageUrl ? '#ffffff' : undefined,
+                    padding: item.imageUrl ? 2 : undefined,
+                  }}
+                >
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        if (e.currentTarget.parentElement) {
+                          e.currentTarget.parentElement.innerText = emoji;
+                        }
+                      }}
+                    />
+                  ) : (
+                    emoji
+                  )}
                 </div>
 
                 {/* Info Col */}
@@ -331,6 +353,21 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                       <h3 className="stitch-product-name">{item.name}</h3>
                       <div className="stitch-product-meta">
                         Satuan: {item.unit} • {formatRupiah(item.unitPrice)}
+                        {item.source && (
+                          <span
+                            style={{
+                              marginLeft: 6,
+                              fontSize: '9.5px',
+                              background: 'rgba(37, 99, 235, 0.15)',
+                              color: '#2563eb',
+                              padding: '1px 5px',
+                              borderRadius: 4,
+                              fontWeight: 700,
+                            }}
+                          >
+                            🚀 {item.source}
+                          </span>
+                        )}
                         {item.priority === 'optional' && (
                           <span
                             style={{
@@ -348,6 +385,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                         )}
                       </div>
                     </div>
+
 
                     {/* Trend Badge (Stitch Style) */}
                     <div>

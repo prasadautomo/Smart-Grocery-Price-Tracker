@@ -417,20 +417,44 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                     </div>
                   </div>
 
-                  <span
-                    style={{
-                      background: '#eff6ff',
-                      color: '#2563eb',
-                      fontSize: '10.5px',
-                      fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: 12,
-                      border: '1px solid #bfdbfe',
-                    }}
-                  >
-                    ☁️ Tersimpan di Cloud
-                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    {trip.paymentMethod ? (
+                      <span
+                        style={{
+                          background: '#ecfdf5',
+                          color: '#047857',
+                          fontSize: '10.5px',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          borderRadius: 8,
+                          border: '1px solid #a7f3d0',
+                        }}
+                      >
+                        🚀 {trip.paymentMethod.split(' ')[0]}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          background: '#eff6ff',
+                          color: '#2563eb',
+                          fontSize: '10.5px',
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: 12,
+                          border: '1px solid #bfdbfe',
+                        }}
+                      >
+                        ☁️ Tersimpan di Cloud
+                      </span>
+                    )}
+                    {trip.astroOrderId && (
+                      <span style={{ fontSize: '9.5px', color: '#64748b', fontWeight: 600 }}>
+                        {trip.astroOrderId}
+                      </span>
+                    )}
+                  </div>
                 </div>
+
 
                 {/* Total Belanja Row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
@@ -626,12 +650,23 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                 <p style={{ fontSize: '11px', color: '#64748b', marginTop: 3 }}>
                   {new Date(selectedTrip.date).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}
                 </p>
+                {selectedTrip.astroOrderId && (
+                  <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 800, marginTop: 4 }}>
+                    🚀 Order Astro: {selectedTrip.astroOrderId} ({selectedTrip.deliveryMode === 'astro_instant' ? 'Astro Instant 15 Menit' : 'Belanja Fisik'})
+                  </div>
+                )}
+                {selectedTrip.paymentMethod && (
+                  <div style={{ fontSize: '11px', color: '#047857', fontWeight: 700, marginTop: 2 }}>
+                    💳 Pembayaran: {selectedTrip.paymentMethod} {selectedTrip.paymentChannel ? `(${selectedTrip.paymentChannel})` : ''}
+                  </div>
+                )}
                 {selectedTrip.notes && (
                   <p style={{ fontSize: '11px', color: '#10b981', marginTop: 4 }}>
                     📝 {selectedTrip.notes}
                   </p>
                 )}
               </div>
+
 
               {/* Items Breakdown */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -707,6 +742,20 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                       <span>+{formatRupiah(selectedTrip.extraCosts.parkingFee)}</span>
                     </div>
                   )}
+                  {selectedTrip.extraCosts.shippingFee !== undefined && selectedTrip.extraCosts.shippingFee >= 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
+                      <span>Ongkir Astro 15 Menit:</span>
+                      <span style={{ color: selectedTrip.extraCosts.shippingFee === 0 ? '#10b981' : '#0f172a', fontWeight: 700 }}>
+                        {selectedTrip.extraCosts.shippingFee === 0 ? 'GRATIS' : `+${formatRupiah(selectedTrip.extraCosts.shippingFee)}`}
+                      </span>
+                    </div>
+                  )}
+                  {selectedTrip.extraCosts.astroCoinsDiscount !== undefined && selectedTrip.extraCosts.astroCoinsDiscount > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d97706' }}>
+                      <span>Diskon Koin Astro:</span>
+                      <span style={{ fontWeight: 700 }}>-{formatRupiah(selectedTrip.extraCosts.astroCoinsDiscount)}</span>
+                    </div>
+                  )}
                   {selectedTrip.extraCosts.taxAmount > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
                       <span>PPN ({selectedTrip.extraCosts.taxPercent}%):</span>
@@ -714,6 +763,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                     </div>
                   )}
                 </div>
+
               )}
 
               {/* Total Card */}

@@ -1,4 +1,4 @@
-export type UnitType = 'kg' | 'liter' | 'pcs' | 'pack' | 'botol' | 'kaleng' | 'bungkus' | 'gram';
+export type UnitType = string;
 
 export type CategoryType = 
   | 'Bahan Pokok' 
@@ -7,6 +7,12 @@ export type CategoryType =
   | 'Makanan & Camilan' 
   | 'Minuman' 
   | 'Kebutuhan Kamar' 
+  | 'Telur, Tahu & Tempe'
+  | 'Ayam & Daging'
+  | 'Sayur Segar'
+  | 'Buah Segar'
+  | 'Makanan Beku'
+  | 'Astro Cafe'
   | 'Lain-lain';
 
 export type ItemPriority = 'essential' | 'optional';
@@ -28,6 +34,8 @@ export interface GroceryItem {
   priority?: ItemPriority;   // 'essential' (Wajib) | 'optional' (Jajan/Sekunder)
   isCheckedInCart?: boolean; // Checklist lorong toko
   notes?: string;
+  imageUrl?: string;        // Foto produk asli dari Astronauts.id
+  source?: string;          // e.g. "Astronauts.id"
   createdAt: string;
 }
 
@@ -52,6 +60,20 @@ export interface CashierExtraCosts {
   parkingFee: number;
   taxPercent: number;
   taxAmount: number;
+  shippingFee?: number;
+  astroCoinsDiscount?: number;
+}
+
+export type AstroPaymentCategory = 'qris' | 'ewallet' | 'va' | 'card' | 'cod' | 'astropay';
+
+export interface AstroPaymentMethod {
+  id: string;
+  name: string;
+  category: AstroPaymentCategory;
+  icon: string;
+  description: string;
+  badge?: string;
+  vaNumber?: string;
 }
 
 export interface ShoppingTrip {
@@ -66,7 +88,12 @@ export interface ShoppingTrip {
   extraCosts?: CashierExtraCosts;
   grandTotal?: number;
   notes?: string;
+  paymentMethod?: string;
+  paymentChannel?: string;
+  deliveryMode?: 'astro_instant' | 'physical_store';
+  astroOrderId?: string;
 }
+
 
 export interface QuickPresetItem {
   id: string;
@@ -75,11 +102,16 @@ export interface QuickPresetItem {
   unit: UnitType;
   defaultQty: number;
   estimatedPrice: number;
+  originalPrice?: number;
+  discountPercent?: string;
   lastMonthPrice?: number;
   priority: ItemPriority;
   emoji: string;
+  imageUrl?: string;
+  source?: string;
   popularReason?: string;
 }
+
 
 export interface BudgetSettings {
   monthlyBudget: number;
