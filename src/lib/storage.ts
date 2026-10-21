@@ -16,12 +16,12 @@ const STORAGE_KEYS = {
 export const INITIAL_ITEMS: GroceryItem[] = [
   {
     id: 'item-1',
-    name: 'Bundle Beras Ramos Astro 5kg + Indomie',
+    name: 'Beras Ramos Super (5 kg)',
     category: 'Bahan Pokok',
-    unit: 'pack',
+    unit: 'kg',
     quantity: 1,
     unitPrice: 88799,
-    lastMonthPrice: 91300, // Turun hemat!
+    lastMonthPrice: 91300, // Turun hemat Rp 2.501
     discountType: 'nominal',
     discountNominal: 2501,
     priority: 'essential',
@@ -33,33 +33,32 @@ export const INITIAL_ITEMS: GroceryItem[] = [
   },
   {
     id: 'item-2',
-    name: 'Minyak Goreng Sawit (2 Liter)',
-    category: 'Bumbu & Dapur',
-    unit: 'botol',
+    name: 'Minyak Goreng Sawit (1 Liter)',
+    category: 'Bahan Pokok',
+    unit: 'liter',
     quantity: 1,
-    unitPrice: 34000,
-    lastMonthPrice: 38000, // Turun Rp 4.000 (indikator hijau hemat!)
-    discountType: 'single',
-    discountPercent1: 10, // Promo potongan 10%
+    unitPrice: 18000,
+    lastMonthPrice: 20000, // Turun Rp 2.000 (indikator hijau hemat!)
+    discountType: 'none',
     priority: 'essential',
     isCheckedInCart: true,
-    notes: 'Untuk masak lauk kos',
+    notes: 'Untuk masak lauk kos hemat',
     imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/RestockBahanWajibdiDapur_04b8c552-e833-4f30-b13c-e09a7d5ea68e_400x400.jpg',
     source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'item-3',
-    name: 'Telur Ayam Negeri Astro Farm',
-    category: 'Telur, Tahu & Tempe',
-    unit: 'pack',
+    name: 'Telur Ayam Negeri (1 kg)',
+    category: 'Bahan Pokok',
+    unit: 'kg',
     quantity: 1,
     unitPrice: 28500,
     lastMonthPrice: 28500, // Stabil sama (indikator abu-abu =)
     discountType: 'none',
     priority: 'essential',
     isCheckedInCart: false,
-    notes: 'Lauk protein harian terjamin segar',
+    notes: 'Lauk protein harian kos',
     imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/TelurAyamNegeriAstroFarm1_55ce9dfb-31de-4afb-b36d-1ea35f75105c_400x400.jpg',
     source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
@@ -67,49 +66,66 @@ export const INITIAL_ITEMS: GroceryItem[] = [
   {
     id: 'item-4',
     name: 'Sabun Pembersih Lantai (800 ml)',
-    category: 'Mandi & Kebersihan',
+    category: 'Mandi & Cuci',
     unit: 'botol',
     quantity: 1,
     unitPrice: 24000,
-    lastMonthPrice: 22000,
+    lastMonthPrice: 22000, // Naik vs bulan lalu
     discountType: 'stacked',
     discountPercent1: 50,
-    discountPercent2: 20, // Kasus studi: Diskon 50% + 20%
+    discountPercent2: 20, // Kasus studi F-03: Diskon 50% + 20%
     priority: 'optional',
     isCheckedInCart: false,
-    notes: 'Promo cuci gudang bertingkat',
+    notes: 'Promo cuci gudang bertingkat (50% + 20%)',
     imageUrl: 'https://image.astronauts.cloud/homepage-category/2026/10/cattiles02_85172688-a7e5-413d-84bd-f2d96f715791_239x306.png',
     source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'item-5',
-    name: 'Samyang Hot Ramen Carbonara Cup',
-    category: 'Bahan Pokok',
-    unit: 'cup',
-    quantity: 3,
-    unitPrice: 19800,
-    lastMonthPrice: 19800,
-    discountType: 'none',
+    name: 'Pasta Gigi Fresh & Protect (160g)',
+    category: 'Mandi & Cuci',
+    unit: 'pcs',
+    quantity: 1,
+    unitPrice: 14500,
+    lastMonthPrice: 16000, // Turun Rp 1.500
+    discountType: 'single',
+    discountPercent1: 10,
     priority: 'essential',
     isCheckedInCart: false,
-    notes: 'Cadangan makanan cepat saji akhir bulan',
+    notes: 'Perlengkapan mandi bulanan kos',
     imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/AL20260911T092823558_a46bd4e1-8c9c-48ad-983e-394efe2f41ce_400x400.png',
     source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
   },
   {
     id: 'item-6',
+    name: 'Mie Instan Goreng Spesial (5 Bungkus)',
+    category: 'Makanan Instan',
+    unit: 'pack',
+    quantity: 1,
+    unitPrice: 15500,
+    lastMonthPrice: 15500, // Stabil
+    discountType: 'none',
+    priority: 'essential',
+    isCheckedInCart: false,
+    notes: 'Penyelamat akhir bulan',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/AL20260911T092823558_a46bd4e1-8c9c-48ad-983e-394efe2f41ce_400x400.png',
+    source: 'Astronauts.id',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'item-7',
     name: 'Keripik Kentang Balado (68g)',
     category: 'Makanan & Camilan',
     unit: 'bungkus',
     quantity: 2,
     unitPrice: 13500,
-    lastMonthPrice: 13000,
+    lastMonthPrice: 13000, // Naik Rp 500
     discountType: 'none',
     priority: 'optional',
     isCheckedInCart: false,
-    notes: 'Camilan jajan nonton film (Opsional)',
+    notes: 'Camilan jajan nonton film (Opsional / Siap di-trim)',
     imageUrl: 'https://image.astronauts.cloud/homepage-category/2026/10/snack_04b0794c-7746-4167-bd41-a9c2fb123862_239x306.jpg',
     source: 'Astronauts.id',
     createdAt: new Date().toISOString(),
@@ -144,11 +160,11 @@ export const INITIAL_HISTORY: ShoppingTrip[] = [
       },
       {
         id: 'old-2',
-        name: 'Minyak Goreng Sawit (2 Liter)',
-        category: 'Bumbu & Dapur',
+        name: 'Minyak Goreng Sawit (1 Liter)',
+        category: 'Bahan Pokok',
         unit: 'liter',
         quantity: 1,
-        unitPrice: 38000,
+        unitPrice: 20000,
         discountType: 'none',
         createdAt: new Date().toISOString(),
       },
@@ -165,7 +181,7 @@ export const INITIAL_HISTORY: ShoppingTrip[] = [
       {
         id: 'old-4',
         name: 'Sabun Pembersih Lantai (800 ml)',
-        category: 'Mandi & Kebersihan',
+        category: 'Mandi & Cuci',
         unit: 'botol',
         quantity: 1,
         unitPrice: 22000,
@@ -174,8 +190,28 @@ export const INITIAL_HISTORY: ShoppingTrip[] = [
       },
       {
         id: 'old-5',
+        name: 'Pasta Gigi Fresh & Protect (160g)',
+        category: 'Mandi & Cuci',
+        unit: 'pcs',
+        quantity: 1,
+        unitPrice: 16000,
+        discountType: 'none',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'old-6',
+        name: 'Mie Instan Goreng Spesial (5 Bungkus)',
+        category: 'Makanan Instan',
+        unit: 'pack',
+        quantity: 1,
+        unitPrice: 15500,
+        discountType: 'none',
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: 'old-7',
         name: 'Deterjen Bubuk Konsentrat (1 kg)',
-        category: 'Mandi & Kebersihan',
+        category: 'Mandi & Cuci',
         unit: 'pack',
         quantity: 1,
         unitPrice: 24500,
@@ -183,7 +219,7 @@ export const INITIAL_HISTORY: ShoppingTrip[] = [
         createdAt: new Date().toISOString(),
       },
     ],
-    notes: 'Struk Belanja Bulan Lalu (Data Resmi Pembanding)',
+    notes: 'Struk Belanja Bulan Lalu (Data Resmi Pembanding Kasus Rian)',
   },
 ];
 
@@ -362,6 +398,55 @@ export function getHistoricalBenchmarkPrice(productName: string): number | null 
   }
 
   return null;
+}
+
+/**
+ * Daftar rekomendasi/auto-suggest nama barang dari riwayat belanja bulan lalu (F-01)
+ */
+export interface ProductSuggestion {
+  name: string;
+  category: string;
+  unit: string;
+  lastMonthPrice: number | null;
+}
+
+export function getHistoricalProductSuggestions(): ProductSuggestion[] {
+  const suggestionsMap = new Map<string, ProductSuggestion>();
+
+  // 1. Ambil dari riwayat struk belanja
+  try {
+    const history = loadShoppingHistory();
+    history.forEach((trip) => {
+      trip.itemsSnapshot.forEach((item) => {
+        const key = item.name.trim().toLowerCase();
+        if (!suggestionsMap.has(key)) {
+          suggestionsMap.set(key, {
+            name: item.name,
+            category: item.category,
+            unit: item.unit,
+            lastMonthPrice: item.unitPrice,
+          });
+        }
+      });
+    });
+  } catch (e) {
+    console.error('Error getting history suggestions:', e);
+  }
+
+  // 2. Ambil dari seed items contoh kasus Rian
+  INITIAL_ITEMS.forEach((item) => {
+    const key = item.name.trim().toLowerCase();
+    if (!suggestionsMap.has(key)) {
+      suggestionsMap.set(key, {
+        name: item.name,
+        category: item.category,
+        unit: item.unit,
+        lastMonthPrice: item.lastMonthPrice ?? item.unitPrice,
+      });
+    }
+  });
+
+  return Array.from(suggestionsMap.values());
 }
 
 /**

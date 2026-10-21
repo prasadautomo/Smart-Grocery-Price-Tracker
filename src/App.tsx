@@ -30,6 +30,7 @@ import { SupabaseConfigModal } from './components/SupabaseConfigModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { QuickPresetModal } from './components/QuickPresetModal';
 import { ShareChecklistModal } from './components/ShareChecklistModal';
+import { UnitBulkComparatorModal } from './components/UnitBulkComparatorModal';
 
 export const App: React.FC = () => {
   // State Data Belanja
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isComparatorModalOpen, setIsComparatorModalOpen] = useState(false);
 
   // Cloud & PWA State
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
@@ -271,6 +273,7 @@ export const App: React.FC = () => {
                 setIsAddModalOpen(true);
               }}
               onOpenPresets={() => setIsPresetModalOpen(true)}
+              onOpenComparator={() => setIsComparatorModalOpen(true)}
               onOpenShare={() => setIsShareModalOpen(true)}
               onEditItem={handleEditItem}
               onDeleteItem={handleDeleteItem}
@@ -294,6 +297,7 @@ export const App: React.FC = () => {
               items={items}
               onEditBudget={() => setIsBudgetModalOpen(true)}
               onApplyToCart={handleSaveItem}
+              onResetDemoData={handleResetDemoData}
             />
           )}
 
@@ -373,6 +377,12 @@ export const App: React.FC = () => {
           budgetSettings={budgetSettings}
           onClose={() => setIsCheckoutModalOpen(false)}
           onConfirmCheckout={handleConfirmCheckout}
+        />
+
+        <UnitBulkComparatorModal
+          isOpen={isComparatorModalOpen}
+          onClose={() => setIsComparatorModalOpen(false)}
+          onAddToCart={handleSaveItem}
         />
       </div>
     </div>

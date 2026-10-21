@@ -4,6 +4,7 @@ import {
   Edit3,
   Info,
   Check,
+  RotateCcw,
 } from 'lucide-react';
 import { formatRupiah, compareUnitPricing } from '../lib/calculations';
 import type { BudgetSettings, GroceryItem } from '../types/grocery';
@@ -14,6 +15,7 @@ interface SmartPromoCalculatorProps {
   items?: GroceryItem[];
   onEditBudget?: () => void;
   onApplyToCart?: (item: GroceryItem) => void;
+  onResetDemoData?: () => void;
 }
 
 export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
@@ -22,6 +24,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
   items = [],
   onEditBudget,
   onApplyToCart,
+  onResetDemoData,
 }) => {
   // Tool 1: Kalkulator Diskon Supermarket (F-03)
   const [promoBasePrice, setPromoBasePrice] = useState<number>(25000);
@@ -687,6 +690,80 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
           </button>
         </div>
       </div>
+
+      {/* ============================================================
+          TOMBOL RESET DEMO DATA AWAL KASUS RIAN (F-06 PENILAIAN GURU)
+          ============================================================ */}
+      {onResetDemoData && (
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 18,
+            padding: '16px',
+            border: '1.5px dashed #fda4af',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            boxShadow: 'var(--shadow-sm)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: '50%',
+                background: '#ffe4e6',
+                color: '#e11d48',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <RotateCcw size={16} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: '#9f1239', margin: 0 }}>
+                Reset ke Data Demo Awal (Kasus Rian)
+              </h3>
+              <p style={{ fontSize: '10.5px', color: '#be123c', margin: '2px 0 0' }}>
+                Kemudahan pengujian saat penilaian guru (F-06)
+              </p>
+            </div>
+          </div>
+
+          <p style={{ fontSize: '11px', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+            Memulihkan limit dompet Rian (<strong>Rp 350.000</strong>), 6 item belanja pokok (Beras 5kg, Minyak 1L, Telur 1kg, Sabun 50%+20%, Pasta Gigi, Mie Instan), dan database riwayat harga bulan lalu.
+          </p>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            style={{
+              background: '#fff1f2',
+              borderColor: '#fecdd3',
+              color: '#e11d48',
+              fontWeight: 700,
+              fontSize: '12px',
+              height: 40,
+              borderRadius: 12,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+            }}
+            onClick={() => {
+              if (confirm('Kembalikan data troli & riwayat belanja ke contoh awal kasus Rian (Rp 350.000 & 6 item pokok)?')) {
+                onResetDemoData();
+                alert('Data demo awal kasus Rian berhasil dipulihkan!');
+              }
+            }}
+          >
+            <RotateCcw size={14} />
+            <span>Reset ke Data Demo Awal</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

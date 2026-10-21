@@ -59,7 +59,7 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
         </div>
 
         <span className={`stitch-status-pill ${statusClass}`}>
-          {safety.status === 'SAFE' && 'Aman'}
+          {safety.status === 'SAFE' && 'Anggaran Aman'}
           {safety.status === 'WARNING' && `Waspada (${safety.percentage}%)`}
           {safety.status === 'DANGER' && `Bahaya (${safety.percentage}%)`}
         </span>
@@ -74,19 +74,53 @@ export const BudgetSafetyBanner: React.FC<BudgetSafetyBannerProps> = ({
           </span>
         </span>
         <span style={{ textAlign: 'right' }}>
-          {safety.remaining >= 0 ? 'Sisa: ' : 'Boncos: '}
+          {safety.remaining >= 0 ? 'Sisa Dompet: ' : 'Defisit: '}
           <strong style={{ color: safety.remaining >= 0 ? '#10b981' : '#dc2626' }}>
             {formatRupiah(Math.abs(safety.remaining))}
           </strong>
         </span>
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar Dinamis */}
       <div className="stitch-progress-bar-wrap">
         <div
           className={`stitch-progress-bar-fill ${statusClass}`}
           style={{ width: `${Math.min(100, safety.percentage)}%` }}
         />
+      </div>
+
+      {/* Peringatan Otomatis Realtime Sesuai SRS F-05 */}
+      <div
+        style={{
+          padding: '8px 12px',
+          borderRadius: 10,
+          fontSize: '11.5px',
+          fontWeight: 700,
+          lineHeight: 1.35,
+          background:
+            safety.status === 'SAFE'
+              ? '#ecfdf5'
+              : safety.status === 'WARNING'
+              ? '#fffbeb'
+              : '#fef2f2',
+          border: `1.5px solid ${
+            safety.status === 'SAFE'
+              ? '#a7f3d0'
+              : safety.status === 'WARNING'
+              ? '#fde68a'
+              : '#fca5a5'
+          }`,
+          color:
+            safety.status === 'SAFE'
+              ? '#047857'
+              : safety.status === 'WARNING'
+              ? '#b45309'
+              : '#b91c1c',
+        }}
+      >
+        {safety.status === 'SAFE' && `🛡️ Status: Anggaran Aman (< 80% limit)`}
+        {safety.status === 'WARNING' && `⚠️ Peringatan: Hati-hati! Mendekati batas uang tunai di dompet (${safety.percentage}%)`}
+        {safety.status === 'DANGER' && `🚨 ${safety.advice}`}
       </div>
 
       {/* Auto-Trim button if Over Budget */}

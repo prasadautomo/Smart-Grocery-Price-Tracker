@@ -157,13 +157,13 @@ export function getBudgetSafetyStatus(
   const percentage = Math.min(200, Math.round((currentTotal / limit) * 100));
   const remaining = budgetLimit - currentTotal;
 
-  if (currentTotal > limit) {
+  if (currentTotal >= limit) {
     return {
       status: 'DANGER',
       percentage,
       remaining,
-      label: 'OVER BUDGET!',
-      advice: `Tagihan melebihi dompet sebesar ${formatRupiah(Math.abs(remaining))}. Kurangi barang sebelum ke kasir!`,
+      label: 'Bahaya / Overbudget',
+      advice: `STOP! Total belanja melebihi uang di dompet sebesar ${formatRupiah(Math.abs(remaining))}! Kurangi barang sebelum ke kasir!`,
     };
   }
 
@@ -172,8 +172,8 @@ export function getBudgetSafetyStatus(
       status: 'WARNING',
       percentage,
       remaining,
-      label: 'Mendekati Limit',
-      advice: `Sisa anggaran tinggal ${formatRupiah(remaining)} (${100 - percentage}%). Cermati barang berikutnya.`,
+      label: 'Waspada (Mendekati Limit)',
+      advice: 'Hati-hati! Mendekati batas uang tunai di dompet',
     };
   }
 
@@ -181,8 +181,8 @@ export function getBudgetSafetyStatus(
     status: 'SAFE',
     percentage,
     remaining,
-    label: 'Saldo Aman',
-    advice: `Belanja terkendali. Sisa anggaran aman sebesar ${formatRupiah(remaining)}.`,
+    label: 'Anggaran Aman',
+    advice: 'Anggaran Aman. Sisa uang tunai masih memadai.',
   };
 }
 

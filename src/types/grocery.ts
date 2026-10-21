@@ -2,10 +2,13 @@ export type UnitType = string;
 
 export type CategoryType = 
   | 'Bahan Pokok' 
+  | 'Mandi & Cuci'
+  | 'Makanan Instan'
+  | 'Minuman'
+  | 'Lainnya'
   | 'Bumbu & Dapur' 
   | 'Mandi & Kebersihan' 
   | 'Makanan & Camilan' 
-  | 'Minuman' 
   | 'Kebutuhan Kamar' 
   | 'Telur, Tahu & Tempe'
   | 'Ayam & Daging'

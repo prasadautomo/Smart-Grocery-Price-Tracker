@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Check, Sparkles, TrendingUp, TrendingDown, Minus, ShieldCheck, Heart } from 'lucide-react';
 import type { GroceryItem, CategoryType, UnitType, DiscountType, ItemPriority } from '../types/grocery';
 import { calculateItemPrice, compareWithLastMonth, formatRupiah } from '../lib/calculations';
-import { getHistoricalBenchmarkPrice } from '../lib/storage';
+import { getHistoricalBenchmarkPrice, getHistoricalProductSuggestions, type ProductSuggestion } from '../lib/storage';
 
 interface AddEditItemModalProps {
   isOpen: boolean;
@@ -13,21 +13,27 @@ interface AddEditItemModalProps {
 
 const CATEGORIES: CategoryType[] = [
   'Bahan Pokok',
+  'Mandi & Cuci',
+  'Makanan Instan',
+  'Minuman',
+  'Lainnya',
   'Bumbu & Dapur',
   'Mandi & Kebersihan',
   'Makanan & Camilan',
-  'Minuman',
   'Kebutuhan Kamar',
+  'Telur, Tahu & Tempe',
   'Lain-lain',
 ];
 
 const UNITS: UnitType[] = [
-  'pcs',
-  'pack',
   'kg',
   'liter',
-  'botol',
+  'pcs',
+  'pack',
   'kaleng',
+  'jerigen',
+  'kantong',
+  'botol',
   'bungkus',
   'gram',
 ];
@@ -52,6 +58,14 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
   const [notes, setNotes] = useState('');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [source, setSource] = useState<string>('');
+  const [suggestions, setSuggestions] = useState<ProductSuggestion[]>([]);
+
+  // Muat daftar rekomendasi nama & patokan harga bulan lalu saat modal dibuka
+  useEffect(() => {
+    if (isOpen) {
+      setSuggestions(getHistoricalProductSuggestions());
+    }
+  }, [isOpen]);
 
   // Sinkronkan state saat modal dibuka atau itemToEdit berubah
   useEffect(() => {
@@ -89,14 +103,33 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
   }, [itemToEdit, isOpen]);
 
 
-  // Cek apakah ada benchmark otomatis saat user mengetik nama barang baru
+  // Auto-Suggest & Auto-Fill saat pengguna mengetik/memilih nama barang (F-01)
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setName(val);
-    if (!itemToEdit && val.length > 2) {
-      const benchmark = getHistoricalBenchmarkPrice(val);
-      if (benchmark && (!lastMonthPrice || lastMonthPrice === 0)) {
-        setLastMonthPrice(benchmark);
+
+    if (!itemToEdit) {
+      // 1. Cek apakah cocok persis dengan salah satu saran riwayat
+      const match = suggestions.find((s) => s.name.trim().toLowerCase() === val.trim().toLowerCase());
+      if (match) {
+        if (match.lastMonthPrice && (!lastMonthPrice || lastMonthPrice === 0)) {
+          setLastMonthPrice(match.lastMonthPrice);
+        }
+        if (match.category && CATEGORIES.includes(match.category as CategoryType)) {
+          setCategory(match.category as CategoryType);
+        }
+        if (match.unit && UNITS.includes(match.unit)) {
+          setUnit(match.unit);
+        }
+        if (unitPrice === 0 && match.lastMonthPrice) {
+          setUnitPrice(match.lastMonthPrice);
+        }
+      } else if (val.length > 2) {
+        // 2. Cek benchmark parsial
+        const benchmark = getHistoricalBenchmarkPrice(val);
+        if (benchmark && (!lastMonthPrice || lastMonthPrice === 0)) {
+          setLastMonthPrice(benchmark);
+        }
       }
     }
   };
@@ -174,18 +207,31 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
         </div>
 
         <form className="sheet-body" onSubmit={handleSubmit}>
-          {/* Nama Barang */}
+          {/* Nama Barang (F-01 dengan Auto-Suggest) */}
           <div className="form-group">
-            <label className="form-label">Nama Produk / Barang *</label>
+            <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Nama Produk / Barang *</span>
+              <span style={{ fontSize: '10.5px', color: '#10b981', fontWeight: 600 }}>
+                💡 Auto-Suggest Aktif
+              </span>
+            </label>
             <input
               type="text"
+              list="historical-product-suggestions"
               className="form-input"
-              placeholder="Contoh: Beras Ramos 5kg, Minyak Goreng..."
+              placeholder="Ketik atau pilih dari riwayat bulan lalu..."
               value={name}
               onChange={handleNameChange}
               required
               autoFocus
             />
+            <datalist id="historical-product-suggestions">
+              {suggestions.map((s, idx) => (
+                <option key={idx} value={s.name}>
+                  {s.category} ({s.unit}) • Bulan Lalu: {formatRupiah(s.lastMonthPrice || 0)}
+                </option>
+              ))}
+            </datalist>
           </div>
 
           {/* Kategori & Satuan */}
@@ -413,27 +459,48 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
               </span>
             </div>
 
-            {/* Komparasi Bulan Lalu */}
+            {/* Komparasi Bulan Lalu (F-04) */}
             {lastMonthPrice && lastMonthPrice > 0 && (
-              <div className="calc-preview-row" style={{ marginTop: 4, paddingTop: 4, borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
-                <span>Tren vs Bulan Lalu:</span>
-                <span>
+              <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px dashed rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div className="calc-preview-row">
+                  <span>Tren vs Bulan Lalu:</span>
+                  <span>
+                    {comparison.trend === 'up' && (
+                      <span style={{ color: '#f87171', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700 }}>
+                        <TrendingUp size={13} /> ↑ Naik {formatRupiah(comparison.difference)} (+{comparison.percentChange}%)
+                      </span>
+                    )}
+                    {comparison.trend === 'down' && (
+                      <span style={{ color: '#34d399', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700 }}>
+                        <TrendingDown size={13} /> ↓ Turun {formatRupiah(Math.abs(comparison.difference))} ({comparison.percentChange}%)
+                      </span>
+                    )}
+                    {comparison.trend === 'equal' && (
+                      <span style={{ color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                        <Minus size={13} /> = Harga Stabil
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                {/* Saran F-04 */}
+                <div style={{ fontSize: '10.5px', textAlign: 'right', fontStyle: 'italic' }}>
                   {comparison.trend === 'up' && (
-                    <span style={{ color: '#f87171', display: 'inline-flex', alignItems: 'center', gap: 2, fontWeight: 700 }}>
-                      <TrendingUp size={13} /> Naik +{formatRupiah(comparison.difference)} (+{comparison.percentChange}%)
+                    <span style={{ color: '#fca5a5' }}>
+                      ⚠️ "Harga melonjak! Pertimbangkan tunda/kurangi"
                     </span>
                   )}
                   {comparison.trend === 'down' && (
-                    <span style={{ color: '#34d399', display: 'inline-flex', alignItems: 'center', gap: 2, fontWeight: 700 }}>
-                      <TrendingDown size={13} /> Turun {formatRupiah(Math.abs(comparison.difference))} ({comparison.percentChange}%)
+                    <span style={{ color: '#86efac' }}>
+                      🎉 "Harga turun! Layak diborong"
                     </span>
                   )}
                   {comparison.trend === 'equal' && (
-                    <span style={{ color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                      <Minus size={13} /> Sama persis
+                    <span style={{ color: '#cbd5e1' }}>
+                      ✓ "Harga stabil sama dengan bulan lalu"
                     </span>
                   )}
-                </span>
+                </div>
               </div>
             )}
 

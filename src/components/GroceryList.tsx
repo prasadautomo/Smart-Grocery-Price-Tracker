@@ -10,7 +10,8 @@ import {
   Trash2,
   ShoppingCart,
   ArrowRight,
-  CheckCheck
+  CheckCheck,
+  Scale
 } from 'lucide-react';
 import type { GroceryItem, CategoryType } from '../types/grocery';
 import {
@@ -24,6 +25,7 @@ interface GroceryListProps {
   budgetLimit: number;
   onAddItem: () => void;
   onOpenPresets: () => void;
+  onOpenComparator?: () => void;
   onOpenShare: () => void;
   onEditItem: (item: GroceryItem) => void;
   onDeleteItem: (id: string) => void;
@@ -59,6 +61,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
   budgetLimit,
   onAddItem,
   onOpenPresets,
+  onOpenComparator,
   onOpenShare,
   onEditItem,
   onDeleteItem,
@@ -145,8 +148,21 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           style={{ background: '#fef3c7', borderColor: '#fde68a', color: '#b45309' }}
         >
           <Zap size={15} />
-          <span>Katalog Cepat</span>
+          <span>Katalog</span>
         </button>
+
+        {onOpenComparator && (
+          <button
+            type="button"
+            className="stitch-tool-btn"
+            onClick={onOpenComparator}
+            title="Bandingkan Kemasan & Promo Hemat (F-03)"
+            style={{ background: '#eff6ff', borderColor: '#bfdbfe', color: '#1d4ed8' }}
+          >
+            <Scale size={15} />
+            <span>Bandingkan</span>
+          </button>
+        )}
 
         <button
           type="button"
@@ -387,21 +403,31 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                     </div>
 
 
-                    {/* Trend Badge (Stitch Style) */}
-                    <div>
+                    {/* Trend Badge & Advisory (F-04) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
                       {comp.trend === 'up' && (
-                        <span className="stitch-trend-badge up">
-                          {formatRupiah(item.lastMonthPrice || 0)} | Naik (+{formatRupiah(comp.difference)})
-                        </span>
+                        <>
+                          <span className="stitch-trend-badge up">
+                            ↑ Naik {formatRupiah(comp.difference)} (+{comp.percentChange}%)
+                          </span>
+                          <span style={{ fontSize: '9px', color: '#dc2626', fontWeight: 600, textAlign: 'right', lineHeight: 1.2 }}>
+                            ⚠️ Harga melonjak! Pertimbangkan tunda/kurangi
+                          </span>
+                        </>
                       )}
                       {comp.trend === 'down' && (
-                        <span className="stitch-trend-badge down">
-                          {formatRupiah(item.lastMonthPrice || 0)} | Turun (-{formatRupiah(Math.abs(comp.difference))})
-                        </span>
+                        <>
+                          <span className="stitch-trend-badge down">
+                            ↓ Turun {formatRupiah(Math.abs(comp.difference))} ({comp.percentChange}%)
+                          </span>
+                          <span style={{ fontSize: '9px', color: '#15803d', fontWeight: 600, textAlign: 'right', lineHeight: 1.2 }}>
+                            🎉 Harga turun! Layak diborong
+                          </span>
+                        </>
                       )}
                       {comp.trend === 'equal' && (
                         <span className="stitch-trend-badge equal">
-                          {formatRupiah(item.lastMonthPrice || 0)} = Stabil
+                          = Harga Stabil
                         </span>
                       )}
                       {comp.trend === 'new' && (
