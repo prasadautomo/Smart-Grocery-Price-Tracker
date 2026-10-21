@@ -21,6 +21,7 @@ import {
   compareWithLastMonth,
   formatRupiah,
 } from '../lib/calculations';
+import { resolveProductImageUrl } from '../lib/productImages';
 
 interface GroceryListProps {
   items: GroceryItem[];
@@ -305,35 +306,54 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                   {isChecked ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                 </button>
 
-                {/* Product Photo or Professional Package Icon */}
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 12,
-                    background: '#f1f5f9',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    overflow: 'hidden',
-                    border: '1px solid #e2e8f0',
-                  }}
-                >
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
+                {/* Product Photo with Auto-Resolve & Fallback */}
+                {(() => {
+                  const itemImg = item.imageUrl || resolveProductImageUrl(item.name, item.category);
+                  return (
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        background: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                        overflow: 'hidden',
+                        border: '1px solid #e2e8f0',
+                        position: 'relative',
                       }}
-                    />
-                  ) : (
-                    <Package size={20} color="#64748b" />
-                  )}
-                </div>
+                    >
+                      {itemImg ? (
+                        <img
+                          src={itemImg}
+                          alt={item.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.parentElement?.querySelector('.fallback-pkg');
+                            if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <span
+                        className="fallback-pkg"
+                        style={{
+                          display: itemImg ? 'none' : 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '100%',
+                          height: '100%',
+                          background: '#f8fafc',
+                        }}
+                      >
+                        <Package size={20} color="#64748b" />
+                      </span>
+                    </div>
+                  );
+                })()}
 
                 {/* Name & Unit Price */}
                 <div style={{ flex: 1, minWidth: 0 }}>

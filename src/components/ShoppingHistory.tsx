@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { ShoppingTrip } from '../types/grocery';
 import { formatRupiah, calculateItemPrice } from '../lib/calculations';
+import { resolveProductImageUrl } from '../lib/productImages';
 
 interface ShoppingHistoryProps {
   history: ShoppingTrip[];
@@ -470,30 +471,48 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                     </div>
                   </div>
 
-                  {/* Category Avatars */}
+                  {/* Category Avatars / Product Photo Thumbnails */}
                   <div style={{ display: 'flex', gap: 4 }}>
-                    {trip.itemsSnapshot.slice(0, 3).map((_item, idx) => (
-                      <span
-                        key={idx}
-                        style={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: '50%',
-                          background: '#f1f5f9',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <Package size={13} color="#64748b" />
-                      </span>
-                    ))}
+                    {trip.itemsSnapshot.slice(0, 3).map((snapItem, idx) => {
+                      const itemImg = snapItem.imageUrl || resolveProductImageUrl(snapItem.name, snapItem.category);
+                      return (
+                        <span
+                          key={idx}
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: 8,
+                            background: '#f1f5f9',
+                            border: '1px solid #e2e8f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {itemImg ? (
+                            <img
+                              src={itemImg}
+                              alt={snapItem.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <Package size={13} color="#64748b" />
+                          )}
+                        </span>
+                      );
+                    })}
                     {trip.itemsSnapshot.length > 3 && (
                       <span
                         style={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: '50%',
+                          width: 28,
+                          height: 28,
+                          borderRadius: 8,
                           background: '#dcfce7',
                           color: '#15803d',
                           fontSize: '10px',
@@ -501,6 +520,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          border: '1px solid #bbf7d0',
                         }}
                       >
                         +{trip.itemsSnapshot.length - 3}
@@ -678,6 +698,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
 
                 {selectedTrip.itemsSnapshot.map((item, idx) => {
                   const calc = calculateItemPrice(item);
+                  const itemImg = item.imageUrl || resolveProductImageUrl(item.name, item.category);
                   return (
                     <div
                       key={item.id || idx}
@@ -687,20 +708,61 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
                         alignItems: 'center',
                         padding: '10px 12px',
                         background: '#f8fafc',
-                        borderRadius: 10,
+                        borderRadius: 12,
                         border: '1px solid #e2e8f0',
+                        gap: 10,
                       }}
                     >
-                      <div>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>
-                          {item.name}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                        <div
+                          style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: 8,
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {itemImg ? (
+                            <img
+                              src={itemImg}
+                              alt={item.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <Package size={18} color="#64748b" />
+                          )}
                         </div>
-                        <div style={{ fontSize: '11px', color: '#64748b' }}>
-                          {item.quantity} {item.unit} × {formatRupiah(calc.discountedUnitPrice)}
+
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div
+                            style={{
+                              fontSize: '13px',
+                              fontWeight: 700,
+                              color: '#0f172a',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {item.name}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: 1 }}>
+                            {item.quantity} {item.unit} × {formatRupiah(calc.discountedUnitPrice)}
+                          </div>
                         </div>
                       </div>
 
-                      <div style={{ textAlign: 'right' }}>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
                         <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
                           {formatRupiah(calc.finalTotal)}
                         </div>

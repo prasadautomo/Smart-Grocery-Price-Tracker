@@ -4,6 +4,7 @@ import { POPULAR_PRESETS, convertPresetToGroceryItem } from '../lib/quickPresets
 import { ASTRO_CATALOG_PRESETS } from '../lib/astroPresets';
 import type { GroceryItem, QuickPresetItem } from '../types/grocery';
 import { formatRupiah } from '../lib/calculations';
+import { resolveProductImageUrl } from '../lib/productImages';
 
 
 interface QuickPresetModalProps {
@@ -268,35 +269,54 @@ export const QuickPresetModal: React.FC<QuickPresetModalProps> = ({
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0, flex: 1 }}>
-                    {/* Product Photo Thumbnail from Astronauts.cloud */}
-                    <div
-                      style={{
-                        width: 52,
-                        height: 52,
-                        background: '#ffffff',
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                        border: '1px solid rgba(255,255,255,0.1)',
-                      }}
-                    >
-                      {preset.imageUrl ? (
-                        <img
-                          src={preset.imageUrl}
-                          alt={preset.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                    {/* Product Photo Thumbnail with Auto-Resolve & Fallback */}
+                    {(() => {
+                      const pImg = preset.imageUrl || resolveProductImageUrl(preset.name, preset.category);
+                      return (
+                        <div
+                          style={{
+                            width: 52,
+                            height: 52,
+                            background: '#ffffff',
+                            borderRadius: '10px',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            position: 'relative',
                           }}
-                        />
-                      ) : (
-                        <Package size={22} color="#94a3b8" />
-                      )}
-                    </div>
+                        >
+                          {pImg ? (
+                            <img
+                              src={pImg}
+                              alt={preset.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const fallback = e.currentTarget.parentElement?.querySelector('.preset-fallback');
+                                if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <span
+                            className="preset-fallback"
+                            style={{
+                              display: pImg ? 'none' : 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '100%',
+                              height: '100%',
+                              background: '#f8fafc',
+                            }}
+                          >
+                            <Package size={22} color="#64748b" />
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

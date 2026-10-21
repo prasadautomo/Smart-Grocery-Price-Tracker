@@ -94,8 +94,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'essential',
     isCheckedInCart: false,
     notes: 'Perlengkapan mandi bulanan kos',
-    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/AL20260911T092823558_a46bd4e1-8c9c-48ad-983e-394efe2f41ce_400x400.png',
-    source: 'Astronauts.id',
+    imageUrl: 'https://images.openbeautyfacts.org/images/products/893/483/912/8302/front_en.3.400.jpg',
+    source: 'Open Beauty Facts',
     createdAt: new Date().toISOString(),
   },
   {
@@ -110,8 +110,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'essential',
     isCheckedInCart: false,
     notes: 'Penyelamat akhir bulan',
-    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/AL20260911T092823558_a46bd4e1-8c9c-48ad-983e-394efe2f41ce_400x400.png',
-    source: 'Astronauts.id',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/008/968/618/0626/front_en.3.400.jpg',
+    source: 'Open Food Facts',
     createdAt: new Date().toISOString(),
   },
   {
@@ -126,8 +126,8 @@ export const INITIAL_ITEMS: GroceryItem[] = [
     priority: 'optional',
     isCheckedInCart: false,
     notes: 'Camilan jajan nonton film (Opsional / Siap di-trim)',
-    imageUrl: 'https://image.astronauts.cloud/homepage-category/2026/10/snack_04b0794c-7746-4167-bd41-a9c2fb123862_239x306.jpg',
-    source: 'Astronauts.id',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/008/968/659/9077/front_en.43.400.jpg',
+    source: 'Open Food Facts',
     createdAt: new Date().toISOString(),
   },
 ];

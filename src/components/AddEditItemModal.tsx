@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Sparkles, TrendingUp, TrendingDown, Minus, ShieldCheck, Heart } from 'lucide-react';
+import { X, Check, Sparkles, TrendingUp, TrendingDown, Minus, ShieldCheck, Heart, Package, Globe } from 'lucide-react';
 import type { GroceryItem, CategoryType, UnitType, DiscountType, ItemPriority } from '../types/grocery';
 import { calculateItemPrice, compareWithLastMonth, formatRupiah } from '../lib/calculations';
 import { getHistoricalBenchmarkPrice, getHistoricalProductSuggestions, type ProductSuggestion } from '../lib/storage';
+import { resolveProductImageUrl, resolveProductImageSource } from '../lib/productImages';
 
 interface AddEditItemModalProps {
   isOpen: boolean;
@@ -58,12 +59,14 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
   const [notes, setNotes] = useState('');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [source, setSource] = useState<string>('');
+  const [showCustomUrl, setShowCustomUrl] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<ProductSuggestion[]>([]);
 
   // Muat daftar rekomendasi nama & patokan harga bulan lalu saat modal dibuka
   useEffect(() => {
     if (isOpen) {
       setSuggestions(getHistoricalProductSuggestions());
+      setShowCustomUrl(false);
     }
   }, [isOpen]);
 
@@ -102,11 +105,17 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
     }
   }, [itemToEdit, isOpen]);
 
-
-  // Auto-Suggest & Auto-Fill saat pengguna mengetik/memilih nama barang (F-01)
+  // Auto-Suggest nama barang & foto otomatis dari internet
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setName(val);
+
+    // Otomatis cari foto produk asli dari internet
+    const autoImg = resolveProductImageUrl(val, category);
+    if (autoImg && (!itemToEdit || !imageUrl)) {
+      setImageUrl(autoImg);
+      setSource(resolveProductImageSource(val));
+    }
 
     if (!itemToEdit) {
       // 1. Cek apakah cocok persis dengan salah satu saran riwayat
@@ -130,6 +139,16 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
         if (benchmark && (!lastMonthPrice || lastMonthPrice === 0)) {
           setLastMonthPrice(benchmark);
         }
+      }
+    }
+  };
+
+  const handleCategorySelect = (newCat: CategoryType) => {
+    setCategory(newCat);
+    if (!imageUrl || imageUrl.includes('unsplash') || imageUrl.includes('astronauts')) {
+      const autoImg = resolveProductImageUrl(name, newCat);
+      if (autoImg) {
+        setImageUrl(autoImg);
       }
     }
   };
@@ -169,6 +188,10 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       return;
     }
 
+    // Pastikan foto terisi otomatis dari internet jika belum ada
+    const finalImageUrl = imageUrl.trim() || resolveProductImageUrl(name.trim(), category) || undefined;
+    const finalSource = source.trim() || resolveProductImageSource(name.trim()) || undefined;
+
     const finalItem: GroceryItem = {
       id: itemToEdit ? itemToEdit.id : `item-${Date.now()}`,
       name: name.trim(),
@@ -184,11 +207,10 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
       priority,
       isCheckedInCart: itemToEdit?.isCheckedInCart ?? false,
       notes: notes.trim(),
-      imageUrl: imageUrl.trim() || undefined,
-      source: source.trim() || undefined,
+      imageUrl: finalImageUrl,
+      source: finalSource,
       createdAt: itemToEdit ? itemToEdit.createdAt : new Date().toISOString(),
     };
-
 
     onSave(finalItem);
     onClose();
@@ -207,19 +229,19 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
         </div>
 
         <form className="sheet-body" onSubmit={handleSubmit}>
-          {/* Nama Barang (F-01 dengan Auto-Suggest) */}
+          {/* Nama Barang (F-01 dengan Auto-Suggest & Auto-Image) */}
           <div className="form-group">
             <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Nama Produk / Barang *</span>
               <span style={{ fontSize: '10.5px', color: '#10b981', fontWeight: 600 }}>
-                Auto-Suggest Riwayat
+                Foto & Harga Auto-Sync
               </span>
             </label>
             <input
               type="text"
               list="historical-product-suggestions"
               className="form-input"
-              placeholder="Ketik atau pilih dari riwayat bulan lalu..."
+              placeholder="Ketik nama produk (Beras, Indomie, Minyak, Sabun, dll)..."
               value={name}
               onChange={handleNameChange}
               required
@@ -232,6 +254,92 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
                 </option>
               ))}
             </datalist>
+
+            {/* Live Foto Produk Asli dari Internet Preview */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                marginTop: 8,
+                padding: '8px 12px',
+                background: '#f8fafc',
+                borderRadius: 12,
+                border: '1px solid #e2e8f0',
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: '#ffffff',
+                  border: '1px solid #cbd5e1',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="Preview Produk"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <Package size={20} color="#94a3b8" />
+                )}
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Globe size={13} color="#2563eb" />
+                  <span>{imageUrl ? 'Foto Produk Asli Terhubung' : 'Foto Produk Internet'}</span>
+                </div>
+                <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: 1 }}>
+                  {imageUrl
+                    ? `Sumber: ${source || 'Katalog E-Grocery'}`
+                    : 'Ketik nama barang untuk menampilkan foto resmi'}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowCustomUrl(!showCustomUrl)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#2563eb',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0,
+                  flexShrink: 0,
+                }}
+              >
+                {showCustomUrl ? 'Sembunyikan' : 'Ubah URL'}
+              </button>
+            </div>
+
+            {/* Input Manual URL Foto Jika Pengguna Ingin Custom */}
+            {showCustomUrl && (
+              <div style={{ marginTop: 8 }}>
+                <input
+                  type="url"
+                  className="form-input"
+                  style={{ fontSize: '11.5px', height: 36 }}
+                  placeholder="https://... URL gambar produk"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                />
+              </div>
+            )}
           </div>
 
           {/* Kategori & Satuan */}
@@ -241,7 +349,7 @@ export const AddEditItemModal: React.FC<AddEditItemModalProps> = ({
               <select
                 className="form-select"
                 value={category}
-                onChange={(e) => setCategory(e.target.value as CategoryType)}
+                onChange={(e) => handleCategorySelect(e.target.value as CategoryType)}
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>

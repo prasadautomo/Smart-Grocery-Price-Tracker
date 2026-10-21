@@ -12,6 +12,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 72000,
     priority: 'essential',
     emoji: '🍚',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/10/Untitled20261015T103343658_f2c66217-cdc9-4eee-9880-99267097b786_400x400.png',
+    source: 'Astronauts.id',
     popularReason: 'Makanan pokok utama 1 bulan kos',
   },
   {
@@ -24,6 +26,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 36000,
     priority: 'essential',
     emoji: '🍳',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/RestockBahanWajibdiDapur_04b8c552-e833-4f30-b13c-e09a7d5ea68e_400x400.jpg',
+    source: 'Astronauts.id',
     popularReason: 'Stok masak lauk harian',
   },
   {
@@ -36,6 +40,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 28000,
     priority: 'essential',
     emoji: '🥚',
+    imageUrl: 'https://image.astronauts.cloud/product-images/2026/9/TelurAyamNegeriAstroFarm1_55ce9dfb-31de-4afb-b36d-1ea35f75105c_400x400.jpg',
+    source: 'Astronauts.id',
     popularReason: 'Protein murah & praktis',
   },
   {
@@ -48,6 +54,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 17000,
     priority: 'essential',
     emoji: '🧂',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/899/517/710/2058/front_id.6.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Pemanis teh & kopi',
   },
   {
@@ -60,6 +68,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 12000,
     priority: 'essential',
     emoji: '🌾',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/899/329/620/1119/front_en.5.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Bahan gorengan / adonan',
   },
 
@@ -74,6 +84,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 3000,
     priority: 'essential',
     emoji: '🍜',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/008/968/618/0626/front_en.3.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Penyelamat lapar akhir bulan',
   },
   {
@@ -86,6 +98,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 11000,
     priority: 'essential',
     emoji: '🥫',
+    imageUrl: 'https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Lauk instan awet lama',
   },
   {
@@ -98,6 +112,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 10500,
     priority: 'optional',
     emoji: '🍪',
+    imageUrl: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Camilan santai ngerjain tugas',
   },
   {
@@ -110,6 +126,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 12000,
     priority: 'optional',
     emoji: '🍟',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/008/968/659/9077/front_en.43.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Jajan waktu nonton / santai',
   },
 
@@ -124,6 +142,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 22000,
     priority: 'essential',
     emoji: '🍶',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/899/999/900/2503/front_fr.3.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Penyedap rasa nasi & telur',
   },
   {
@@ -136,6 +156,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 13000,
     priority: 'optional',
     emoji: '🌶️',
+    imageUrl: 'https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Cocolan gorengan & mie',
   },
   {
@@ -148,6 +170,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 14000,
     priority: 'essential',
     emoji: '🧅',
+    imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Bumbu dasar tumisan',
   },
   {
@@ -160,6 +184,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 11000,
     priority: 'essential',
     emoji: '🧄',
+    imageUrl: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Bumbu penyedap wangi',
   },
 
@@ -174,6 +200,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 23000,
     priority: 'essential',
     emoji: '🧼',
+    imageUrl: 'https://images.openbeautyfacts.org/images/products/890/103/081/3252/front_en.3.400.jpg',
+    source: 'Open Beauty Facts',
     popularReason: 'Higienis harian',
   },
   {
@@ -186,6 +214,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 23500,
     priority: 'essential',
     emoji: '🧴',
+    imageUrl: 'https://images.openbeautyfacts.org/images/products/541/007/665/1627/front_en.14.400.jpg',
+    source: 'Open Beauty Facts',
     popularReason: 'Perawatan rambut',
   },
   {
@@ -198,6 +228,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 14000,
     priority: 'essential',
     emoji: '🪥',
+    imageUrl: 'https://images.openbeautyfacts.org/images/products/893/483/912/8302/front_en.3.400.jpg',
+    source: 'Open Beauty Facts',
     popularReason: 'Kesehatan gigi rutin',
   },
   {
@@ -210,6 +242,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 31000,
     priority: 'essential',
     emoji: '🧺',
+    imageUrl: 'https://images.unsplash.com/photo-1585670210693-e7fdd16b142e?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Cuci baju hemat anak kos',
   },
   {
@@ -222,6 +256,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 15000,
     priority: 'essential',
     emoji: '🍽️',
+    imageUrl: 'https://images.openbeautyfacts.org/images/products/007/261/373/9318/front_fr.3.400.jpg',
+    source: 'Open Beauty Facts',
     popularReason: 'Bersihkan minyak perabot kos',
   },
 
@@ -236,6 +272,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 20000,
     priority: 'essential',
     emoji: '🚰',
+    imageUrl: 'https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=400&q=80',
+    source: 'Katalog Internet',
     popularReason: 'Hidrasi air minum utama kos',
   },
   {
@@ -248,6 +286,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 13500,
     priority: 'optional',
     emoji: '☕',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/899/100/210/3436/front_id.6.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Booster melek begadang nugas',
   },
   {
@@ -260,6 +300,8 @@ export const POPULAR_PRESETS: QuickPresetItem[] = [
     lastMonthPrice: 8000,
     priority: 'essential',
     emoji: '🍵',
+    imageUrl: 'https://images.openfoodfacts.org/images/products/899/999/953/8118/front_en.4.400.jpg',
+    source: 'Open Food Facts',
     popularReason: 'Minuman hangat pagi & sore',
   },
 ];
