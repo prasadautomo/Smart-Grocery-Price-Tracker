@@ -14,7 +14,7 @@ import {
   saveSupabaseConfig,
   testSupabaseConnection,
 } from '../lib/supabase';
-import { pullDataFromSupabase } from '../lib/storage';
+import { pullDataFromSupabase, pushAllDataToCloud } from '../lib/storage';
 
 interface SupabaseConfigModalProps {
   isOpen: boolean;
@@ -73,6 +73,21 @@ export const SupabaseConfigModal: React.FC<SupabaseConfigModalProps> = ({
         onClose();
       } else {
         alert(pullRes.message);
+      }
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const handlePushAllToCloud = async () => {
+    saveSupabaseConfig({ url: url.trim(), anonKey: anonKey.trim() });
+    setIsTesting(true);
+    try {
+      const pushRes = await pushAllDataToCloud();
+      alert(pushRes.message);
+      if (pushRes.success) {
+        onConnectionChange(true);
+        onClose();
       }
     } finally {
       setIsTesting(false);
@@ -229,17 +244,30 @@ CREATE POLICY "Public budget" ON user_budget_settings FOR ALL USING (true) WITH 
             </div>
           )}
 
-          {/* Tombol Simpan & Sinkronisasi */}
-          <button
-            type="button"
-            className="btn-primary"
-            style={{ width: '100%', marginTop: 4 }}
-            onClick={handleSaveAndSync}
-            disabled={isTesting}
-          >
-            <RefreshCw size={16} />
-            <span>Simpan & Sinkronkan Data Cloud</span>
-          </button>
+          {/* Tombol Aksi Cloud: Pull & Push */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
+            <button
+              type="button"
+              className="btn-primary"
+              style={{ width: '100%' }}
+              onClick={handleSaveAndSync}
+              disabled={isTesting}
+            >
+              <RefreshCw size={16} />
+              <span>Simpan & Tarik Data Cloud (Pull)</span>
+            </button>
+
+            <button
+              type="button"
+              className="btn-secondary"
+              style={{ width: '100%', borderColor: '#10b981', color: '#34d399', background: 'rgba(16, 185, 129, 0.1)' }}
+              onClick={handlePushAllToCloud}
+              disabled={isTesting}
+            >
+              <Cloud size={16} />
+              <span>Unggah Semua Data Pengguna ke Cloud (Push)</span>
+            </button>
+          </div>
 
           {/* Reset Demo Data & LocalStorage Backup */}
           <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: 14 }}>

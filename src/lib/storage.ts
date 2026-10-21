@@ -541,3 +541,98 @@ export async function pullDataFromSupabase(): Promise<{
     };
   }
 }
+
+/**
+ * Unggah seluruh data belanja (Profil, Keranjang, Struk, Anggaran) ke Cloud Supabase
+ */
+export async function pushAllDataToCloud(): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  const client = getSupabaseClient();
+  if (!client) {
+    return {
+      success: false,
+      message: 'Supabase client belum terhubung! Masukkan URL & Anon Key terlebih dahulu.',
+    };
+  }
+
+  try {
+    // 1. Simpan Profil Pengguna ke Cloud
+    await client.from('user_profiles').upsert({
+      id: 'user_rian',
+      name: 'Rian Pratama',
+      role: 'Siswa Rantau (Anak Kos)',
+      email: 'rian.rantau@codehub.sch.id',
+      campus: 'Kampus ICT Codehub',
+      monthly_allowance: 350000,
+      updated_at: new Date().toISOString(),
+    });
+
+    // 2. Simpan Pengaturan Anggaran ke Cloud
+    const budget = loadBudgetSettings();
+    await client.from('user_budget_settings').upsert({
+      id: 'default_user',
+      user_id: 'user_rian',
+      monthly_budget: budget.monthlyBudget,
+      warning_threshold_percent: budget.warningThresholdPercent,
+      updated_at: new Date().toISOString(),
+    });
+
+    // 3. Simpan Keranjang Belanja Aktif ke Cloud
+    const items = loadGroceryItems();
+    if (items.length > 0) {
+      await client.from('grocery_items').delete().neq('id', 'placeholder_id');
+      const records = items.map((i) => ({
+        id: i.id,
+        user_id: 'user_rian',
+        name: i.name,
+        category: i.category,
+        unit: i.unit,
+        quantity: i.quantity,
+        unit_price: i.unitPrice,
+        last_month_price: i.lastMonthPrice || null,
+        discount_type: i.discountType,
+        discount_percent_1: i.discountPercent1 || 0,
+        discount_percent_2: i.discountPercent2 || 0,
+        discount_nominal: i.discountNominal || 0,
+        priority: i.priority || 'essential',
+        is_checked_in_cart: i.isCheckedInCart || false,
+        notes: i.notes || '',
+        image_url: i.imageUrl || null,
+        source: i.source || 'Astronauts.id',
+      }));
+      await client.from('grocery_items').insert(records);
+    }
+
+    // 4. Simpan Riwayat Struk Belanja ke Cloud
+    const history = loadShoppingHistory();
+    for (const trip of history) {
+      await client.from('shopping_trips').upsert({
+        id: trip.id,
+        user_id: 'user_rian',
+        store_name: trip.storeName,
+        trip_date: trip.date,
+        total_spent: trip.totalSpent,
+        total_savings: trip.totalSavings,
+        total_items_count: trip.totalItemsCount,
+        budget_limit: trip.budgetLimit,
+        grand_total: trip.grandTotal || trip.totalSpent,
+        items_snapshot: trip.itemsSnapshot,
+        notes: trip.notes || '',
+      });
+    }
+
+    return {
+      success: true,
+      message: 'Seluruh data pengguna berhasil disimpan ke Cloud Database Supabase!',
+    };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      message: `Gagal menyimpan ke Cloud: ${errorMsg}`,
+    };
+  }
+}
+

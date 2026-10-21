@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, Cloud, HardDrive, Sparkles } from 'lucide-react';
+import { ShoppingCart, Cloud, Sparkles } from 'lucide-react';
 
 interface HeaderProps {
   isSupabaseConnected: boolean;
@@ -52,25 +52,32 @@ export const Header: React.FC<HeaderProps> = ({
             <span>PWA Aktif</span>
           </div>
 
-          {/* Cloud Indicator */}
+          {/* Cloud Database Indicator Pill */}
           <button
             type="button"
             onClick={onOpenSupabaseModal}
             style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: '50%',
-              width: 32,
-              height: 32,
+              background: isSupabaseConnected
+                ? 'rgba(16, 185, 129, 0.35)'
+                : 'rgba(255, 255, 255, 0.25)',
+              border: isSupabaseConnected
+                ? '1px solid #a7f3d0'
+                : '1px solid rgba(255, 255, 255, 0.4)',
+              borderRadius: '20px',
+              padding: '4px 10px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: 5,
               color: '#fff',
+              fontSize: '11px',
+              fontWeight: 700,
               cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
             }}
-            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud' : 'Mode Offline (LocalStorage)'}
+            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud Database' : 'Klik untuk hubungkan database Cloud'}
           >
-            {isSupabaseConnected ? <Cloud size={15} /> : <HardDrive size={15} />}
+            <Cloud size={14} color={isSupabaseConnected ? '#a7f3d0' : '#fff'} />
+            <span>{isSupabaseConnected ? 'Cloud Aktif' : 'Setup Cloud'}</span>
           </button>
         </div>
       </div>
