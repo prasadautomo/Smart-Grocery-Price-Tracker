@@ -12,6 +12,44 @@ const STORAGE_KEYS = {
   BENCHMARKS: 'smart_grocery_benchmarks_v1',
 };
 
+function getCurrentUserId(): string {
+  try {
+    const raw = localStorage.getItem('smart_grocery_auth_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u?.id) return u.id;
+    }
+  } catch {
+    // fallback
+  }
+  return 'user_rian';
+}
+
+function getCurrentUserInfo(): { id: string; name: string; email: string; role: string } {
+  try {
+    const raw = localStorage.getItem('smart_grocery_auth_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u?.id) {
+        return {
+          id: u.id,
+          name: u.name || 'Gavin Utomo',
+          email: u.email || 'gavinutomo4@gmail.com',
+          role: u.email?.includes('gavin') ? 'Akun Utama (Pemilik)' : 'Siswa Rantau (Anak Kos)',
+        };
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return {
+    id: 'user_rian',
+    name: 'Rian Pratama',
+    email: 'rian.rantau@codehub.sch.id',
+    role: 'Siswa Rantau (Anak Kos)',
+  };
+}
+
 // Data Awal Realistis Sesuai Kasus Rian & Katalog Astro (astronauts.id)
 export const INITIAL_ITEMS: GroceryItem[] = [
   {
@@ -258,13 +296,14 @@ export async function saveGroceryItems(items: GroceryItem[]): Promise<void> {
   const client = getSupabaseClient();
   if (client) {
     try {
+      const activeUserId = getCurrentUserId();
       // Hapus item keranjang user saat ini
-      await client.from('grocery_items').delete().eq('user_id', 'user_rian');
+      await client.from('grocery_items').delete().eq('user_id', activeUserId);
 
       if (items.length > 0) {
         const records = items.map((i) => ({
           id: i.id,
-          user_id: 'user_rian',
+          user_id: activeUserId,
           name: i.name,
           category: i.category,
           unit: i.unit,
@@ -323,10 +362,11 @@ export async function saveShoppingHistory(trips: ShoppingTrip[]): Promise<void> 
   const client = getSupabaseClient();
   if (client) {
     try {
+      const activeUserId = getCurrentUserId();
       for (const trip of trips) {
         await client.from('shopping_trips').upsert({
           id: trip.id,
-          user_id: 'user_rian',
+          user_id: activeUserId,
           store_name: trip.storeName,
           trip_date: trip.date,
           total_spent: trip.totalSpent,
@@ -501,6 +541,10 @@ export async function pullDataFromSupabase(): Promise<{
         discountPercent1: Number(row.discount_percent_1 || 0),
         discountPercent2: Number(row.discount_percent_2 || 0),
         discountNominal: Number(row.discount_nominal || 0),
+        priority: row.priority || 'essential',
+        isCheckedInCart: row.is_checked_in_cart ?? false,
+        imageUrl: row.image_url || null,
+        source: row.source || 'Astronauts.id',
         notes: row.notes || '',
         createdAt: row.created_at || new Date().toISOString(),
       }));
@@ -523,6 +567,8 @@ export async function pullDataFromSupabase(): Promise<{
         totalSavings: Number(row.total_savings),
         totalItemsCount: Number(row.total_items_count),
         budgetLimit: Number(row.budget_limit),
+        grandTotal: Number(row.grand_total || row.total_spent),
+        extraCosts: row.extra_costs || {},
         itemsSnapshot: row.items_snapshot || [],
         notes: row.notes || '',
       }));
@@ -574,12 +620,14 @@ export async function pushAllDataToCloud(): Promise<{
   }
 
   try {
+    const activeUser = getCurrentUserInfo();
+
     // 1. Simpan Profil Pengguna ke Cloud
     await client.from('user_profiles').upsert({
-      id: 'user_rian',
-      name: 'Rian Pratama',
-      role: 'Siswa Rantau (Anak Kos)',
-      email: 'rian.rantau@codehub.sch.id',
+      id: activeUser.id,
+      name: activeUser.name,
+      role: activeUser.role,
+      email: activeUser.email,
       campus: 'Kampus ICT Codehub',
       monthly_allowance: 350000,
       updated_at: new Date().toISOString(),
@@ -589,7 +637,7 @@ export async function pushAllDataToCloud(): Promise<{
     const budget = loadBudgetSettings();
     await client.from('user_budget_settings').upsert({
       id: 'default_user',
-      user_id: 'user_rian',
+      user_id: activeUser.id,
       monthly_budget: budget.monthlyBudget,
       warning_threshold_percent: budget.warningThresholdPercent,
       updated_at: new Date().toISOString(),
@@ -601,7 +649,7 @@ export async function pushAllDataToCloud(): Promise<{
       await client.from('grocery_items').delete().neq('id', 'placeholder_id');
       const records = items.map((i) => ({
         id: i.id,
-        user_id: 'user_rian',
+        user_id: activeUser.id,
         name: i.name,
         category: i.category,
         unit: i.unit,
@@ -626,7 +674,7 @@ export async function pushAllDataToCloud(): Promise<{
     for (const trip of history) {
       await client.from('shopping_trips').upsert({
         id: trip.id,
-        user_id: 'user_rian',
+        user_id: activeUser.id,
         store_name: trip.storeName,
         trip_date: trip.date,
         total_spent: trip.totalSpent,
@@ -635,6 +683,7 @@ export async function pushAllDataToCloud(): Promise<{
         budget_limit: trip.budgetLimit,
         grand_total: trip.grandTotal || trip.totalSpent,
         items_snapshot: trip.itemsSnapshot,
+        extra_costs: trip.extraCosts || {},
         notes: trip.notes || '',
       });
     }

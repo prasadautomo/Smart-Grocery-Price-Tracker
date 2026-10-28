@@ -25,7 +25,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
   onSetBenchmark,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('Lihat Semua');
   const [selectedTrip, setSelectedTrip] = useState<ShoppingTrip | null>(null);
   const [showScannerNotice, setShowScannerNotice] = useState(false);
 
@@ -65,16 +65,31 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
   });
 
   const lastMonthTrip = history[0];
-  const lastMonthTotal = lastMonthTrip ? (lastMonthTrip.grandTotal || lastMonthTrip.totalSpent) : 312000;
-  const avgSavings = history.length > 0 ? Math.round(cumulativeSavings / history.length) : 42500;
+  const lastMonthTotal = lastMonthTrip ? (lastMonthTrip.grandTotal || lastMonthTrip.totalSpent) : 0;
+  const avgSavings = history.length > 0 ? Math.round(cumulativeSavings / history.length) : 0;
 
-  // Filter list struk
+  // Filter list struk berdasarkan teks pencarian dan filter periode
   const filteredHistory = history.filter((trip) => {
     const matchSearch =
       trip.storeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (trip.notes && trip.notes.toLowerCase().includes(searchQuery.toLowerCase())) ||
       trip.itemsSnapshot.some((i) => i.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchSearch;
+
+    if (!matchSearch) return false;
+
+    if (selectedPeriod === 'Bulan Ini') {
+      const now = new Date();
+      const tripDate = new Date(trip.date);
+      return tripDate.getMonth() === now.getMonth() && tripDate.getFullYear() === now.getFullYear();
+    }
+    if (selectedPeriod === 'Bulan Lalu') {
+      const now = new Date();
+      const tripDate = new Date(trip.date);
+      const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+      const lastMonthYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      return tripDate.getMonth() === lastMonth && tripDate.getFullYear() === lastMonthYear;
+    }
+    return true;
   });
 
   return (
