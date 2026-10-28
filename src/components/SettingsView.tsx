@@ -5,8 +5,6 @@ import {
   Smartphone,
   RotateCcw,
   Info,
-  ShieldCheck,
-  LogOut,
   User,
 } from 'lucide-react';
 import type { BudgetSettings } from '../types/grocery';
