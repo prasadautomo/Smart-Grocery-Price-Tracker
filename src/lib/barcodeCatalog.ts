@@ -119,3 +119,4 @@ export function findProductByBarcode(barcode: string): BarcodeProduct | undefine
   const clean = barcode.trim();
   return BARCODE_CATALOG.find((p) => p.barcode === clean);
 }
+
