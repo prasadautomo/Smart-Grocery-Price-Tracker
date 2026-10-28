@@ -5,15 +5,22 @@ import {
   Smartphone,
   RotateCcw,
   Info,
+  ShieldCheck,
+  LogOut,
+  User,
 } from 'lucide-react';
 import type { BudgetSettings } from '../types/grocery';
+import type { UserProfile } from '../types/auth';
 import { formatRupiah } from '../lib/calculations';
+import { GoogleIcon } from './GoogleIcon';
 
 interface SettingsViewProps {
   budgetSettings: BudgetSettings;
   isSupabaseConnected: boolean;
+  user: UserProfile | null;
   onOpenBudgetModal: () => void;
   onOpenSupabaseModal: () => void;
+  onOpenAuthModal: () => void;
   onResetDemoData: () => void;
   onInstallPwa?: () => void;
   isInstallable: boolean;
@@ -22,8 +29,10 @@ interface SettingsViewProps {
 export const SettingsView: React.FC<SettingsViewProps> = ({
   budgetSettings,
   isSupabaseConnected,
+  user,
   onOpenBudgetModal,
   onOpenSupabaseModal,
+  onOpenAuthModal,
   onResetDemoData,
   onInstallPwa,
   isInstallable,
@@ -32,8 +41,123 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     <div className="settings-tab-section" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="section-header">
         <div className="section-title">
-          <span>Pengaturan & Integrasi Cloud</span>
+          <span>Pengaturan & Akun Cloud</span>
         </div>
+      </div>
+
+      {/* Card 0: Profil Akun Google (Google OAuth) */}
+      <div
+        className="card"
+        style={{
+          border: user ? '1.5px solid #a7f3d0' : '1px solid var(--border-subtle)',
+          background: user
+            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.02) 100%)'
+            : undefined,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {user ? (
+              <div style={{ position: 'relative', width: 44, height: 44, flexShrink: 0 }}>
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '2px solid #10b981',
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user.name
+                    )}&background=10b981&color=fff`;
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: -2,
+                    right: -2,
+                    background: '#ffffff',
+                    borderRadius: '50%',
+                    width: 18,
+                    height: 18,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  }}
+                >
+                  <GoogleIcon size={11} />
+                </div>
+              </div>
+            ) : (
+              <div
+                className="header-logo-badge"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: '#ffffff',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                }}
+              >
+                <GoogleIcon size={22} />
+              </div>
+            )}
+
+            <div>
+              <h4 style={{ fontSize: '15px', color: '#fff', fontWeight: 800 }}>
+                {user ? user.name : 'Akun Google Belum Masuk'}
+              </h4>
+              <p style={{ fontSize: '11.5px', color: user ? '#34d399' : '#94a3b8' }}>
+                {user ? user.email : 'Sinkronkan data belanja via Google OAuth'}
+              </p>
+            </div>
+          </div>
+
+          <span className={`cloud-status-pill ${user ? 'connected' : 'offline'}`}>
+            <span className={`cloud-dot ${user ? 'pulse' : ''}`} />
+            {user ? 'Google Aktif' : 'Tamu'}
+          </span>
+        </div>
+
+        <p style={{ fontSize: '11.5px', color: '#94a3b8', lineHeight: 1.45, marginBottom: 12 }}>
+          {user
+            ? 'Akun kamu terhubung dan otomatis menyinkronkan keranjang troli, riwayat struk kasir, dan anggaran belanja ke cloud database.'
+            : 'Masuk dengan Akun Google untuk menyimpan daftar belanja dan riwayat struk digital secara permanen lintas gadget.'}
+        </p>
+
+        {user ? (
+          <button
+            className="btn-secondary"
+            style={{ width: '100%', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            onClick={onOpenAuthModal}
+          >
+            <User size={15} />
+            <span>Kelola Profil & Ganti Akun</span>
+          </button>
+        ) : (
+          <button
+            className="btn-primary"
+            style={{
+              width: '100%',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              background: '#ffffff',
+              color: '#0f172a',
+              border: '1px solid #cbd5e1',
+            }}
+            onClick={onOpenAuthModal}
+          >
+            <GoogleIcon size={16} />
+            <span>Masuk dengan Google (1-Klik)</span>
+          </button>
+        )}
       </div>
 
       {/* Card 1: Batas Anggaran Dompet */}

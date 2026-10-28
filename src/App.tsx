@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { GroceryItem, ShoppingTrip, BudgetSettings } from './types/grocery';
+import type { UserProfile } from './types/auth';
 import {
   loadGroceryItems,
   saveGroceryItems,
@@ -14,6 +15,7 @@ import {
   INITIAL_BUDGET,
 } from './lib/storage';
 import { getSupabaseClient } from './lib/supabase';
+import { getSavedUser, initializeAuth, subscribeAuthState } from './lib/auth';
 import { calculateItemPrice, formatRupiah, getTrimRecommendations } from './lib/calculations';
 
 // Components
@@ -33,12 +35,17 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { QuickPresetModal } from './components/QuickPresetModal';
 import { ShareChecklistModal } from './components/ShareChecklistModal';
 import { UnitBulkComparatorModal } from './components/UnitBulkComparatorModal';
+import { AuthModal } from './components/AuthModal';
 
 export const App: React.FC = () => {
   // State Data Belanja
   const [items, setItems] = useState<GroceryItem[]>(() => loadGroceryItems());
   const [history, setHistory] = useState<ShoppingTrip[]>(() => loadShoppingHistory());
   const [budgetSettings, setBudgetSettings] = useState<BudgetSettings>(() => loadBudgetSettings());
+
+  // User & Auth State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getSavedUser());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Navigation State
   const [activeTab, setActiveTab] = useState<ActiveTab>('cart');
@@ -58,8 +65,32 @@ export const App: React.FC = () => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Inisialisasi status koneksi Supabase & Tarik data Cloud otomatis saat aplikasi dibuka
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3200);
+  };
+
+  // Inisialisasi Auth Google & status koneksi Supabase & Tarik data Cloud otomatis saat aplikasi dibuka
   useEffect(() => {
+    // 1. Inisialisasi Auth (Deteksi session Google OAuth dari URL redirect atau storage)
+    initializeAuth().then((user) => {
+      if (user) {
+        setCurrentUser(user);
+      }
+    });
+
+    const unsubscribeAuth = subscribeAuthState((user) => {
+      setCurrentUser(user);
+      if (user) {
+        showToast(`Halo ${user.name.split(' ')[0]}, berhasil masuk via Google!`);
+      } else {
+        showToast('Berhasil keluar dari akun.');
+      }
+    });
+
+    // 2. Hubungkan ke Supabase Cloud
     const client = getSupabaseClient();
     if (client) {
       setIsSupabaseConnected(true);
@@ -73,12 +104,11 @@ export const App: React.FC = () => {
           }
           setHistory(loadShoppingHistory());
           setBudgetSettings(loadBudgetSettings());
-          showToast('Terhubung ke Cloud Supabase (Auto Realtime Sync)');
         }
       });
     }
 
-    // PWA install prompt handler
+    // 3. PWA install prompt handler
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e);
@@ -86,16 +116,10 @@ export const App: React.FC = () => {
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     return () => {
+      unsubscribeAuth();
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
   }, []);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3000);
-  };
 
   // Kalkulasi total keranjang aktif
   let totalSpent = 0;
@@ -260,8 +284,10 @@ export const App: React.FC = () => {
         {/* Header Mobile (Sleek Stitch Green Hero) */}
         <Header
           isSupabaseConnected={isSupabaseConnected}
+          user={currentUser}
           onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
           onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
           activeTab={activeTab}
         >
           {activeTab === 'cart' && (
@@ -327,8 +353,10 @@ export const App: React.FC = () => {
             <SettingsView
               budgetSettings={budgetSettings}
               isSupabaseConnected={isSupabaseConnected}
+              user={currentUser}
               onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
               onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
+              onOpenAuthModal={() => setIsAuthModalOpen(true)}
               onResetDemoData={handleResetDemoData}
               onInstallPwa={handleInstallPwa}
               isInstallable={!!installPrompt}
@@ -343,7 +371,15 @@ export const App: React.FC = () => {
           onTabChange={setActiveTab}
         />
 
-        {/* Modals & Sheets */}
+        {/* Auth Modal (Google OAuth & Profil Pengguna) */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          user={currentUser}
+          onClose={() => setIsAuthModalOpen(false)}
+          onLoginSuccess={(u) => showToast(`Selamat datang, ${u.name}! (Akun Google)`)}
+        />
+
+        {/* Modals & Sheets Lainnya */}
         <AddEditItemModal
           isOpen={isAddModalOpen}
           itemToEdit={itemToEdit}
