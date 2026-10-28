@@ -2,6 +2,7 @@ import { getSupabaseClient } from './supabase';
 import type { UserProfile } from '../types/auth';
 
 const USER_STORAGE_KEY = 'smart_grocery_auth_user';
+const LOGGED_OUT_KEY = 'smart_grocery_logged_out';
 
 type AuthListener = (user: UserProfile | null) => void;
 const listeners: Set<AuthListener> = new Set();
@@ -26,9 +27,15 @@ export const PRESET_GOOGLE_ACCOUNTS: Array<{
   role: string;
 }> = [
   {
+    name: 'Gavin Utomo',
+    email: 'gavinutomo4@gmail.com',
+    avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    role: 'Akun Utama (Pemilik)',
+  },
+  {
     name: 'Rian Pratama',
     email: 'rian.pratama@gmail.com',
-    avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80',
     role: 'Siswa Rantau / Anak Kos',
   },
   {
@@ -36,12 +43,6 @@ export const PRESET_GOOGLE_ACCOUNTS: Array<{
     email: 'siti.rahma@gmail.com',
     avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
     role: 'Pengelola Anggaran Hemat',
-  },
-  {
-    name: 'Budi Santoso',
-    email: 'budi.santoso@gmail.com',
-    avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80',
-    role: 'Mahasiswa Tingkat Akhir',
   },
 ];
 
@@ -65,7 +66,7 @@ function mapSupabaseUser(sbUser: any): UserProfile {
 }
 
 /**
- * Dapatkan user aktif (dari Supabase auth session atau storage lokal)
+ * Dapatkan user aktif (dari Supabase auth session, storage lokal, atau sambungkan akun Google Gavin Utomo secara default)
  */
 export function getSavedUser(): UserProfile | null {
   try {
@@ -73,6 +74,25 @@ export function getSavedUser(): UserProfile | null {
     if (raw) {
       return JSON.parse(raw) as UserProfile;
     }
+
+    const hasLoggedOut = localStorage.getItem(LOGGED_OUT_KEY);
+    if (hasLoggedOut === 'true') {
+      return null;
+    }
+
+    // Sambungkan otomatis ke Akun Google Gavin Utomo agar aplikasi langsung siap pakai
+    const defaultGoogleUser: UserProfile = {
+      id: 'google_user_gavin_utomo',
+      name: 'Gavin Utomo',
+      email: 'gavinutomo4@gmail.com',
+      avatarUrl:
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      provider: 'google',
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+    };
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(defaultGoogleUser));
+    return defaultGoogleUser;
   } catch (err) {
     console.warn('Gagal membaca saved user:', err);
   }
@@ -89,6 +109,7 @@ export async function initializeAuth(): Promise<UserProfile | null> {
       const { data } = await client.auth.getSession();
       if (data?.session?.user) {
         const profile = mapSupabaseUser(data.session.user);
+        localStorage.removeItem(LOGGED_OUT_KEY);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile));
         notifyListeners(profile);
         return profile;
@@ -144,7 +165,7 @@ export async function signInWithGoogleOAuth(): Promise<{
         return {
           success: false,
           message:
-            'Google Provider belum diaktifkan di Supabase Dashboard kamu. Kamu bisa mengaktifkannya di Dashboard > Authentication > Providers > Google, atau gunakan opsi "Demo Login Google" di bawah ini.',
+            'Google Provider belum diaktifkan di Dashboard Supabase. Silakan buka Supabase Dashboard > Authentication > Providers > Google, atau masuk langsung lewat tombol Akun Google Gavin Utomo.',
         };
       }
       return { success: false, message: error.message };
@@ -184,6 +205,7 @@ export function signInDemoGoogle(account?: {
     lastLogin: new Date().toISOString(),
   };
 
+  localStorage.removeItem(LOGGED_OUT_KEY);
   localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(demoProfile));
   notifyListeners(demoProfile);
   return demoProfile;
@@ -202,6 +224,7 @@ export async function signOutUser(): Promise<void> {
     }
   }
 
+  localStorage.setItem(LOGGED_OUT_KEY, 'true');
   localStorage.removeItem(USER_STORAGE_KEY);
   notifyListeners(null);
 }
@@ -220,9 +243,11 @@ export function subscribeAuthState(callback: AuthListener): () => void {
     const { data } = client.auth.onAuthStateChange((event, session) => {
       if (session?.user && (event === 'SIGNED_IN' || event === 'USER_UPDATED')) {
         const profile = mapSupabaseUser(session.user);
+        localStorage.removeItem(LOGGED_OUT_KEY);
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(profile));
         notifyListeners(profile);
       } else if (event === 'SIGNED_OUT') {
+        localStorage.setItem(LOGGED_OUT_KEY, 'true');
         localStorage.removeItem(USER_STORAGE_KEY);
         notifyListeners(null);
       }
@@ -255,4 +280,3 @@ export function subscribeAuthState(callback: AuthListener): () => void {
     }
   };
 }
-

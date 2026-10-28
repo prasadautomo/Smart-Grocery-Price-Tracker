@@ -9,6 +9,10 @@ import {
   ArrowRight,
   AlertCircle,
   HelpCircle,
+  Copy,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import type { UserProfile } from '../types/auth';
 import { GoogleIcon } from './GoogleIcon';
@@ -35,10 +39,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customEmail, setCustomEmail] = useState('');
 
   if (!isOpen) return null;
+
+  const callbackUrl = 'https://wkrspzoixbkbpanoelvp.supabase.co/auth/v1/callback';
+
+  const copyCallbackUrl = () => {
+    navigator.clipboard.writeText(callbackUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
 
   // Handler: Login Real via Supabase Google OAuth
   const handleGoogleOAuthLogin = async () => {
@@ -51,7 +65,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     if (!result.success) {
       setErrorMessage(result.message || 'Gagal memulai login Google.');
     }
-    // Jika result.success dan URL tersedia, browser akan auto redirect ke Google Accounts
   };
 
   // Handler: 1-Click Demo Google Account Login
@@ -127,8 +140,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </h2>
               <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>
                 {user
-                  ? 'Tersambung ke Cloud SafeGrocer'
-                  : 'Satu klik untuk simpan data di cloud'}
+                  ? 'Tersambung ke SafeGrocer Cloud'
+                  : 'Satu klik untuk hubungkan akun Google'}
               </p>
             </div>
           </div>
@@ -199,21 +212,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 {/* User Details */}
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <h3
-                      style={{
-                        fontSize: '15px',
-                        fontWeight: 800,
-                        color: '#065f46',
-                        margin: 0,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {user.name}
-                    </h3>
-                  </div>
+                  <h3
+                    style={{
+                      fontSize: '15px',
+                      fontWeight: 800,
+                      color: '#065f46',
+                      margin: 0,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {user.name}
+                  </h3>
 
                   <p
                     style={{
@@ -241,11 +252,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     }}
                   >
                     <ShieldCheck size={12} color="#16a34a" />
-                    <span>
-                      {user.provider === 'google'
-                        ? 'Google OAuth Aktif'
-                        : 'Akun Google Terhubung'}
-                    </span>
+                    <span>Akun Google Terhubung</span>
                   </div>
                 </div>
               </div>
@@ -272,7 +279,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 >
                   <span style={{ color: '#64748b' }}>Sinkronisasi Cloud</span>
                   <span style={{ fontWeight: 700, color: '#10b981' }}>
-                    ● Otomatis Realtime
+                    ● Realtime Aktif
                   </span>
                 </div>
 
@@ -284,7 +291,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     fontSize: '11.5px',
                   }}
                 >
-                  <span style={{ color: '#64748b' }}>User ID</span>
+                  <span style={{ color: '#64748b' }}>Akun Email</span>
                   <span
                     style={{
                       fontWeight: 600,
@@ -292,7 +299,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       fontFamily: 'monospace',
                     }}
                   >
-                    {user.id.substring(0, 14)}...
+                    {user.email}
                   </span>
                 </div>
               </div>
@@ -341,44 +348,129 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           ) : (
             /* ======================= CASE B: BELUM LOGIN ======================= */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Highlight Banner */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* TOMBOL UTAMA 1-KLIK: GAVIN UTOMO (AKUN GOOGLE PENGGUNA) */}
               <div
                 style={{
-                  background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-                  border: '1px solid #e2e8f0',
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                  border: '1.5px solid #10b981',
                   borderRadius: '16px',
-                  padding: '14px 16px',
+                  padding: '14px',
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
+                  flexDirection: 'column',
+                  gap: 10,
                 }}
               >
-                <div
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <GoogleIcon size={18} />
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#047857' }}>
+                      Akun Google Anda Siap Masuk:
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      background: '#10b981',
+                      color: '#ffffff',
+                      padding: '2px 7px',
+                      borderRadius: '10px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    1-Klik
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin(PRESET_GOOGLE_ACCOUNTS[0])}
                   style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: '12px',
+                    width: '100%',
+                    padding: '11px 14px',
                     background: '#ffffff',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-                    flexShrink: 0,
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(16, 185, 129, 0.15)',
+                    transition: 'all 0.15s ease',
                   }}
                 >
-                  <Sparkles size={20} color="#10b981" />
-                </div>
-                <div>
-                  <h4 style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-                    Akses Cloud Lintas Perangkat
-                  </h4>
-                  <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0 0', lineHeight: 1.35 }}>
-                    Daftar belanja, struk kasir, dan patokan harga otomatis tersimpan di akun Google kamu.
-                  </p>
-                </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img
+                      src={PRESET_GOOGLE_ACCOUNTS[0].avatarUrl}
+                      alt={PRESET_GOOGLE_ACCOUNTS[0].name}
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: '50%',
+                        border: '1.5px solid #10b981',
+                      }}
+                    />
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
+                        {PRESET_GOOGLE_ACCOUNTS[0].name}
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: '#059669', fontWeight: 600 }}>
+                        {PRESET_GOOGLE_ACCOUNTS[0].email}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      background: '#10b981',
+                      color: '#ffffff',
+                      padding: '6px 12px',
+                      borderRadius: '10px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <span>Masuk</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </button>
               </div>
+
+              {/* TOMBOL GOOGLE OAUTH POPUP / BROWSER */}
+              <button
+                type="button"
+                className="google-sign-in-btn"
+                onClick={handleGoogleOAuthLogin}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  background: '#ffffff',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 10,
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <GoogleIcon size={20} />
+                <span
+                  style={{
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    color: '#1e293b',
+                  }}
+                >
+                  {isLoading ? 'Menghubungkan ke Google...' : 'Lanjutkan via Google OAuth Cloud'}
+                </span>
+              </button>
 
               {/* Error Alert jika Google OAuth provider belum diaktifkan */}
               {errorMessage && (
@@ -395,86 +487,116 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 >
                   <AlertCircle size={18} color="#d97706" style={{ flexShrink: 0, marginTop: 1 }} />
                   <div style={{ fontSize: '11.5px', color: '#92400e', lineHeight: 1.4 }}>
-                    <strong>Pemberitahuan:</strong> {errorMessage}
-                    <div style={{ marginTop: 6, fontWeight: 600, color: '#059669' }}>
-                      💡 Tip: Kamu bisa langsung pakai tombol <strong>"Demo 1-Klik Google"</strong> di bawah untuk mencoba fitur tanpa setup!
-                    </div>
+                    <strong>Pemberitahuan Cloud:</strong> {errorMessage}
                   </div>
                 </div>
               )}
 
-              {/* TOMBOL UTAMA: GOOGLE SIGN-IN RESMI */}
-              <button
-                type="button"
-                className="google-sign-in-btn"
-                onClick={handleGoogleOAuthLogin}
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '13px 16px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 12,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <GoogleIcon size={22} />
-                <span
-                  style={{
-                    fontSize: '14.5px',
-                    fontWeight: 700,
-                    color: '#1e293b',
-                    letterSpacing: '-0.2px',
-                  }}
-                >
-                  {isLoading ? 'Menghubungkan ke Google...' : 'Lanjutkan dengan Google'}
-                </span>
-              </button>
-
-              {/* Divider Pemisah */}
+              {/* Petunjuk Pengaktifan Supabase Google Provider */}
               <div
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  margin: '4px 0',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '10px 12px',
                 }}
               >
-                <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
-                <span
+                <button
+                  type="button"
+                  onClick={() => setShowGuide(!showGuide)}
                   style={{
-                    fontSize: '11px',
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    padding: 0,
+                    color: '#334155',
+                    fontSize: '11.5px',
                     fontWeight: 700,
-                    color: '#94a3b8',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
                   }}
                 >
-                  atau coba cepat (1-klik)
-                </span>
-                <div style={{ flex: 1, height: 1, background: '#e2e8f0' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <HelpCircle size={15} color="#059669" />
+                    <span>Petunjuk Menghubungkan Google ke Supabase</span>
+                  </div>
+                  {showGuide ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                </button>
+
+                {showGuide && (
+                  <div style={{ marginTop: 10, fontSize: '11px', color: '#475569', lineHeight: 1.45 }}>
+                    <p style={{ margin: '0 0 6px 0' }}>
+                      Untuk mengaktifkan login Google via Cloud Supabase:
+                    </p>
+                    <ol style={{ paddingLeft: '16px', margin: '0 0 8px 0', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <li>
+                        Buka{' '}
+                        <a
+                          href="https://supabase.com/dashboard/project/wkrspzoixbkbpanoelvp/auth/providers"
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: '#059669', fontWeight: 700 }}
+                        >
+                          Supabase Dashboard &gt; Providers &gt; Google <ExternalLink size={10} style={{ display: 'inline' }} />
+                        </a>
+                      </li>
+                      <li>Aktifkan toggle <strong>Enable Google provider</strong>.</li>
+                      <li>
+                        Masukkan <strong>Client ID</strong> &amp; <strong>Client Secret</strong> dari Google Cloud Console.
+                      </li>
+                      <li>
+                        Masukkan Callback URL ini ke Google Cloud Console:
+                        <div
+                          style={{
+                            background: '#e2e8f0',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            marginTop: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            fontFamily: 'monospace',
+                            fontSize: '10px',
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          <span>{callbackUrl}</span>
+                          <button
+                            type="button"
+                            onClick={copyCallbackUrl}
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #cbd5e1',
+                              borderRadius: '4px',
+                              padding: '2px 6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 3,
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: copiedUrl ? '#059669' : '#334155',
+                            }}
+                          >
+                            <Copy size={11} />
+                            {copiedUrl ? 'Disalin!' : 'Salin'}
+                          </button>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                )}
               </div>
 
-              {/* Pilihan Akun Demo 1-Klik */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <p
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#64748b',
-                    margin: 0,
-                  }}
-                >
-                  Pilih akun Google instan untuk pengujian langsung:
-                </p>
+              {/* Pilihan Akun Lainnya */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>
+                  Pilihan Akun Google Lainnya:
+                </span>
 
-                {PRESET_GOOGLE_ACCOUNTS.map((acc) => (
+                {PRESET_GOOGLE_ACCOUNTS.slice(1).map((acc) => (
                   <button
                     key={acc.email}
                     type="button"
@@ -483,80 +605,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       width: '100%',
                       background: '#ffffff',
                       border: '1px solid #e2e8f0',
-                      borderRadius: '12px',
-                      padding: '9px 12px',
+                      borderRadius: '10px',
+                      padding: '8px 10px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
                       textAlign: 'left',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#10b981';
-                      e.currentTarget.style.background = '#f0fdf4';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#e2e8f0';
-                      e.currentTarget.style.background = '#ffffff';
-                    }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <img
                         src={acc.avatarUrl}
                         alt={acc.name}
-                        style={{
-                          width: 34,
-                          height: 34,
-                          borderRadius: '50%',
-                          objectFit: 'cover',
-                          border: '1px solid #cbd5e1',
-                        }}
+                        style={{ width: 28, height: 28, borderRadius: '50%' }}
                       />
                       <div>
-                        <div
-                          style={{
-                            fontSize: '12.5px',
-                            fontWeight: 700,
-                            color: '#0f172a',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 6,
-                          }}
-                        >
-                          <span>{acc.name}</span>
-                          <span
-                            style={{
-                              fontSize: '9.5px',
-                              background: '#ecfdf5',
-                              color: '#059669',
-                              padding: '1px 5px',
-                              borderRadius: '6px',
-                              fontWeight: 700,
-                            }}
-                          >
-                            {acc.role}
-                          </span>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+                          {acc.name}
                         </div>
-                        <span style={{ fontSize: '11px', color: '#64748b' }}>
-                          {acc.email}
-                        </span>
+                        <div style={{ fontSize: '10.5px', color: '#64748b' }}>{acc.email}</div>
                       </div>
                     </div>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        fontSize: '11px',
-                        color: '#10b981',
-                        fontWeight: 700,
-                      }}
-                    >
-                      <span>Masuk</span>
-                      <ArrowRight size={14} />
-                    </div>
+                    <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 700 }}>
+                      Pilih
+                    </span>
                   </button>
                 ))}
               </div>
@@ -574,13 +647,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       fontSize: '11.5px',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      padding: '4px 0',
+                      padding: '2px 0',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 4,
                     }}
                   >
-                    <span>+ Ketik Nama & Email Google Pribadi</span>
+                    <span>+ Masuk dengan Email Google Lain</span>
                   </button>
                 ) : (
                   <form
@@ -595,14 +668,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       gap: 8,
                     }}
                   >
-                    <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#334155' }}>
-                      Input Akun Google Kustom:
-                    </div>
-
                     <input
                       type="text"
                       className="form-input"
-                      placeholder="Nama Lengkap (Contoh: Rian Pratama)"
+                      placeholder="Nama Lengkap"
                       value={customName}
                       onChange={(e) => setCustomName(e.target.value)}
                       style={{ fontSize: '12px', padding: '8px 10px' }}
@@ -611,14 +680,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <input
                       type="email"
                       className="form-input"
-                      placeholder="Email Google (contoh: kamu@gmail.com) *"
+                      placeholder="Email Google (@gmail.com) *"
                       value={customEmail}
                       onChange={(e) => setCustomEmail(e.target.value)}
                       required
                       style={{ fontSize: '12px', padding: '8px 10px' }}
                     />
 
-                    <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                    <div style={{ display: 'flex', gap: 6 }}>
                       <button
                         type="submit"
                         className="btn-primary"
@@ -638,22 +707,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   </form>
                 )}
               </div>
-
-              {/* Keamanan & Privacy Note */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  justifyContent: 'center',
-                  marginTop: 6,
-                  color: '#94a3b8',
-                  fontSize: '10.5px',
-                }}
-              >
-                <ShieldCheck size={13} color="#94a3b8" />
-                <span>Otentikasi aman via Google Identity & Supabase Auth</span>
-              </div>
             </div>
           )}
         </div>
@@ -661,4 +714,3 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     </div>
   );
 };
-
