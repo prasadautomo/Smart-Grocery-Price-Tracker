@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   X,
   CheckCircle,
@@ -25,6 +25,8 @@ interface CheckoutModalProps {
   isOpen: boolean;
   items: GroceryItem[];
   budgetSettings: BudgetSettings;
+  sessionStoreName?: string;
+  sessionDate?: string;
   onClose: () => void;
   onConfirmCheckout: (trip: ShoppingTrip) => void;
 }
@@ -47,7 +49,7 @@ const ASTRO_PAYMENT_METHODS: AstroPaymentOption[] = [
     name: 'QRIS Instant (Rekomendasi)',
     category: 'qris',
     channel: 'QRIS Nasional (GoPay, ShopeePay, OVO, DANA, BCA)',
-    description: 'Bebas biaya admin • Scan otomatis dari semua aplikasi perbankan & e-wallet',
+    description: 'Bebas biaya admin â€¢ Scan otomatis dari semua aplikasi perbankan & e-wallet',
     badge: 'Paling Cepat',
   },
   {
@@ -55,7 +57,7 @@ const ASTRO_PAYMENT_METHODS: AstroPaymentOption[] = [
     name: 'GoPay Direct',
     category: 'ewallet',
     channel: 'GoPay (0812-****-4321)',
-    description: 'Saldo terhubung • Pembayaran 1-tap tanpa PIN',
+    description: 'Saldo terhubung â€¢ Pembayaran 1-tap tanpa PIN',
     badge: 'Cashback 5%',
   },
   {
@@ -117,13 +119,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
   items,
   budgetSettings,
+  sessionStoreName = 'Lotte Mart Grocery - Puri Indah',
+  sessionDate,
   onClose,
   onConfirmCheckout,
 }) => {
-  // Mode Pengiriman Astro
-  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('astro_instant');
-  const [storeName, setStoreName] = useState('Astro Hub Sudirman (15 Menit)');
-  const [notes, setNotes] = useState('Pesanan Kos via Astronauts.id');
+  // Mode Belanja Kasir Supermarket Fisik vs Online Instant
+  const [deliveryMode, setDeliveryMode] = useState<DeliveryMode>('physical_store');
+  const [storeName, setStoreName] = useState(sessionStoreName);
+  const [notes, setNotes] = useState('Belanja bulanan di Lotte Mart Puri Indah');
+
+  React.useEffect(() => {
+    if (sessionStoreName) setStoreName(sessionStoreName);
+  }, [sessionStoreName, isOpen]);
 
   // Astro Payment State
   const [selectedPaymentId, setSelectedPaymentId] = useState<string>('qris');
@@ -183,7 +191,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       const newTrip: ShoppingTrip = {
         id: `trip-${Date.now()}`,
-        date: new Date().toISOString(),
+        date: sessionDate ? new Date(sessionDate).toISOString() : new Date().toISOString(),
         storeName: deliveryMode === 'astro_instant' ? 'Astronauts.id (Astro 15m)' : storeName.trim(),
         totalSpent,
         totalSavings: totalSavings + astroCoinsDiscount + (deliveryMode === 'astro_instant' && isFreeShipping ? 9000 : 0),
@@ -345,7 +353,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: '15px' }}>🏪</span>
+                  <span style={{ fontSize: '15px' }}>ðŸª</span>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>Belanja Mandiri</span>
                 </div>
                 <div style={{ fontSize: '10.5px', color: '#94a3b8', lineHeight: 1.3 }}>
@@ -526,7 +534,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     {formatRupiah(grandTotal)}
                   </div>
                   <div style={{ fontSize: '10.5px', color: '#059669', fontWeight: 600, marginTop: 2 }}>
-                    ✅ Dukung GoPay, BCA, Livin, ShopeePay, OVO, DANA
+                    âœ… Dukung GoPay, BCA, Livin, ShopeePay, OVO, DANA
                   </div>
                 </div>
               </div>
@@ -573,7 +581,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </button>
                 </div>
                 <div style={{ fontSize: '10.5px', color: '#cbd5e1' }}>
-                  💡 Masukkan nominal persis <strong>{formatRupiah(grandTotal)}</strong> agar terverifikasi otomatis dalam 10 detik.
+                  ðŸ’¡ Masukkan nominal persis <strong>{formatRupiah(grandTotal)}</strong> agar terverifikasi otomatis dalam 10 detik.
                 </div>
               </div>
             )}

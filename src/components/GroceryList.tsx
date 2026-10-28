@@ -13,7 +13,11 @@ import {
   Share2,
   Package,
   Tag,
-  Check
+  Check,
+  Store,
+  Calendar,
+  Clock,
+  MapPin,
 } from 'lucide-react';
 import type { GroceryItem, CategoryType } from '../types/grocery';
 import {
@@ -26,6 +30,10 @@ import { resolveProductImageUrl } from '../lib/productImages';
 interface GroceryListProps {
   items: GroceryItem[];
   budgetLimit: number;
+  selectedStore?: string;
+  sessionDate?: string;
+  onStoreChange?: (store: string) => void;
+  onDateChange?: (date: string) => void;
   onAddItem: () => void;
   onOpenPresets: () => void;
   onOpenComparator?: () => void;
@@ -36,6 +44,14 @@ interface GroceryListProps {
   onToggleCheckItem: (id: string) => void;
   onCheckout: () => void;
 }
+
+const STORE_OPTIONS = [
+  'Lotte Mart Grocery - Puri Indah',
+  'Super Indo - Puri Pesanggrahan',
+  'Hypermart - Puri Indah Mall',
+  'Indomaret Fresh - Kos Rian',
+  'Pasar Tradisional Puri',
+];
 
 const FILTER_CATEGORIES: (CategoryType | 'Semua')[] = [
   'Semua',
@@ -51,6 +67,10 @@ const FILTER_CATEGORIES: (CategoryType | 'Semua')[] = [
 export const GroceryList: React.FC<GroceryListProps> = ({
   items,
   budgetLimit,
+  selectedStore = 'Lotte Mart Grocery - Puri Indah',
+  sessionDate = new Date().toISOString().slice(0, 10),
+  onStoreChange,
+  onDateChange,
   onAddItem,
   onOpenPresets,
   onOpenComparator,
@@ -83,6 +103,142 @@ export const GroceryList: React.FC<GroceryListProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {/* 0. METADATA SESI BELANJA (SRS F-01: LOKASI TOKO & TANGGAL TRANSAKSI) */}
+      <div
+        className="card"
+        style={{
+          padding: '11px 14px',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          border: '1.5px solid #cbd5e1',
+          borderRadius: 16,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                width: 24,
+                height: 24,
+                borderRadius: '50%',
+                background: '#ecfdf5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#059669',
+              }}
+            >
+              <Store size={13} />
+            </div>
+            <span style={{ fontSize: '11.5px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.2px' }}>
+              Sesi Belanja Aktif (SRS F-01)
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '10px',
+              fontWeight: 700,
+              background: '#ecfdf5',
+              color: '#059669',
+              padding: '2px 7px',
+              borderRadius: 6,
+              border: '1px solid #a7f3d0',
+            }}
+          >
+            Multi-Toko
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1.45fr 1fr', gap: 8 }}>
+          {/* Selector Lokasi Toko */}
+          <div>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                marginBottom: 3,
+              }}
+            >
+              <MapPin size={10} color="#059669" />
+              <span>Lokasi Toko (Default):</span>
+            </label>
+            <select
+              value={selectedStore}
+              onChange={(e) => onStoreChange && onStoreChange(e.target.value)}
+              className="form-select"
+              style={{
+                height: 34,
+                fontSize: '11.5px',
+                padding: '4px 8px',
+                fontWeight: 700,
+                color: '#0f172a',
+                border: '1px solid #cbd5e1',
+                borderRadius: 8,
+                background: '#ffffff',
+                width: '100%',
+              }}
+            >
+              {STORE_OPTIONS.map((store) => (
+                <option key={store} value={store}>
+                  {store}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Selector Tanggal Belanja */}
+          <div>
+            <label
+              style={{
+                fontSize: '10px',
+                fontWeight: 700,
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                marginBottom: 3,
+              }}
+            >
+              <Calendar size={10} color="#059669" />
+              <span>Tanggal Belanja:</span>
+            </label>
+            <input
+              type="date"
+              value={sessionDate}
+              onChange={(e) => onDateChange && onDateChange(e.target.value)}
+              className="form-input"
+              style={{
+                height: 34,
+                fontSize: '11px',
+                padding: '4px 8px',
+                fontWeight: 600,
+                color: '#0f172a',
+                border: '1px solid #cbd5e1',
+                borderRadius: 8,
+                background: '#ffffff',
+                width: '100%',
+              }}
+            />
+          </div>
+        </div>
+
+        <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Clock size={11} color="#10b981" />
+          <span>
+            Membandingkan patokan harga otomatis terhadap riwayat bulan lalu di{' '}
+            <strong style={{ color: '#065f46' }}>{selectedStore.split(' - ')[0]}</strong>.
+          </span>
+        </div>
+      </div>
+
       {/* 1. Clean Compact Action Bar: Search + Katalog + Tambah */}
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <div style={{ position: 'relative', flex: 1 }}>
@@ -392,7 +548,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                       {formatRupiah(item.unitPrice)} / {item.unit}
                     </span>
 
-                    {/* Trend Pill Ringkas (Hanya jika ada selisih) */}
+                    {/* Trend Pill Ringkas (SRS F-04: Komparator Harga Realtime vs Riwayat Toko) */}
                     {comp.trend === 'up' && (
                       <span
                         style={{
@@ -403,6 +559,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                           padding: '1px 5px',
                           borderRadius: 4,
                         }}
+                        title={`Harga naik dibanding riwayat bulan lalu di ${selectedStore.split(' - ')[0]}`}
                       >
                         ↑ +{formatRupiah(comp.difference)}
                       </span>
@@ -417,8 +574,24 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                           padding: '1px 5px',
                           borderRadius: 4,
                         }}
+                        title={`Harga lebih hemat dibanding riwayat bulan lalu di ${selectedStore.split(' - ')[0]}`}
                       >
                         ↓ -{formatRupiah(Math.abs(comp.difference))}
+                      </span>
+                    )}
+                    {comp.trend === 'equal' && item.lastMonthPrice !== undefined && item.lastMonthPrice !== null && (
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          fontWeight: 700,
+                          color: '#475569',
+                          background: '#f1f5f9',
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                        }}
+                        title={`Harga stabil sama dengan riwayat bulan lalu di ${selectedStore.split(' - ')[0]}`}
+                      >
+                        = Tetap
                       </span>
                     )}
                   </div>
@@ -459,70 +632,131 @@ export const GroceryList: React.FC<GroceryListProps> = ({
                 </div>
               </div>
 
-              {/* Promo Banner if applicable (Satu baris ringkas) */}
-              {calc.totalDiscountAmount > 0 && (
+              {/* Promo Banner on Item if any */}
+              {item.discountType !== 'none' && (
                 <div
                   style={{
-                    background: '#ecfdf5',
-                    borderRadius: 6,
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: 8,
                     padding: '3px 8px',
-                    fontSize: '10.5px',
-                    color: '#065f46',
-                    fontWeight: 700,
                     display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'space-between',
+                    fontSize: '10.5px',
+                    color: '#15803d',
                   }}
                 >
-                  <span>
-                    <Tag size={11} style={{ marginRight: 4, display: 'inline', verticalAlign: '-1px' }} />
-                    Promo{' '}
-                    {item.discountType === 'stacked'
-                      ? `${item.discountPercent1}% + ${item.discountPercent2}%`
-                      : item.discountType === 'single'
-                      ? `${item.discountPercent1}%`
-                      : 'Potongan Tunai'}
-                  </span>
-                  <span>Hemat {formatRupiah(calc.totalDiscountAmount)}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <Tag size={11} />
+                    <span>
+                      {item.discountType === 'stacked' && `Diskon Bertingkat (${item.discountPercent1}% + ${item.discountPercent2}%)`}
+                      {item.discountType === 'single' && `Diskon ${item.discountPercent1}%`}
+                      {item.discountType === 'nominal' && `Potongan Langsung ${formatRupiah(item.discountNominal || 0)}`}
+                    </span>
+                  </div>
+                  <strong>Hemat {formatRupiah(calc.totalDiscountAmount)}</strong>
                 </div>
               )}
 
-              {/* Bottom Row: Subtotal & One-Handed Touch Stepper */}
+              {/* Bottom Quantity Stepper & Price Calculation (F-02) */}
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  marginTop: 2,
                   paddingTop: 6,
                   borderTop: '1px solid #f1f5f9',
                 }}
               >
-                <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                  <span style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 500, marginRight: 4 }}>
-                    Subtotal:
-                  </span>
-                  {formatRupiah(calc.finalTotal)}
-                </div>
-
-                <div className="stitch-stepper" style={{ padding: '2px 4px' }}>
+                {/* Stepper Ramah Jempol (Touch-Friendly F-02) */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: '#f1f5f9',
+                    borderRadius: 10,
+                    padding: '2px',
+                    gap: 4,
+                  }}
+                >
                   <button
                     type="button"
-                    className="stitch-stepper-btn"
-                    onClick={() => onUpdateQuantity(item.id, Math.max(1, Number(item.quantity) - 1))}
-                    style={{ width: 26, height: 26, fontSize: '14px' }}
+                    onClick={() => onUpdateQuantity(item.id, Math.max(0.1, item.quantity - 1))}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      border: 'none',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                    }}
+                    title="Kurangi"
                   >
                     -
                   </button>
-                  <span className="stitch-stepper-value" style={{ fontSize: '12.5px', minWidth: 20 }}>
+
+                  <span
+                    style={{
+                      minWidth: 32,
+                      textAlign: 'center',
+                      fontSize: '12.5px',
+                      fontWeight: 800,
+                      color: '#0f172a',
+                    }}
+                  >
                     {item.quantity}
                   </span>
+
                   <button
                     type="button"
-                    className="stitch-stepper-btn plus"
-                    onClick={() => onUpdateQuantity(item.id, Number(item.quantity) + 1)}
-                    style={{ width: 26, height: 26, fontSize: '14px' }}
+                    onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      border: 'none',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                    }}
+                    title="Tambah"
                   >
                     +
                   </button>
+                </div>
+
+                {/* Total Per Item (Otomatis Dihitung Detik Itu Juga F-02) */}
+                <div style={{ textAlign: 'right' }}>
+                  <div
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 800,
+                      color: isChecked ? '#94a3b8' : '#0f172a',
+                      letterSpacing: '-0.3px',
+                    }}
+                  >
+                    {formatRupiah(calc.finalTotal)}
+                  </div>
+                  {item.quantity > 1 && (
+                    <div style={{ fontSize: '10px', color: '#94a3b8' }}>
+                      @{formatRupiah(calc.discountedUnitPrice)}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -530,34 +764,40 @@ export const GroceryList: React.FC<GroceryListProps> = ({
         })}
       </div>
 
-      {/* 4. Sticky Bottom Checkout Bar: Simple & High Contrast */}
+      {/* Floating Checkout Floating Trigger Button */}
       {items.length > 0 && (
-        <div className="stitch-sticky-checkout" style={{ padding: '12px 16px', gap: 8, borderRadius: 16 }}>
-          <div className="stitch-checkout-info-row">
-            <div>
-              <div className="stitch-checkout-label" style={{ fontSize: '10.5px' }}>
-                Total Belanja ({items.length} item)
-              </div>
-              <div className="stitch-checkout-price" style={{ fontSize: '18px' }}>
-                {formatRupiah(totalSpent)}
-              </div>
+        <div style={{ marginTop: 8, marginBottom: 12 }}>
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={onCheckout}
+            style={{
+              width: '100%',
+              padding: '13px 16px',
+              fontSize: '14px',
+              fontWeight: 800,
+              borderRadius: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)',
+              background: isOverBudget
+                ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <ShoppingCart size={18} />
+              <span>Selesai Belanja di Kasir</span>
             </div>
 
-            <div
-              className={`stitch-status-pill ${isOverBudget ? 'danger' : 'safe'}`}
-              style={{ fontSize: '11px', padding: '3px 8px' }}
-            >
-              {isOverBudget ? 'Over Budget' : 'Aman'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>{formatRupiah(totalSpent)}</span>
+              <ArrowRight size={16} />
             </div>
-          </div>
-
-          <button className="stitch-checkout-btn" onClick={onCheckout} style={{ padding: '10px 16px', borderRadius: 10 }}>
-            <span>Checkout & Bayar</span>
-            <ArrowRight size={16} />
           </button>
         </div>
       )}
     </div>
   );
 };
-

@@ -142,7 +142,7 @@ export const INITIAL_HISTORY: ShoppingTrip[] = [
   {
     id: 'trip-prev-month',
     date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    storeName: 'Grosir Indo Makmur',
+    storeName: 'Lotte Mart Grocery - Puri Indah',
     totalSpent: 315000,
     totalSavings: 28500,
     totalItemsCount: 5,
