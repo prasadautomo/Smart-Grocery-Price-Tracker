@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, MapPin, Calendar, Cloud, Wallet, ChevronDown } from 'lucide-react';
+import { ShoppingBag, MapPin, Calendar, Wallet, ChevronDown } from 'lucide-react';
 import type { UserProfile } from '../types/auth';
 import { GoogleIcon } from './GoogleIcon';
 import { formatRupiah } from '../lib/calculations';
