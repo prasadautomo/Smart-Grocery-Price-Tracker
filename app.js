@@ -2289,19 +2289,7 @@
 
         AudioEngine.playTap();
 
-        // Screen 2 Stitch: Scan Barcode & Promo Calculator
-        if (paneId === 'tabScan') {
-          renderBarcodePresets();
-          startCameraScanner();
-          if (!currentScannedItem && BARCODE_CATALOG.length > 0) {
-            onBarcodeDetected(BARCODE_CATALOG[0].barcode, false);
-          } else if (currentScannedItem) {
-            runPythonScanAnalysis(currentScannedItem.barcode);
-          }
-        } else {
-          // Matikan kamera saat meninggalkan tab scan
-          stopCameraScanner();
-        }
+        // Tab Scan Barcode dinonaktifkan sesuai permintaan pengguna
 
         if (paneId === 'tabBudget') {
           renderShoppingPlannerSection();
@@ -2618,24 +2606,24 @@
     const btnCompareHeader = document.getElementById('btnQuickCompareHeader');
     if (btnCompareHeader) {
       btnCompareHeader.addEventListener('click', () => {
-        const navScan = document.getElementById('navBtnScan');
-        if (navScan) navScan.click();
+        const navBudget = document.getElementById('navBtnBudget');
+        if (navBudget) navBudget.click();
       });
     }
 
     const btnScanHeader = document.getElementById('btnOpenScannerHeader');
     if (btnScanHeader) {
       btnScanHeader.addEventListener('click', () => {
-        const navScan = document.getElementById('navBtnScan');
-        if (navScan) navScan.click();
+        const navBudget = document.getElementById('navBtnBudget');
+        if (navBudget) navBudget.click();
       });
     }
 
     const btnGoToScanTab = document.getElementById('btnGoToScanTab');
     if (btnGoToScanTab) {
       btnGoToScanTab.addEventListener('click', () => {
-        const navScan = document.getElementById('navBtnScan');
-        if (navScan) navScan.click();
+        const navBudget = document.getElementById('navBtnBudget');
+        if (navBudget) navBudget.click();
       });
     }
 
