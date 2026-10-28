@@ -18,8 +18,10 @@ import {
   Calendar,
   Clock,
   MapPin,
+  Scan,
+  CheckSquare,
 } from 'lucide-react';
-import type { GroceryItem, CategoryType } from '../types/grocery';
+import type { GroceryItem, CategoryType, PlannerItem } from '../types/grocery';
 import {
   calculateItemPrice,
   compareWithLastMonth,
@@ -32,10 +34,12 @@ interface GroceryListProps {
   budgetLimit: number;
   selectedStore?: string;
   sessionDate?: string;
+  plannerItems?: PlannerItem[];
   onStoreChange?: (store: string) => void;
   onDateChange?: (date: string) => void;
   onAddItem: () => void;
   onOpenPresets: () => void;
+  onOpenScanner?: () => void;
   onOpenComparator?: () => void;
   onOpenShare: () => void;
   onEditItem: (item: GroceryItem) => void;
@@ -43,6 +47,7 @@ interface GroceryListProps {
   onUpdateQuantity: (id: string, newQty: number) => void;
   onToggleCheckItem: (id: string) => void;
   onCheckout: () => void;
+  onAddFromPlanner?: (plannerItem: PlannerItem) => void;
 }
 
 const STORE_OPTIONS = [
@@ -69,10 +74,12 @@ export const GroceryList: React.FC<GroceryListProps> = ({
   budgetLimit,
   selectedStore = 'Lotte Mart Grocery - Puri Indah',
   sessionDate = new Date().toISOString().slice(0, 10),
+  plannerItems = [],
   onStoreChange,
   onDateChange,
   onAddItem,
   onOpenPresets,
+  onOpenScanner,
   onOpenComparator,
   onOpenShare,
   onEditItem,
@@ -80,6 +87,7 @@ export const GroceryList: React.FC<GroceryListProps> = ({
   onUpdateQuantity,
   onToggleCheckItem,
   onCheckout,
+  onAddFromPlanner,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'Semua'>('Semua');
@@ -100,6 +108,8 @@ export const GroceryList: React.FC<GroceryListProps> = ({
     const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const unpurchasedPlanItems = plannerItems.filter((p) => !p.isPurchased);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -239,8 +249,8 @@ export const GroceryList: React.FC<GroceryListProps> = ({
         </div>
       </div>
 
-      {/* 1. Clean Compact Action Bar: Search + Katalog + Tambah */}
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {/* 1. Action Bar: Search + Pindai Barcode + Katalog + Tambah */}
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
         <div style={{ position: 'relative', flex: 1 }}>
           <Search
             size={15}
@@ -263,21 +273,48 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           />
         </div>
 
+        {onOpenScanner && (
+          <button
+            type="button"
+            onClick={onOpenScanner}
+            style={{
+              height: 38,
+              padding: '0 10px',
+              borderRadius: 12,
+              border: '1.5px solid #181512',
+              background: '#181512',
+              color: '#f59e0b',
+              fontSize: '11.5px',
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 2px 0 #000',
+            }}
+            title="Pindai Barcode Kemasan"
+          >
+            <Scan size={14} />
+            <span>Pindai</span>
+          </button>
+        )}
+
         <button
           type="button"
           onClick={onOpenPresets}
           style={{
             height: 38,
-            padding: '0 12px',
+            padding: '0 10px',
             borderRadius: 12,
             border: '1px solid #fde68a',
             background: '#fef3c7',
             color: '#b45309',
-            fontSize: '12px',
+            fontSize: '11.5px',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 4,
             cursor: 'pointer',
             flexShrink: 0,
           }}
@@ -292,16 +329,16 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           onClick={onAddItem}
           style={{
             height: 38,
-            padding: '0 12px',
+            padding: '0 11px',
             borderRadius: 12,
             border: 'none',
             background: '#10b981',
             color: '#ffffff',
-            fontSize: '12px',
+            fontSize: '11.5px',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
-            gap: 5,
+            gap: 4,
             cursor: 'pointer',
             flexShrink: 0,
             boxShadow: '0 2px 6px rgba(16, 185, 129, 0.3)',
@@ -312,6 +349,100 @@ export const GroceryList: React.FC<GroceryListProps> = ({
           <span>Tambah</span>
         </button>
       </div>
+
+      {/* RENCANA BELANJA DARI RUMAH (PRE-SHOPPING CHECKLIST - STITCH STYLE) */}
+      {unpurchasedPlanItems.length > 0 && (
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 18,
+            padding: '12px 14px',
+            border: '1.5px solid #dcd2c6',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <CheckSquare size={16} color="#059669" />
+              <div>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#181512', margin: 0 }}>
+                  Rencana Belanja dari Rumah
+                </h4>
+                <p style={{ fontSize: '10.5px', color: '#78716c', margin: '1px 0 0' }}>
+                  Checklist kebutuhan terencana. Masukkan harga saat barang ditemukan di rak.
+                </p>
+              </div>
+            </div>
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '10px',
+                fontWeight: 800,
+                background: '#ecfdf5',
+                color: '#059669',
+                padding: '2px 8px',
+                borderRadius: 20,
+                border: '1px solid #a7f3d0',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {plannerItems.length - unpurchasedPlanItems.length}/{plannerItems.length} Terbeli
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 2 }}>
+            {unpurchasedPlanItems.slice(0, 3).map((plan) => (
+              <div
+                key={plan.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '7px 10px',
+                  borderRadius: 10,
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#181512' }}>
+                    {plan.name}
+                  </div>
+                  <div style={{ fontSize: '10.5px', color: '#64748b' }}>
+                    Jumlah: {plan.quantity} {plan.unit} • Est: {formatRupiah(plan.estimatedPrice || 0)}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onAddFromPlanner && onAddFromPlanner(plan)}
+                  style={{
+                    background: '#181512',
+                    border: 'none',
+                    color: '#f59e0b',
+                    borderRadius: 8,
+                    padding: '4px 10px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 0 #000',
+                  }}
+                  title="Temukan barang ini di rak dan masukkan harga"
+                >
+                  <Plus size={12} />
+                  <span>Ambil di Rak</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 2. Category Pills + Trolley Counter Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>

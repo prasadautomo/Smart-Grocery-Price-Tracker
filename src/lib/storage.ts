@@ -2,6 +2,8 @@ import type {
   GroceryItem,
   ShoppingTrip,
   BudgetSettings,
+  PlannerItem,
+  MasterProduct,
 } from '../types/grocery';
 import { getSupabaseClient } from './supabase';
 
@@ -10,6 +12,8 @@ const STORAGE_KEYS = {
   HISTORY: 'smart_grocery_history_v1',
   BUDGET: 'smart_grocery_budget_v1',
   BENCHMARKS: 'smart_grocery_benchmarks_v1',
+  PLANNER: 'smart_grocery_planner_v1',
+  MASTER: 'smart_grocery_master_v1',
 };
 
 function getCurrentUserId(): string {
@@ -706,4 +710,192 @@ export async function pushAllDataToCloud(): Promise<{
     };
   }
 }
+
+// ============================================================
+// SHOPPING PLANNER (RENCANA KEBUTUHAN DARI KOS/RUMAH)
+// ============================================================
+
+export const INITIAL_PLANNER_ITEMS: PlannerItem[] = [
+  {
+    id: 'plan-1',
+    name: 'Beras Ramos Super (5 kg)',
+    category: 'Bahan Pokok',
+    unit: 'pack',
+    quantity: 1,
+    estimatedPrice: 72000,
+    notes: 'Kebutuhan makan pokok 1 bulan',
+    isPurchased: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'plan-2',
+    name: 'Minyak Goreng Sawit (1 Liter)',
+    category: 'Bahan Pokok',
+    unit: 'liter',
+    quantity: 1,
+    estimatedPrice: 20000,
+    notes: 'Untuk masak lauk kos',
+    isPurchased: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'plan-3',
+    name: 'Telur Ayam Negeri (1 kg)',
+    category: 'Bahan Pokok',
+    unit: 'kg',
+    quantity: 1,
+    estimatedPrice: 28500,
+    notes: 'Sumber protein utama hemat',
+    isPurchased: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'plan-4',
+    name: 'Sabun Cuci Deterjen (800g)',
+    category: 'Mandi & Kebersihan',
+    unit: 'pack',
+    quantity: 1,
+    estimatedPrice: 19500,
+    notes: 'Cuci pakaian mingguan',
+    isPurchased: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'plan-5',
+    name: 'Pasta Gigi Fresh (160g)',
+    category: 'Mandi & Kebersihan',
+    unit: 'pcs',
+    quantity: 1,
+    estimatedPrice: 16000,
+    notes: 'Kebersihan diri kos',
+    isPurchased: false,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+export function loadPlannerItems(): PlannerItem[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.PLANNER);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading planner items:', e);
+  }
+  savePlannerItems(INITIAL_PLANNER_ITEMS);
+  return INITIAL_PLANNER_ITEMS;
+}
+
+export function savePlannerItems(items: PlannerItem[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.PLANNER, JSON.stringify(items));
+  } catch (e) {
+    console.error('Error saving planner items:', e);
+  }
+}
+
+// ============================================================
+// DAFTAR ACUAN HARGA BULAN LALU (MASTER BENCHMARK DATABASE)
+// ============================================================
+
+export const INITIAL_MASTER_PRODUCTS: MasterProduct[] = [
+  {
+    id: 'master-1',
+    name: 'Beras Ramos Super (5 kg)',
+    category: 'Bahan Pokok',
+    unit: 'pack',
+    lastMonthPrice: 73000,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8992753311201',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-2',
+    name: 'Minyak Goreng Sawit (1 Liter)',
+    category: 'Bahan Pokok',
+    unit: 'liter',
+    lastMonthPrice: 20000,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8991002105432',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-3',
+    name: 'Telur Ayam Negeri (1 kg)',
+    category: 'Bahan Pokok',
+    unit: 'kg',
+    lastMonthPrice: 28500,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8998866200192',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-4',
+    name: 'Sabun Pembersih Lantai (800 ml)',
+    category: 'Mandi & Kebersihan',
+    unit: 'botol',
+    lastMonthPrice: 14000,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8993189201018',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-5',
+    name: 'Pasta Gigi Fresh & Protect (160g)',
+    category: 'Mandi & Kebersihan',
+    unit: 'pcs',
+    lastMonthPrice: 16000,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8991111002345',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-6',
+    name: 'Mie Instan Goreng Spesial (5 Bungkus)',
+    category: 'Makanan & Camilan',
+    unit: 'pack',
+    lastMonthPrice: 15500,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8991001100223',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+  {
+    id: 'master-7',
+    name: 'Deterjen Rinso Molto Cair (750 ml)',
+    category: 'Mandi & Kebersihan',
+    unit: 'pouch',
+    lastMonthPrice: 24500,
+    storeName: 'Lotte Mart Grocery - Puri Indah',
+    barcode: '8999999001234',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+  },
+];
+
+export function loadMasterProducts(): MasterProduct[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.MASTER);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading master products:', e);
+  }
+  saveMasterProducts(INITIAL_MASTER_PRODUCTS);
+  return INITIAL_MASTER_PRODUCTS;
+}
+
+export function saveMasterProducts(items: MasterProduct[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.MASTER, JSON.stringify(items));
+  } catch (e) {
+    console.error('Error saving master products:', e);
+  }
+}
+
 

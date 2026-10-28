@@ -95,6 +95,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     onClose();
   };
 
+  // Handler: Open Authentic Google Accounts Chooser Popup
+  const handleOpenGooglePopup = () => {
+    window.open('/google-auth.html', 'GoogleAccounts', 'width=500,height=620');
+    onClose();
+  };
+
   // Handler: Logout
   const handleLogout = async () => {
     if (confirm('Apakah kamu yakin ingin keluar dari akun Google ini?')) {
@@ -438,37 +444,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               {/* TOMBOL GOOGLE OAUTH POPUP / BROWSER */}
-              <button
-                type="button"
-                className="google-sign-in-btn"
-                onClick={handleGoogleOAuthLogin}
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  background: '#ffffff',
-                  border: '1.5px solid #cbd5e1',
-                  borderRadius: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-                  cursor: isLoading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <GoogleIcon size={20} />
-                <span
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <button
+                  type="button"
+                  className="google-sign-in-btn"
+                  onClick={handleOpenGooglePopup}
                   style={{
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    color: '#1e293b',
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: '#181512',
+                    border: '1.5px solid #292524',
+                    borderRadius: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                    color: '#ffffff',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  {isLoading ? 'Menghubungkan ke Google...' : 'Lanjutkan via Google OAuth Cloud'}
-                </span>
-              </button>
+                  <GoogleIcon size={18} />
+                  <span style={{ fontSize: '13px', fontWeight: 800 }}>
+                    Buka Google Account Chooser (Popup)
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  className="google-sign-in-btn"
+                  onClick={handleGoogleOAuthLogin}
+                  disabled={isLoading}
+                  style={{
+                    width: '100%',
+                    padding: '11px 16px',
+                    background: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    borderRadius: '14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 10,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <GoogleIcon size={18} />
+                  <span
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      color: '#1e293b',
+                    }}
+                  >
+                    {isLoading ? 'Menghubungkan ke Google...' : 'Lanjutkan via Supabase OAuth'}
+                  </span>
+                </button>
+              </div>
 
               {/* Error Alert jika Google OAuth provider belum diaktifkan */}
               {errorMessage && (

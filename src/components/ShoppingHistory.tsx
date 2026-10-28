@@ -5,14 +5,15 @@ import {
   X,
   FileText,
   Search,
-  Camera,
   CheckCircle,
-  Package,
-  Calendar
+  Copy,
+  Plus,
+  BookOpen,
+  Store,
 } from 'lucide-react';
-import type { ShoppingTrip } from '../types/grocery';
-import { formatRupiah, calculateItemPrice } from '../lib/calculations';
-import { resolveProductImageUrl } from '../lib/productImages';
+import type { ShoppingTrip, MasterProduct, CategoryType } from '../types/grocery';
+import { formatRupiah } from '../lib/calculations';
+import { loadMasterProducts, saveMasterProducts } from '../lib/storage';
 
 interface ShoppingHistoryProps {
   history: ShoppingTrip[];
@@ -22,19 +23,28 @@ interface ShoppingHistoryProps {
 
 export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
   history,
-  onSetBenchmark,
 }) => {
+  const [activeSubTab, setActiveSubTab] = useState<'receipts' | 'benchmarks'>('receipts');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('Lihat Semua');
   const [selectedTrip, setSelectedTrip] = useState<ShoppingTrip | null>(null);
-  const [showScannerNotice, setShowScannerNotice] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  // Master benchmark products
+  const [masterProducts, setMasterProducts] = useState<MasterProduct[]>(() => loadMasterProducts());
+  const [searchBenchmark, setSearchBenchmark] = useState('');
+  const [showAddMasterModal, setShowAddMasterModal] = useState(false);
+  const [newMasterName, setNewMasterName] = useState('');
+  const [newMasterCategory, setNewMasterCategory] = useState<CategoryType>('Bahan Pokok');
+  const [newMasterUnit, setNewMasterUnit] = useState('pack');
+  const [newMasterPrice, setNewMasterPrice] = useState<number>(0);
 
   // Download receipt as JSON file
   const handleExportJSON = () => {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(history, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `safegrocer-history-${new Date().toISOString().slice(0, 10)}.json`);
+    downloadAnchor.setAttribute('download', `keranjangpintar-history-${new Date().toISOString().slice(0, 10)}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -50,10 +60,52 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `safegrocer-riwayat-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `keranjangpintar-riwayat-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();
+  };
+
+  // Copy receipt text to clipboard
+  const handleCopyReceiptText = (trip: ShoppingTrip) => {
+    let text = `LOTTE MART GROCERY - PURI INDAH\n`;
+    text += `Puri Indah Mall Lt. LG, Kembangan, Jakarta Barat\n`;
+    text += `Tanggal: ${new Date(trip.date).toLocaleDateString('id-ID')}\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    trip.itemsSnapshot.forEach((item) => {
+      text += `${item.name} x${item.quantity} = ${formatRupiah(item.quantity * item.unitPrice)}\n`;
+    });
+    text += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `TOTAL: ${formatRupiah(trip.grandTotal || trip.totalSpent)}\n`;
+    text += `HEMAT: ${formatRupiah(trip.totalSavings)}\n`;
+    text += `Bukti Pembayaran Sah KeranjangPintar PRO`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    });
+  };
+
+  const handleSaveNewMaster = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMasterName.trim() || newMasterPrice <= 0) return;
+
+    const item: MasterProduct = {
+      id: `master-${Date.now()}`,
+      name: newMasterName.trim(),
+      category: newMasterCategory,
+      unit: newMasterUnit,
+      lastMonthPrice: newMasterPrice,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      updatedAt: new Date().toISOString(),
+    };
+
+    const updated = [item, ...masterProducts];
+    setMasterProducts(updated);
+    saveMasterProducts(updated);
+    setShowAddMasterModal(false);
+    setNewMasterName('');
+    setNewMasterPrice(0);
   };
 
   // Agregasi Statistik Belanja
@@ -68,7 +120,7 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
   const lastMonthTotal = lastMonthTrip ? (lastMonthTrip.grandTotal || lastMonthTrip.totalSpent) : 0;
   const avgSavings = history.length > 0 ? Math.round(cumulativeSavings / history.length) : 0;
 
-  // Filter list struk berdasarkan teks pencarian dan filter periode
+  // Filter list struk
   const filteredHistory = history.filter((trip) => {
     const matchSearch =
       trip.storeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -92,16 +144,21 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
     return true;
   });
 
+  const filteredMaster = masterProducts.filter((m) =>
+    m.name.toLowerCase().includes(searchBenchmark.toLowerCase()) ||
+    m.category.toLowerCase().includes(searchBenchmark.toLowerCase())
+  );
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Header Riwayat (Stitch Screen 3) */}
+      {/* Header Riwayat (Stitch Style) */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Riwayat & Struk Belanja
+          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '18px', fontWeight: 800, color: '#181512', margin: 0 }}>
+            Riwayat &amp; Struk Belanja
           </h2>
-          <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0' }}>
-            Arsip Struk Digital & Tren Harga
+          <p style={{ fontSize: '11px', color: '#78716c', margin: '2px 0 0' }}>
+            Arsip Struk Digital Kasir &amp; Database Acuan Harga Toko
           </p>
         </div>
 
@@ -115,780 +172,622 @@ export const ShoppingHistory: React.FC<ShoppingHistoryProps> = ({
         </div>
       </div>
 
-      {/* Search Input (Stitch Screen 3) */}
-      <div style={{ position: 'relative' }}>
-        <Search
-          size={16}
-          style={{ position: 'absolute', left: 14, top: 12, color: '#94a3b8' }}
-        />
-        <input
-          type="text"
-          className="form-input"
-          style={{ paddingLeft: 38, height: 40, borderRadius: 12 }}
-          placeholder="Cari struk / barang..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      {/* 3 Circular Metric Pills (Stitch Screen 3) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-        {/* Metric 1 */}
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 18,
-            padding: '12px 8px',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}
-        >
-          <span style={{ fontSize: '9.5px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>
-            Bulan Lalu
-          </span>
-          <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: '3px 0' }}>
-            {formatRupiah(lastMonthTotal)}
-          </div>
-          <span style={{ fontSize: '9.5px', color: '#64748b' }}>
-            Total Belanja Terakhir
-          </span>
-        </div>
-
-        {/* Metric 2 */}
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 18,
-            padding: '12px 8px',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}
-        >
-          <span style={{ fontSize: '9.5px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>
-            Hemat Promo
-          </span>
-          <div style={{ fontSize: '14px', fontWeight: 800, color: '#10b981', margin: '3px 0' }}>
-            {formatRupiah(avgSavings)}
-          </div>
-          <span style={{ fontSize: '9.5px', color: '#059669' }}>
-            Rata-rata Hemat
-          </span>
-        </div>
-
-        {/* Metric 3 */}
-        <div
-          style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: 18,
-            padding: '12px 8px',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-sm)',
-          }}
-        >
-          <span style={{ fontSize: '9.5px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>
-            Inflasi
-          </span>
-          <div style={{ fontSize: '14px', fontWeight: 800, color: '#ef4444', margin: '3px 0' }}>
-            +5.8%
-          </div>
-          <span style={{ fontSize: '9.5px', color: '#dc2626' }}>
-            Beras Naik
-          </span>
-        </div>
-      </div>
-
-      {/* Filter Periode Pills (Stitch Screen 3) */}
-      <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
-        {['Bulan Ini', 'Bulan Lalu', 'Lihat Semua'].map((period) => (
-          <button
-            key={period}
-            type="button"
-            className={`stitch-category-pill ${selectedPeriod === period ? 'active' : ''}`}
-            onClick={() => setSelectedPeriod(period)}
-            style={{ fontSize: '11px', padding: '5px 12px' }}
-          >
-            {period}
-          </button>
-        ))}
-      </div>
-
-      {/* ============================================================
-          DETEKSI FLUKTUASI HARGA (LIVE MONITOR - F-04) - STITCH SCREEN 3
-          ============================================================ */}
+      {/* Sub Tab Switcher: Struk Pembelian vs Acuan Harga */}
       <div
         style={{
-          background: '#ffffff',
-          borderRadius: 20,
-          padding: '16px',
-          border: '1px solid #e2e8f0',
-          boxShadow: 'var(--shadow-sm)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 12,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          padding: 3,
+          borderRadius: 14,
+          background: '#ede5dc',
+          gap: 4,
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-              Deteksi Fluktuasi Harga
-            </h3>
-            <p style={{ fontSize: '10.5px', color: '#64748b', margin: '2px 0 0' }}>
-              Perbandingan harga bulan ini vs bulan lalu
-            </p>
-          </div>
-
-          <span
-            style={{
-              background: '#ecfdf5',
-              color: '#047857',
-              fontSize: '10.5px',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: 20,
-              border: '1px solid #a7f3d0',
-            }}
-          >
-            Live Monitor
-          </span>
-        </div>
-
-        {/* Item 1: Beras Premium (Naik) */}
-        <div
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('receipts')}
           style={{
-            background: '#fff5f5',
-            border: '1px solid #fed7d7',
-            borderRadius: 14,
-            padding: '12px',
+            padding: '8px 12px',
+            borderRadius: 11,
+            border: 'none',
+            background: activeSubTab === 'receipts' ? '#181512' : 'transparent',
+            color: activeSubTab === 'receipts' ? '#ffffff' : '#57534e',
+            fontSize: '12px',
+            fontWeight: 800,
+            cursor: 'pointer',
             display: 'flex',
-            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
             gap: 6,
+            transition: 'all 0.2s',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                Beras Premium 5kg
-              </div>
-              <div style={{ fontSize: '11px', color: '#64748b' }}>
-                Bulan lalu: Rp 68.000
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <span className="stitch-trend-badge up" style={{ fontSize: '10.5px' }}>
-                ↑ Naik Rp 4.000
-              </span>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
-                Rp 72.000
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #fecaca', paddingTop: 6 }}>
-            <span style={{ color: '#b45309', fontWeight: 700 }}>
-              Saran: Beli secukupnya
-            </span>
-            <span style={{ color: '#dc2626', fontWeight: 700 }}>
-              +5.8% inflasi
-            </span>
-          </div>
-        </div>
-
-        {/* Item 2: Sabun Pembersih (Turun Promo) */}
-        <div
-          style={{
-            background: '#ecfdf5',
-            border: '1px solid #a7f3d0',
-            borderRadius: 14,
-            padding: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                Sabun Pembersih Lantai 800ml
-              </div>
-              <div style={{ fontSize: '11px', color: '#64748b' }}>
-                Bulan lalu: Rp 14.000
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <span className="stitch-trend-badge down" style={{ fontSize: '10.5px' }}>
-                ↓ Turun Rp 4.000
-              </span>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#047857', marginTop: 2 }}>
-                Rp 10.000
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #bbf7d0', paddingTop: 6 }}>
-            <span style={{ color: '#047857', fontWeight: 700 }}>
-              Saran: Harga terendah
-            </span>
-            <span style={{ color: '#15803d', fontWeight: 700 }}>
-              -28.5% diskon
-            </span>
-          </div>
-        </div>
-
-        {/* Item 3: Minyak Goreng (Stabil) */}
-        <div
-          style={{
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
-            borderRadius: 14,
-            padding: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 6,
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                Minyak Goreng 2L
-              </div>
-              <div style={{ fontSize: '11px', color: '#64748b' }}>
-                Bulan lalu: Rp 34.000
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              <span className="stitch-trend-badge equal" style={{ fontSize: '10.5px' }}>
-                = Stabil
-              </span>
-              <div style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', marginTop: 2 }}>
-                Rp 34.000
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10.5px', borderTop: '1px dashed #e2e8f0', paddingTop: 6 }}>
-            <span style={{ color: '#64748b', fontWeight: 700 }}>
-              Stabil di Rp 34.000
-            </span>
-            <span style={{ color: '#64748b', fontWeight: 700 }}>
-              0% perubahan
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ============================================================
-          DAFTAR STRUK BELANJA (STITCH SCREEN 3)
-          ============================================================ */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '14.5px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Daftar Struk Belanja
-          </h3>
-          <span style={{ fontSize: '11px', color: '#64748b' }}>
-            {filteredHistory.length} Struk Tersimpan
-          </span>
-        </div>
-
-        {filteredHistory.length === 0 ? (
-          <div className="empty-state">
-            <Receipt size={32} />
-            <h3>Belum Ada Struk</h3>
-            <p>Selesaikan belanja di tab Troli untuk menyimpan struk digital di sini.</p>
-          </div>
-        ) : (
-          filteredHistory.map((trip) => {
-            const formattedDate = new Date(trip.date).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            });
-            const grand = trip.grandTotal || trip.totalSpent;
-
-            return (
-              <div
-                key={trip.id}
-                style={{
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: 18,
-                  padding: '16px',
-                  boxShadow: 'var(--shadow-sm)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 12,
-                }}
-              >
-                {/* Header Row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h4 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                      {trip.storeName}
-                    </h4>
-                    <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <Calendar size={12} color="#64748b" />
-                      <span>{formattedDate} • {trip.totalItemsCount} barang</span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                    {trip.paymentMethod ? (
-                      <span
-                        style={{
-                          background: '#ecfdf5',
-                          color: '#047857',
-                          fontSize: '10.5px',
-                          fontWeight: 800,
-                          padding: '2px 8px',
-                          borderRadius: 8,
-                          border: '1px solid #a7f3d0',
-                        }}
-                      >
-                        {trip.paymentMethod.split(' ')[0]}
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          background: '#eff6ff',
-                          color: '#2563eb',
-                          fontSize: '10.5px',
-                          fontWeight: 700,
-                          padding: '3px 8px',
-                          borderRadius: 12,
-                          border: '1px solid #bfdbfe',
-                        }}
-                      >
-                        Cloud Sync
-                      </span>
-                    )}
-                    {trip.astroOrderId && (
-                      <span style={{ fontSize: '9.5px', color: '#64748b', fontWeight: 600 }}>
-                        {trip.astroOrderId}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-
-                {/* Total Belanja Row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
-                  <div>
-                    <div style={{ fontSize: '10.5px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
-                      TOTAL BELANJA
-                    </div>
-                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#10b981' }}>
-                      {formatRupiah(grand)}
-                    </div>
-                  </div>
-
-                  {/* Category Avatars / Product Photo Thumbnails */}
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    {trip.itemsSnapshot.slice(0, 3).map((snapItem, idx) => {
-                      const itemImg = snapItem.imageUrl || resolveProductImageUrl(snapItem.name, snapItem.category);
-                      return (
-                        <span
-                          key={idx}
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: 8,
-                            background: '#f1f5f9',
-                            border: '1px solid #e2e8f0',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {itemImg ? (
-                            <img
-                              src={itemImg}
-                              alt={snapItem.name}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <Package size={13} color="#64748b" />
-                          )}
-                        </span>
-                      );
-                    })}
-                    {trip.itemsSnapshot.length > 3 && (
-                      <span
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: 8,
-                          background: '#dcfce7',
-                          color: '#15803d',
-                          fontSize: '10px',
-                          fontWeight: 800,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          border: '1px solid #bbf7d0',
-                        }}
-                      >
-                        +{trip.itemsSnapshot.length - 3}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* 2 Buttons Side-by-Side (Stitch Screen 3) */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    style={{ fontSize: '11.5px', padding: '8px 10px', borderRadius: 10 }}
-                    onClick={() => setSelectedTrip(trip)}
-                  >
-                    <span>Lihat Rincian Struk</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    style={{
-                      fontSize: '11.5px',
-                      padding: '8px 10px',
-                      borderRadius: 10,
-                      background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    }}
-                    onClick={() => {
-                      if (onSetBenchmark) {
-                        onSetBenchmark(trip);
-                      }
-                      alert(`Struk dari "${trip.storeName}" berhasil dijadikan acuan komparasi harga bulan depan!`);
-                    }}
-                  >
-                    <CheckCircle size={13} />
-                    <span>Jadikan Acuan</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      {/* Bottom Scanner Banner (Stitch Screen 3) */}
-      <div
-        style={{
-          background: '#ecfdf5',
-          border: '1.5px solid #a7f3d0',
-          borderRadius: 18,
-          padding: '14px 16px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <div>
-          <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#047857', margin: 0 }}>
-            Punya Struk Belanja Baru?
-          </h4>
-          <p style={{ fontSize: '11px', color: '#059669', margin: '2px 0 0' }}>
-            Foto & biarkan SafeGrocer catat otomatis
-          </p>
-        </div>
+          <Receipt size={14} color={activeSubTab === 'receipts' ? '#f59e0b' : '#78716c'} />
+          <span>Struk Pembelian</span>
+        </button>
 
         <button
           type="button"
-          className="btn-primary"
+          onClick={() => setActiveSubTab('benchmarks')}
           style={{
-            fontSize: '11.5px',
             padding: '8px 12px',
-            borderRadius: 10,
-            background: '#047857',
-            whiteSpace: 'nowrap',
+            borderRadius: 11,
+            border: 'none',
+            background: activeSubTab === 'benchmarks' ? '#181512' : 'transparent',
+            color: activeSubTab === 'benchmarks' ? '#ffffff' : '#57534e',
+            fontSize: '12px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            transition: 'all 0.2s',
           }}
-          onClick={() => setShowScannerNotice(true)}
         >
-          <Camera size={14} />
-          <span>Pindai Struk</span>
+          <BookOpen size={14} color={activeSubTab === 'benchmarks' ? '#f59e0b' : '#78716c'} />
+          <span>Acuan Harga Toko</span>
         </button>
       </div>
 
-      {/* Modal Scanner Notice */}
-      {showScannerNotice && (
-        <div className="modal-backdrop" onClick={() => setShowScannerNotice(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ padding: 20 }}>
-            <div style={{ textAlign: 'center' }}>
+      {/* VIEW 1: STRUK PEMBELIAN */}
+      {activeSubTab === 'receipts' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Search Input */}
+          <div style={{ position: 'relative' }}>
+            <Search
+              size={15}
+              style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }}
+            />
+            <input
+              type="text"
+              className="form-input"
+              style={{ paddingLeft: 36, height: 38, borderRadius: 12, fontSize: '12px', background: '#ffffff' }}
+              placeholder="Cari struk / nama toko / barang..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          {/* 3 Metric Pills */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e7e5e4',
+                borderRadius: 16,
+                padding: '10px 8px',
+                textAlign: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div style={{ fontSize: '9.5px', color: '#78716c', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, textTransform: 'uppercase' }}>
+                Bulan Lalu
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: '#181512', marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>
+                {formatRupiah(lastMonthTotal)}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e7e5e4',
+                borderRadius: 16,
+                padding: '10px 8px',
+                textAlign: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div style={{ fontSize: '9.5px', color: '#78716c', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, textTransform: 'uppercase' }}>
+                Total Belanja
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: '#047857', marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>
+                {formatRupiah(cumulativeSpent)}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: '#ffffff',
+                border: '1px solid #e7e5e4',
+                borderRadius: 16,
+                padding: '10px 8px',
+                textAlign: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+              }}
+            >
+              <div style={{ fontSize: '9.5px', color: '#78716c', fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, textTransform: 'uppercase' }}>
+                Rata-rata Hemat
+              </div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: '#d97706', marginTop: 2, fontFamily: "'JetBrains Mono', monospace" }}>
+                {formatRupiah(avgSavings)}
+              </div>
+            </div>
+          </div>
+
+          {/* Period Filter Pills */}
+          <div style={{ display: 'flex', gap: 6 }}>
+            {['Bulan Ini', 'Bulan Lalu', 'Lihat Semua'].map((period) => (
+              <button
+                key={period}
+                type="button"
+                className={`stitch-category-pill ${selectedPeriod === period ? 'active' : ''}`}
+                onClick={() => setSelectedPeriod(period)}
+                style={{ fontSize: '11px', padding: '5px 12px', fontWeight: 700 }}
+              >
+                {period}
+              </button>
+            ))}
+          </div>
+
+          {/* Receipts List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filteredHistory.length === 0 ? (
+              <div className="empty-state">
+                <Receipt size={32} />
+                <h3>Belum Ada Struk</h3>
+                <p>Selesaikan belanja di tab Troli untuk menyimpan struk digital di sini.</p>
+              </div>
+            ) : (
+              filteredHistory.map((trip) => {
+                const formattedDate = new Date(trip.date).toLocaleDateString('id-ID', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                });
+                const grand = trip.grandTotal || trip.totalSpent;
+
+                return (
+                  <div
+                    key={trip.id}
+                    onClick={() => setSelectedTrip(trip)}
+                    style={{
+                      background: '#ffffff',
+                      borderRadius: 18,
+                      border: '1.5px solid #e7e5e4',
+                      padding: 14,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                      transition: 'transform 0.15s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          background: '#FAF8F5',
+                          border: '1px solid #dcd2c6',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#059669',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Receipt size={20} />
+                      </div>
+
+                      <div>
+                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#181512' }}>
+                          {trip.storeName}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#78716c', marginTop: 1 }}>
+                          {formattedDate} • {trip.totalItemsCount || trip.itemsSnapshot.length} barang
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div
+                        style={{
+                          fontFamily: "'Space Grotesk', sans-serif",
+                          fontSize: '14.5px',
+                          fontWeight: 800,
+                          color: '#181512',
+                        }}
+                      >
+                        {formatRupiah(grand)}
+                      </div>
+                      {trip.totalSavings > 0 && (
+                        <span
+                          style={{
+                            fontSize: '10px',
+                            fontWeight: 800,
+                            color: '#059669',
+                            background: '#ecfdf5',
+                            padding: '1px 6px',
+                            borderRadius: 4,
+                          }}
+                        >
+                          Hemat {formatRupiah(trip.totalSavings)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* VIEW 2: ACUAN HARGA TOKO (MASTER BENCHMARK DATABASE) */}
+      {activeSubTab === 'benchmarks' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Top Actions: Search & Add */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Search
+                size={15}
+                style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }}
+              />
+              <input
+                type="text"
+                className="form-input"
+                style={{ paddingLeft: 36, height: 38, borderRadius: 12, fontSize: '12px', background: '#ffffff' }}
+                placeholder="Cari acuan harga barang..."
+                value={searchBenchmark}
+                onChange={(e) => setSearchBenchmark(e.target.value)}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAddMasterModal(true)}
+              style={{
+                height: 38,
+                padding: '0 12px',
+                borderRadius: 12,
+                background: '#181512',
+                color: '#ffffff',
+                border: 'none',
+                fontSize: '12px',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <Plus size={15} color="#f59e0b" />
+              <span>Tambah</span>
+            </button>
+          </div>
+
+          <div style={{ fontSize: '11px', color: '#78716c', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Store size={12} color="#059669" />
+            <span>
+              Patokan harga resmi bulan lalu di <strong>Lotte Mart Grocery - Puri Indah</strong>.
+            </span>
+          </div>
+
+          {/* Benchmark Products List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {filteredMaster.map((item) => (
               <div
+                key={item.id}
                 style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  background: '#ecfdf5',
-                  color: '#10b981',
+                  background: '#ffffff',
+                  borderRadius: 16,
+                  border: '1px solid #e7e5e4',
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#181512' }}>
+                    {item.name}
+                  </div>
+                  <div style={{ fontSize: '10.5px', color: '#78716c', marginTop: 2, display: 'flex', gap: 6 }}>
+                    <span style={{ background: '#f5f5f4', padding: '1px 5px', borderRadius: 4, fontWeight: 700 }}>
+                      {item.category}
+                    </span>
+                    <span>Satuan: {item.unit}</span>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '10px', color: '#78716c', display: 'block' }}>
+                    Harga Bulan Lalu:
+                  </span>
+                  <strong
+                    style={{
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      fontSize: '14.5px',
+                      color: '#059669',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {formatRupiah(item.lastMonthPrice)}
+                  </strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          MODAL: STRUK DIGITAL THERMAL ROLLOUT
+          ============================================================ */}
+      {selectedTrip && (
+        <div className="modal-backdrop" onClick={() => setSelectedTrip(null)} style={{ zIndex: 100 }}>
+          <div
+            className="modal-container"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: 420,
+              background: '#FAF8F5',
+              borderRadius: 24,
+              padding: 16,
+              border: '2px solid #181512',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+            }}
+          >
+            {/* Top Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#047857', fontWeight: 800, fontSize: '13px' }}>
+                <CheckCircle size={18} />
+                <span>Bukti Pembayaran Kasir</span>
+              </div>
+              <button
+                type="button"
+                className="icon-action-btn"
+                onClick={() => setSelectedTrip(null)}
+                style={{ borderRadius: '50%', width: 30, height: 30 }}
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Thermal Receipt Paper Card */}
+            <div
+              style={{
+                background: '#ffffff',
+                borderRadius: 16,
+                padding: '20px 18px',
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11.5px',
+                color: '#1f2937',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 10,
+              }}
+            >
+              {/* Receipt Header */}
+              <div style={{ textAlign: 'center', borderBottom: '1px dashed #cbd5e1', paddingBottom: 10 }}>
+                <div style={{ fontWeight: 800, fontSize: '13px', color: '#181512' }}>
+                  {selectedTrip.storeName.toUpperCase()}
+                </div>
+                <div style={{ fontSize: '10px', color: '#64748b', marginTop: 2 }}>
+                  Puri Indah Mall Lt. LG • Kembangan, Jakarta Barat
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#94a3b8', marginTop: 4 }}>
+                  {new Date(selectedTrip.date).toLocaleDateString('id-ID', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </div>
+                <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#181512', marginTop: 2 }}>
+                  TRX: LOTTE-PURI-{selectedTrip.id.slice(-6).toUpperCase()}
+                </div>
+              </div>
+
+              {/* Items List */}
+              <div style={{ borderBottom: '1px dashed #cbd5e1', paddingBottom: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {selectedTrip.itemsSnapshot.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <div style={{ minWidth: 0, flex: 1, paddingRight: 8 }}>
+                      <div style={{ fontWeight: 700, color: '#181512', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {item.name}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#64748b' }}>
+                        {item.quantity} {item.unit} @ {formatRupiah(item.unitPrice)}
+                      </div>
+                    </div>
+                    <strong style={{ color: '#181512' }}>
+                      {formatRupiah(item.quantity * item.unitPrice)}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+
+              {/* Totals Breakdown */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: '11px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
+                  <span>Subtotal Belanja:</span>
+                  <span>{formatRupiah(selectedTrip.totalSpent)}</span>
+                </div>
+
+                {selectedTrip.totalSavings > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#059669', fontWeight: 700 }}>
+                    <span>Hemat Promo:</span>
+                    <span>-{formatRupiah(selectedTrip.totalSavings)}</span>
+                  </div>
+                )}
+
+                {selectedTrip.extraCosts && (
+                  <>
+                    {selectedTrip.extraCosts.bagFee > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
+                        <span>Kantong Belanja:</span>
+                        <span>+{formatRupiah(selectedTrip.extraCosts.bagFee)}</span>
+                      </div>
+                    )}
+                    {selectedTrip.extraCosts.parkingFee > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
+                        <span>Biaya Parkir:</span>
+                        <span>+{formatRupiah(selectedTrip.extraCosts.parkingFee)}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div
+                  style={{
+                    borderTop: '2px dashed #94a3b8',
+                    paddingTop: 8,
+                    marginTop: 4,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    fontWeight: 800,
+                    fontSize: '13px',
+                    color: '#181512',
+                  }}
+                >
+                  <span>TOTAL AKHIR:</span>
+                  <span style={{ fontSize: '16px', color: '#059669' }}>
+                    {formatRupiah(selectedTrip.grandTotal || selectedTrip.totalSpent)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Barcode & Footer */}
+              <div style={{ textAlign: 'center', borderTop: '1px dashed #cbd5e1', paddingTop: 10 }}>
+                <div style={{ letterSpacing: '4px', fontSize: '10px', color: '#64748b', fontWeight: 700 }}>
+                  ||| |||| || ||||| |||| || |||
+                </div>
+                <div style={{ fontSize: '9px', color: '#94a3b8', marginTop: 4 }}>
+                  Terima kasih telah berbelanja cerdas di {selectedTrip.storeName}!
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
+              <button
+                type="button"
+                onClick={() => handleCopyReceiptText(selectedTrip)}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: 12,
+                  background: '#ffffff',
+                  border: '1.5px solid #dcd2c6',
+                  color: '#181512',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  margin: '0 auto 12px',
+                  gap: 6,
+                  cursor: 'pointer',
                 }}
               >
-                <Camera size={28} />
-              </div>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
-                Simulasi Pemindai Struk OCR
-              </h3>
-              <p style={{ fontSize: '12px', color: '#64748b', margin: '8px 0 16px', lineHeight: 1.5 }}>
-                Fitur pemindai struk kamera AI siap mengenali nama produk dan total harga struk supermarket secara otomatis. Saat ini Anda juga dapat langsung mencatat manual atau menggunakan Katalog Cepat.
-              </p>
+                <Copy size={14} />
+                <span>{copySuccess ? 'Tersalin!' : 'Salin Teks'}</span>
+              </button>
+
               <button
                 type="button"
-                className="btn-primary"
-                style={{ width: '100%' }}
-                onClick={() => setShowScannerNotice(false)}
+                onClick={() => setSelectedTrip(null)}
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: 12,
+                  background: '#181512',
+                  border: 'none',
+                  color: '#ffffff',
+                  fontSize: '11.5px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
               >
-                Mengerti & Lanjutkan
+                Tutup Struk
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL DETAIL STRUK DIGITAL */}
-      {selectedTrip && (
-        <div className="modal-backdrop" onClick={() => setSelectedTrip(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Struk Belanja Digital</h3>
-              <button className="icon-action-btn" onClick={() => setSelectedTrip(null)}>
-                <X size={18} />
+      {/* MODAL: TAMBAH ACUAN HARGA BARU */}
+      {showAddMasterModal && (
+        <div className="modal-backdrop" onClick={() => setShowAddMasterModal(false)} style={{ zIndex: 100 }}>
+          <div
+            className="modal-container"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: 400, borderRadius: 24, padding: 18 }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, margin: 0 }}>Tambah Acuan Harga Bulan Lalu</h3>
+              <button type="button" className="icon-action-btn" onClick={() => setShowAddMasterModal(false)}>
+                <X size={15} />
               </button>
             </div>
 
-            <div className="sheet-body">
-              {/* Receipt Store Info */}
-              <div
-                style={{
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: 14,
-                  padding: '14px',
-                  textAlign: 'center',
-                }}
-              >
-                <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                  {selectedTrip.storeName}
-                </h4>
-                <p style={{ fontSize: '11px', color: '#64748b', marginTop: 3 }}>
-                  {new Date(selectedTrip.date).toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' })}
-                </p>
-                {selectedTrip.astroOrderId && (
-                  <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 800, marginTop: 4 }}>
-                    Order ID: {selectedTrip.astroOrderId} ({selectedTrip.deliveryMode === 'astro_instant' ? 'Instant 15 Menit' : 'Belanja Fisik'})
-                  </div>
-                )}
-                {selectedTrip.paymentMethod && (
-                  <div style={{ fontSize: '11px', color: '#047857', fontWeight: 700, marginTop: 2 }}>
-                    Pembayaran: {selectedTrip.paymentMethod} {selectedTrip.paymentChannel ? `(${selectedTrip.paymentChannel})` : ''}
-                  </div>
-                )}
-                {selectedTrip.notes && (
-                  <p style={{ fontSize: '11px', color: '#10b981', marginTop: 4 }}>
-                    Catatan: {selectedTrip.notes}
-                  </p>
-                )}
+            <form onSubmit={handleSaveNewMaster} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div>
+                <label className="form-label">Nama Produk *</label>
+                <input
+                  type="text"
+                  required
+                  className="form-input"
+                  placeholder="Contoh: Beras Ramos Super 5kg"
+                  value={newMasterName}
+                  onChange={(e) => setNewMasterName(e.target.value)}
+                />
               </div>
 
-
-              {/* Items Breakdown */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>
-                  Daftar Barang Belanjaan:
-                </div>
-
-                {selectedTrip.itemsSnapshot.map((item, idx) => {
-                  const calc = calculateItemPrice(item);
-                  const itemImg = item.imageUrl || resolveProductImageUrl(item.name, item.category);
-                  return (
-                    <div
-                      key={item.id || idx}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '10px 12px',
-                        background: '#f8fafc',
-                        borderRadius: 12,
-                        border: '1px solid #e2e8f0',
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
-                        <div
-                          style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: 8,
-                            background: '#ffffff',
-                            border: '1px solid #e2e8f0',
-                            overflow: 'hidden',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {itemImg ? (
-                            <img
-                              src={itemImg}
-                              alt={item.name}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          ) : (
-                            <Package size={18} color="#64748b" />
-                          )}
-                        </div>
-
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div
-                            style={{
-                              fontSize: '13px',
-                              fontWeight: 700,
-                              color: '#0f172a',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            {item.name}
-                          </div>
-                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: 1 }}>
-                            {item.quantity} {item.unit} × {formatRupiah(calc.discountedUnitPrice)}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                          {formatRupiah(calc.finalTotal)}
-                        </div>
-                        {calc.totalDiscountAmount > 0 && (
-                          <div style={{ fontSize: '10.5px', color: '#10b981' }}>
-                            Hemat {formatRupiah(calc.totalDiscountAmount)}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Extra Cashier Costs */}
-              {selectedTrip.extraCosts && (
-                <div
-                  style={{
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: 12,
-                    padding: '10px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4,
-                    fontSize: '11.5px',
-                  }}
-                >
-                  <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: 2 }}>
-                    Biaya Tambahan Kasir:
-                  </div>
-                  {selectedTrip.extraCosts.bagFee > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
-                      <span>Kantong Belanja:</span>
-                      <span>+{formatRupiah(selectedTrip.extraCosts.bagFee)}</span>
-                    </div>
-                  )}
-                  {selectedTrip.extraCosts.parkingFee > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
-                      <span>Biaya Parkir:</span>
-                      <span>+{formatRupiah(selectedTrip.extraCosts.parkingFee)}</span>
-                    </div>
-                  )}
-                  {selectedTrip.extraCosts.shippingFee !== undefined && selectedTrip.extraCosts.shippingFee >= 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
-                      <span>Ongkir Astro 15 Menit:</span>
-                      <span style={{ color: selectedTrip.extraCosts.shippingFee === 0 ? '#10b981' : '#0f172a', fontWeight: 700 }}>
-                        {selectedTrip.extraCosts.shippingFee === 0 ? 'GRATIS' : `+${formatRupiah(selectedTrip.extraCosts.shippingFee)}`}
-                      </span>
-                    </div>
-                  )}
-                  {selectedTrip.extraCosts.astroCoinsDiscount !== undefined && selectedTrip.extraCosts.astroCoinsDiscount > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d97706' }}>
-                      <span>Diskon Koin Astro:</span>
-                      <span style={{ fontWeight: 700 }}>-{formatRupiah(selectedTrip.extraCosts.astroCoinsDiscount)}</span>
-                    </div>
-                  )}
-                  {selectedTrip.extraCosts.taxAmount > 0 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b' }}>
-                      <span>PPN ({selectedTrip.extraCosts.taxPercent}%):</span>
-                      <span>+{formatRupiah(selectedTrip.extraCosts.taxAmount)}</span>
-                    </div>
-                  )}
-                </div>
-
-              )}
-
-              {/* Total Card */}
-              <div
-                style={{
-                  background: '#ecfdf5',
-                  border: '1.5px solid #a7f3d0',
-                  borderRadius: 14,
-                  padding: '12px 16px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: '11px', color: '#047857' }}>Total Dibayar Kasir:</div>
-                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#047857' }}>
-                    {formatRupiah(selectedTrip.grandTotal || selectedTrip.totalSpent)}
-                  </div>
-                </div>
-
-                {selectedTrip.totalSavings > 0 && (
-                  <span
-                    style={{
-                      background: '#10b981',
-                      color: '#fff',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      padding: '4px 8px',
-                      borderRadius: 12,
-                    }}
+                  <label className="form-label">Kategori</label>
+                  <select
+                    className="form-select"
+                    value={newMasterCategory}
+                    onChange={(e) => setNewMasterCategory(e.target.value as CategoryType)}
                   >
-                    Hemat {formatRupiah(selectedTrip.totalSavings)}
-                  </span>
-                )}
+                    <option value="Bahan Pokok">Bahan Pokok</option>
+                    <option value="Mandi & Kebersihan">Mandi &amp; Kebersihan</option>
+                    <option value="Makanan & Camilan">Makanan &amp; Camilan</option>
+                    <option value="Bumbu & Dapur">Bumbu &amp; Dapur</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="form-label">Satuan</label>
+                  <input
+                    type="text"
+                    required
+                    className="form-input"
+                    placeholder="kg / liter / pack"
+                    value={newMasterUnit}
+                    onChange={(e) => setNewMasterUnit(e.target.value)}
+                  />
+                </div>
               </div>
 
-              <button
-                type="button"
-                className="btn-secondary"
-                style={{ width: '100%' }}
-                onClick={() => setSelectedTrip(null)}
-              >
-                Tutup Struk
+              <div>
+                <label className="form-label">Harga Patokan Bulan Lalu (Rp) *</label>
+                <input
+                  type="number"
+                  required
+                  min={1}
+                  className="form-input"
+                  placeholder="72000"
+                  value={newMasterPrice || ''}
+                  onChange={(e) => setNewMasterPrice(Number(e.target.value))}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ marginTop: 6, padding: '11px' }}>
+                Simpan ke Database Acuan
               </button>
-            </div>
+            </form>
           </div>
         </div>
       )}

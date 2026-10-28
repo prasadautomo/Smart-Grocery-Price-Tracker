@@ -1,11 +1,26 @@
 import React from 'react';
-import { ShoppingCart, Cloud, SlidersHorizontal } from 'lucide-react';
+import { ShoppingBag, MapPin, Calendar, Cloud, Wallet, ChevronDown } from 'lucide-react';
 import type { UserProfile } from '../types/auth';
 import { GoogleIcon } from './GoogleIcon';
+import { formatRupiah } from '../lib/calculations';
+
+export const STORE_OPTIONS = [
+  'Lotte Mart Grocery - Puri Indah',
+  'Super Indo - Puri Pesanggrahan',
+  'GrandLucky SCBD',
+  'Hypermart - Puri Indah Mall',
+  'Indomaret Fresh - Kos Rian',
+  'Pasar Tradisional Puri',
+];
 
 interface HeaderProps {
   isSupabaseConnected: boolean;
   user?: UserProfile | null;
+  budgetLimit?: number;
+  selectedStore?: string;
+  sessionDate?: string;
+  onStoreChange?: (store: string) => void;
+  onDateChange?: (date: string) => void;
   onOpenSupabaseModal: () => void;
   onOpenBudgetModal: () => void;
   onOpenAuthModal?: () => void;
@@ -16,6 +31,11 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   isSupabaseConnected,
   user,
+  budgetLimit = 350000,
+  selectedStore = 'Lotte Mart Grocery - Puri Indah',
+  sessionDate = new Date().toISOString().slice(0, 10),
+  onStoreChange,
+  onDateChange,
   onOpenSupabaseModal,
   onOpenBudgetModal,
   onOpenAuthModal,
@@ -23,23 +43,228 @@ export const Header: React.FC<HeaderProps> = ({
   children,
 }) => {
   return (
-    <header className={`stitch-hero-header ${!children ? 'compact' : ''}`}>
-      <div className="stitch-hero-top">
-        <div className="stitch-user-profile">
+    <header
+      style={{
+        background: '#FAF8F5',
+        borderBottom: '1px solid #e8dfd5',
+        padding: '12px 14px 10px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+      }}
+    >
+      {/* Top Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        {/* Left: Squircle Bag Icon & Stacked 3-Line Info */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0, flex: 1 }}>
+          {/* Squircle Bag Icon */}
           <div
-            className="stitch-avatar"
-            onClick={user && onOpenAuthModal ? onOpenAuthModal : onOpenBudgetModal}
-            title={user ? `Akun: ${user.name}` : 'Atur Anggaran'}
-            style={
-              user
-                ? {
-                    padding: 0,
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 14,
+              background: '#181512',
+              color: '#f59e0b',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              border: '2px solid #292524',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            <ShoppingBag size={22} color="#f59e0b" />
+          </div>
+
+          {/* 3 Lines Stacked Info */}
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            {/* Line 1: Title & PRO Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, lineHeight: 1 }}>
+              <span
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: '#181512',
+                  letterSpacing: '-0.02em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                KeranjangPintar
+              </span>
+              <span
+                style={{
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  color: '#b45309',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '9px',
+                  fontWeight: 900,
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                }}
+              >
+                PRO
+              </span>
+            </div>
+
+            {/* Line 2: Store Selector Dropdown */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
+              <MapPin size={11} color="#d97706" style={{ flexShrink: 0 }} />
+              <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+                <select
+                  value={selectedStore}
+                  onChange={(e) => onStoreChange && onStoreChange(e.target.value)}
+                  style={{
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '0 14px 0 0',
+                    fontSize: '11px',
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 700,
+                    color: '#181512',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    maxWidth: '160px',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                     overflow: 'hidden',
-                    border: '2px solid rgba(255,255,255,0.7)',
-                    background: '#ffffff',
-                  }
-                : undefined
-            }
+                  }}
+                  title="Pilih Toko Belanja"
+                >
+                  {STORE_OPTIONS.map((store) => (
+                    <option key={store} value={store}>
+                      {store}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={11}
+                  color="#78716c"
+                  style={{ position: 'absolute', right: 0, pointerEvents: 'none' }}
+                />
+              </div>
+            </div>
+
+            {/* Line 3: Compact Date Picker & Online Cloud Badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  fontSize: '10px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 700,
+                  background: '#ffffff',
+                  border: '1px solid #dcd2c6',
+                  borderRadius: 5,
+                  padding: '1px 5px',
+                }}
+                title="Tanggal Sesi Belanja"
+              >
+                <Calendar size={10} color="#78716c" />
+                <input
+                  type="date"
+                  value={sessionDate}
+                  onChange={(e) => onDateChange && onDateChange(e.target.value)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    fontSize: '9.5px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 700,
+                    color: '#181512',
+                    cursor: 'pointer',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div
+                onClick={onOpenSupabaseModal}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '1px 5px',
+                  borderRadius: 5,
+                  background: isSupabaseConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.15)',
+                  color: isSupabaseConnected ? '#047857' : '#b45309',
+                  border: `1px solid ${isSupabaseConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+                  fontSize: '9px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 900,
+                  cursor: 'pointer',
+                }}
+                title={isSupabaseConnected ? 'Supabase Realtime Cloud Aktif' : 'Klik untuk hubungkan database Supabase'}
+              >
+                <span
+                  style={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    background: isSupabaseConnected ? '#10b981' : '#f59e0b',
+                    boxShadow: isSupabaseConnected ? '0 0 5px #10b981' : 'none',
+                  }}
+                />
+                <span>{isSupabaseConnected ? 'CLOUD' : 'OFFLINE'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Quick Budget Trigger & User Avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+          {/* Quick Budget Trigger */}
+          <button
+            type="button"
+            onClick={onOpenBudgetModal}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '6px 10px',
+              borderRadius: 20,
+              background: '#ffffff',
+              border: '1.5px solid #dcd2c6',
+              boxShadow: '0 2px 0 #dcd2c6',
+              color: '#181512',
+              cursor: 'pointer',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '11px',
+              fontWeight: 800,
+            }}
+            title="Ubah Batas Dompet"
+          >
+            <Wallet size={13} color="#d97706" />
+            <span>{formatRupiah(budgetLimit).replace('Rp ', 'Rp ')}</span>
+          </button>
+
+          {/* User Profile Avatar / Trigger */}
+          <button
+            type="button"
+            onClick={onOpenAuthModal}
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              background: '#181512',
+              border: '2px solid #292524',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              padding: 0,
+              overflow: 'hidden',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+            title={user ? `Akun Google: ${user.name}` : 'Masuk dengan Akun Google'}
           >
             {user?.avatarUrl ? (
               <img
@@ -53,137 +278,14 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
               />
             ) : (
-              <ShoppingCart size={20} strokeWidth={2.4} />
+              <GoogleIcon size={16} />
             )}
-          </div>
-          <div className="stitch-user-info">
-            <h1>{user ? `Halo, ${user.name.split(' ')[0]}!` : 'SafeGrocer'}</h1>
-            <p>
-              {activeTab === 'cart' && 'Troli Belanja Supermarket'}
-              {activeTab === 'history' && 'Riwayat & Struk Belanja'}
-              {activeTab === 'calculator' && 'Pengendali Anggaran & Promo'}
-              {activeTab === 'settings' && 'Pengaturan & Cloud Sync'}
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {/* Tombol Login Google / Akun Profil */}
-          {user ? (
-            <button
-              type="button"
-              onClick={onOpenAuthModal}
-              style={{
-                background: 'rgba(255, 255, 255, 0.18)',
-                border: '1px solid rgba(255, 255, 255, 0.35)',
-                borderRadius: '20px',
-                padding: '4px 8px 4px 5px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                color: '#ffffff',
-                fontSize: '11px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                backdropFilter: 'blur(8px)',
-              }}
-              title={`Akun Google: ${user.name} (${user.email})`}
-            >
-              <GoogleIcon size={13} />
-              <span
-                style={{
-                  maxWidth: '60px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {user.name.split(' ')[0]}
-              </span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onOpenAuthModal}
-              style={{
-                background: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '20px',
-                padding: '4px 10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                color: '#0f172a',
-                fontSize: '11px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
-              }}
-              title="Masuk dengan Google"
-            >
-              <GoogleIcon size={14} />
-              <span>Masuk</span>
-            </button>
-          )}
-
-          {/* Cloud Database Status */}
-          <button
-            type="button"
-            onClick={onOpenSupabaseModal}
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              borderRadius: '20px',
-              padding: '5px 8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              color: '#fff',
-              fontSize: '11px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-            }}
-            title={isSupabaseConnected ? 'Tersambung ke Supabase Cloud' : 'Klik untuk hubungkan database Cloud'}
-          >
-            <Cloud size={13} color={isSupabaseConnected ? '#a7f3d0' : '#ffffff'} />
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background: isSupabaseConnected ? '#10b981' : '#f59e0b',
-                boxShadow: isSupabaseConnected ? '0 0 6px #10b981' : 'none',
-              }}
-            />
-          </button>
-
-          {/* Settings / Budget trigger button */}
-          <button
-            type="button"
-            onClick={onOpenBudgetModal}
-            style={{
-              background: 'rgba(255, 255, 255, 0.15)',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              borderRadius: '50%',
-              width: 30,
-              height: 30,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              cursor: 'pointer',
-              backdropFilter: 'blur(8px)',
-            }}
-            title="Pengaturan Anggaran"
-          >
-            <SlidersHorizontal size={14} />
           </button>
         </div>
       </div>
 
-      {/* Hero Child (Budget Safety Banner on Cart tab) */}
-      {children}
+      {/* Child element (e.g. Tactile Segmented Radar Display on Cart tab) */}
+      {children && <div style={{ marginTop: 12 }}>{children}</div>}
     </header>
   );
 };

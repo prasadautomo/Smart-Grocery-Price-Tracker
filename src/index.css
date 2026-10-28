@@ -1107,3 +1107,75 @@ html, body {
 .user-profile-badge:hover {
   background: rgba(255, 255, 255, 0.25);
 }
+
+
+/* ============================================================
+   KERANJANGPINTAR PRO - TACTILE STITCH ENHANCEMENTS
+   ============================================================ */
+
+.font-space {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.font-mono-num {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 10-Segment LED Meter Grid */
+.segment-meter-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+  width: 100%;
+}
+
+.segment-block {
+  height: 9px;
+  border-radius: 3px;
+  background-color: #292524;
+  transition: all 0.25s ease;
+}
+
+.segment-block.active-green {
+  background-color: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.segment-block.active-yellow {
+  background-color: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.segment-block.active-red {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.75);
+}
+
+/* Rubber Stamp Styling */
+.stamp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #ea580c;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: rotate(1deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(254, 215, 170, 0.4);
+}
+
+/* Thermal Paper Receipt */
+.thermal-receipt-roll {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  font-family: 'JetBrains Mono', monospace;
+}

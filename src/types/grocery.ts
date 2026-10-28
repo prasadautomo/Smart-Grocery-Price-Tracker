@@ -145,3 +145,64 @@ export interface UnitComparisonResult {
   savingsPercent: number;
   savingsNominalPerUnit: number;
 }
+
+export interface PlannerItem {
+  id: string;
+  name: string;
+  category: CategoryType;
+  unit: UnitType;
+  quantity: number;
+  notes?: string;
+  isPurchased?: boolean;
+  estimatedPrice?: number;
+  createdAt: string;
+}
+
+export interface BarcodeProduct {
+  barcode: string;
+  name: string;
+  brand?: string;
+  category: CategoryType;
+  unit: UnitType;
+  unitSize?: string;
+  price: number;
+  lastMonthPrice: number;
+  imageUrl?: string;
+  description?: string;
+  discountType: DiscountType;
+  discountPercent1?: number;
+  discountPercent2?: number;
+  discountNominal?: number;
+}
+
+export interface MasterProduct {
+  id: string;
+  name: string;
+  category: CategoryType;
+  unit: UnitType;
+  lastMonthPrice: number;
+  barcode?: string;
+  storeName?: string;
+  updatedAt: string;
+}
+
+export interface SmartBasketInsight {
+  status: 'SAFE' | 'WARNING' | 'DANGER';
+  healthScore: number;
+  summary: string;
+  inflationSummary: {
+    totalItemsCompared: number;
+    itemsIncreased: number;
+    itemsDecreased: number;
+    itemsStable: number;
+    netInflationPct: number;
+  };
+  recommendations: Array<{
+    type: 'SAVINGS' | 'WARNING' | 'SUBSTITUTION' | 'NUTRITION';
+    title: string;
+    description: string;
+    estimatedSavings?: number;
+  }>;
+  categoryAllocation: Record<string, { spent: number; percentage: number }>;
+  timestamp: string;
+}

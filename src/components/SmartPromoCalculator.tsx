@@ -7,7 +7,7 @@ import {
   RotateCcw,
   Cloud,
 } from 'lucide-react';
-import { formatRupiah, compareUnitPricing } from '../lib/calculations';
+import { formatRupiah, compareUnitPricing, calculateCategoryAllocations } from '../lib/calculations';
 import type { BudgetSettings, GroceryItem } from '../types/grocery';
 
 interface SmartPromoCalculatorProps {
@@ -15,6 +15,7 @@ interface SmartPromoCalculatorProps {
   totalSpent?: number;
   items?: GroceryItem[];
   onEditBudget?: () => void;
+  onSaveBudget?: (settings: BudgetSettings) => void;
   onApplyToCart?: (item: GroceryItem) => void;
   onResetDemoData?: () => void;
   onOpenSupabaseModal?: () => void;
@@ -26,6 +27,7 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
   totalSpent = 264000,
   items = [],
   onEditBudget,
+  onSaveBudget,
   onApplyToCart,
   onResetDemoData,
   onOpenSupabaseModal,
@@ -257,33 +259,72 @@ export const SmartPromoCalculator: React.FC<SmartPromoCalculatorProps> = ({
           </span>
         </div>
 
-        {/* Breakdown Alokasi Belanja Progress Bar */}
+        {/* Pilihan Cepat Batas Dompet (SRS F-05 Macro Allocator) */}
+        <div>
+          <div style={{ fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: 6 }}>
+            Pilihan Cepat Batas Dompet (SRS F-05):
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+            {[100000, 250000, 350000, 500000, 750000].map((amt) => {
+              const isSelected = budgetSettings.monthlyBudget === amt;
+              return (
+                <button
+                  key={amt}
+                  type="button"
+                  onClick={() => onSaveBudget && onSaveBudget({ ...budgetSettings, monthlyBudget: amt })}
+                  style={{
+                    padding: '7px 4px',
+                    borderRadius: 9,
+                    background: isSelected ? '#181512' : '#f8fafc',
+                    color: isSelected ? '#ffffff' : '#181512',
+                    border: isSelected ? '1.5px solid #181512' : '1px solid #e2e8f0',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    boxShadow: isSelected ? '0 2px 0 #000' : 'none',
+                  }}
+                >
+                  Rp {amt / 1000}k
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Breakdown Alokasi Belanja Dinamis dari Keranjang Aktif */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#475569', marginBottom: 6 }}>
-            <span style={{ fontWeight: 700 }}>Breakdown Alokasi Belanja</span>
-            <span style={{ color: '#94a3b8' }}>Kategori Terpilih</span>
+            <span style={{ fontWeight: 700 }}>Sebaran Kategori Belanja Realtime</span>
+            <span style={{ color: '#059669', fontWeight: 700 }}>{items.length} Barang di Troli</span>
           </div>
 
-          <div style={{ display: 'flex', height: 8, borderRadius: 999, overflow: 'hidden', gap: 2 }}>
-            <div style={{ width: '55%', background: '#10b981' }} title="Bahan Pokok (55%)" />
-            <div style={{ width: '25%', background: '#3b82f6' }} title="Kebersihan (25%)" />
-            <div style={{ width: '20%', background: '#f59e0b' }} title="Dapur/Camilan (20%)" />
-          </div>
+          {items.length === 0 ? (
+            <div style={{ fontSize: '11px', color: '#94a3b8', background: '#f8fafc', padding: 8, borderRadius: 8, textAlign: 'center' }}>
+              Troli masih kosong. Tambahkan barang untuk melihat sebaran kategori belanja.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {calculateCategoryAllocations(items).map((alloc, idx) => {
+                const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'];
+                const barColor = colors[idx % colors.length];
 
-          <div style={{ display: 'flex', gap: 12, fontSize: '10px', color: '#64748b', marginTop: 6, flexWrap: 'wrap' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
-              Pokok (55%)
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3b82f6' }} />
-              Mandi (25%)
-            </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} />
-              Dapur/Jajan (20%)
-            </span>
-          </div>
+                return (
+                  <div key={alloc.category} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px' }}>
+                      <span style={{ fontWeight: 700, color: '#181512' }}>{alloc.category} ({alloc.itemCount} item)</span>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", color: '#475569' }}>
+                        {formatRupiah(alloc.totalSpent)} ({alloc.percentage}%)
+                      </span>
+                    </div>
+                    <div style={{ height: 6, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${alloc.percentage}%`, background: barColor, borderRadius: 999 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

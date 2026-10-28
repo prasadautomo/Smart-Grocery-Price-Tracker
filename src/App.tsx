@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { GroceryItem, ShoppingTrip, BudgetSettings } from './types/grocery';
+import type { GroceryItem, ShoppingTrip, BudgetSettings, PlannerItem } from './types/grocery';
 import type { UserProfile } from './types/auth';
 import {
   loadGroceryItems,
@@ -8,6 +8,8 @@ import {
   saveShoppingHistory,
   loadBudgetSettings,
   saveBudgetSettings,
+  loadPlannerItems,
+  savePlannerItems,
   pullDataFromSupabase,
   pushAllDataToCloud,
   INITIAL_ITEMS,
@@ -36,6 +38,7 @@ import { QuickPresetModal } from './components/QuickPresetModal';
 import { ShareChecklistModal } from './components/ShareChecklistModal';
 import { UnitBulkComparatorModal } from './components/UnitBulkComparatorModal';
 import { AuthModal } from './components/AuthModal';
+import { BarcodeScannerModal } from './components/BarcodeScannerModal';
 
 export const App: React.FC = () => {
   // State Data Belanja
@@ -76,6 +79,10 @@ export const App: React.FC = () => {
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isComparatorModalOpen, setIsComparatorModalOpen] = useState(false);
+  const [isScannerModalOpen, setIsScannerModalOpen] = useState(false);
+
+  // Shopping Planner State (Rencana Belanja dari Rumah)
+  const [plannerItems, setPlannerItems] = useState<PlannerItem[]>(() => loadPlannerItems());
 
   // Cloud & PWA State
   const [isSupabaseConnected, setIsSupabaseConnected] = useState<boolean>(false);
@@ -88,6 +95,21 @@ export const App: React.FC = () => {
       setToastMessage(null);
     }, 3200);
   };
+
+  // Listen to Google Sign-In Popup postMessage
+  useEffect(() => {
+    const handleGooglePopupMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'GOOGLE_SIGNIN_SUCCESS' && e.data?.account) {
+        const acc = e.data.account;
+        setCurrentUser(acc);
+        localStorage.setItem('smart_grocery_auth_user', JSON.stringify(acc));
+        localStorage.removeItem('smart_grocery_logged_out');
+        showToast(`Selamat datang, ${acc.name}! (Akun Google Terhubung)`);
+      }
+    };
+    window.addEventListener('message', handleGooglePopupMessage);
+    return () => window.removeEventListener('message', handleGooglePopupMessage);
+  }, []);
 
   const handleStoreChange = (newStore: string) => {
     setSelectedStore(newStore);
@@ -301,6 +323,29 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleAddFromPlanner = (plan: PlannerItem) => {
+    setItemToEdit({
+      id: `item-${Date.now()}`,
+      name: plan.name,
+      category: plan.category,
+      unit: plan.unit,
+      quantity: plan.quantity,
+      unitPrice: plan.estimatedPrice || 20000,
+      lastMonthPrice: plan.estimatedPrice || null,
+      discountType: 'none',
+      priority: 'essential',
+      isCheckedInCart: true,
+      notes: plan.notes || '',
+      createdAt: new Date().toISOString(),
+    });
+    const updated = plannerItems.map((p) =>
+      p.id === plan.id ? { ...p, isPurchased: true } : p
+    );
+    setPlannerItems(updated);
+    savePlannerItems(updated);
+    setIsAddModalOpen(true);
+  };
+
   return (
     <div className="app-viewport-wrapper">
       <div className="mobile-app-container">
@@ -317,6 +362,11 @@ export const App: React.FC = () => {
         <Header
           isSupabaseConnected={isSupabaseConnected}
           user={currentUser}
+          budgetLimit={budgetSettings.monthlyBudget}
+          selectedStore={selectedStore}
+          sessionDate={sessionDate}
+          onStoreChange={handleStoreChange}
+          onDateChange={handleDateChange}
           onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
           onOpenBudgetModal={() => setIsBudgetModalOpen(true)}
           onOpenAuthModal={() => setIsAuthModalOpen(true)}
@@ -344,6 +394,7 @@ export const App: React.FC = () => {
               budgetLimit={budgetSettings.monthlyBudget}
               selectedStore={selectedStore}
               sessionDate={sessionDate}
+              plannerItems={plannerItems}
               onStoreChange={handleStoreChange}
               onDateChange={handleDateChange}
               onAddItem={() => {
@@ -351,12 +402,14 @@ export const App: React.FC = () => {
                 setIsAddModalOpen(true);
               }}
               onOpenPresets={() => setIsPresetModalOpen(true)}
+              onOpenScanner={() => setIsScannerModalOpen(true)}
               onOpenComparator={() => setIsComparatorModalOpen(true)}
               onOpenShare={() => setIsShareModalOpen(true)}
               onEditItem={handleEditItem}
               onDeleteItem={handleDeleteItem}
               onUpdateQuantity={handleUpdateQuantity}
               onToggleCheckItem={handleToggleCheckItem}
+              onAddFromPlanner={handleAddFromPlanner}
               onCheckout={() => {
                 if (items.length === 0) {
                   alert('Troli belanja masih kosong!');
@@ -374,6 +427,7 @@ export const App: React.FC = () => {
               totalSpent={totalSpent}
               items={items}
               onEditBudget={() => setIsBudgetModalOpen(true)}
+              onSaveBudget={handleSaveBudget}
               onApplyToCart={handleSaveItem}
               onResetDemoData={handleResetDemoData}
               onOpenSupabaseModal={() => setIsSupabaseModalOpen(true)}
@@ -475,6 +529,13 @@ export const App: React.FC = () => {
           isOpen={isComparatorModalOpen}
           onClose={() => setIsComparatorModalOpen(false)}
           onAddToCart={handleSaveItem}
+        />
+
+        <BarcodeScannerModal
+          isOpen={isScannerModalOpen}
+          onClose={() => setIsScannerModalOpen(false)}
+          onAddToCart={handleSaveItem}
+          currentBudgetRemaining={budgetSettings.monthlyBudget - totalSpent}
         />
       </div>
     </div>

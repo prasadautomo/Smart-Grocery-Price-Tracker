@@ -299,3 +299,37 @@ export function calculateCashierGrandTotal(
   };
 }
 
+/**
+ * Menghitung Sebaran Alokasi Belanja Berdasarkan Kategori (Macro Allocator)
+ */
+export function calculateCategoryAllocations(items: GroceryItem[]): Array<{
+  category: string;
+  totalSpent: number;
+  itemCount: number;
+  percentage: number;
+}> {
+  const map: Record<string, { totalSpent: number; itemCount: number }> = {};
+  let grandTotal = 0;
+
+  items.forEach((item) => {
+    const calc = calculateItemPrice(item);
+    grandTotal += calc.finalTotal;
+    const cat = item.category || 'Lainnya';
+    if (!map[cat]) {
+      map[cat] = { totalSpent: 0, itemCount: 0 };
+    }
+    map[cat].totalSpent += calc.finalTotal;
+    map[cat].itemCount += 1;
+  });
+
+  return Object.entries(map)
+    .map(([category, data]) => ({
+      category,
+      totalSpent: data.totalSpent,
+      itemCount: data.itemCount,
+      percentage: grandTotal > 0 ? Math.round((data.totalSpent / grandTotal) * 100) : 0,
+    }))
+    .sort((a, b) => b.totalSpent - a.totalSpent);
+}
+
+
