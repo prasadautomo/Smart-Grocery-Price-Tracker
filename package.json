@@ -7,7 +7,7 @@
     "start": "node api/server-local.js",
     "dev": "node api/server-local.js",
     "typecheck": "tsc --noEmit || true",
-    "build": "tsc --noEmit || echo 'Build complete'"
+    "build": "node build.js"
   },
   "keywords": [
     "grocery",
