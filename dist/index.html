@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full" lang="id">
+<html class="dark h-full bg-[#07080b]" lang="id">
 
 <head>
   <meta charset="utf-8" />
@@ -10,7 +10,7 @@
 
   <!-- PWA Settings -->
   <link rel="manifest" href="manifest.json?v=5.3">
-  <meta name="theme-color" content="#f0fdf1">
+  <meta name="theme-color" content="#07080b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SmartGrocery">
@@ -33,50 +33,50 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#181512",
-            "primary-container": "#241f1a",
-            "on-primary": "#ffffff",
-            "on-primary-container": "#e4dbd2",
-            "secondary": "#007432",
-            "secondary-container": "#dcf4e3",
+            "primary": "#f8fafc",
+            "primary-container": "#161926",
+            "on-primary": "#07080b",
+            "on-primary-container": "#f1f5f9",
+            "secondary": "#10b981",
+            "secondary-container": "#064e3b",
             "on-secondary": "#ffffff",
-            "on-secondary-container": "#005321",
+            "on-secondary-container": "#a7f3d0",
             "secondary-fixed": "#f59e0b",
             "secondary-fixed-dim": "#d97706",
-            "on-secondary-fixed": "#181512",
+            "on-secondary-fixed": "#07080b",
             "on-secondary-fixed-variant": "#78350f",
             "tertiary": "#ea580c",
-            "tertiary-container": "#ffedd5",
-            "on-tertiary-container": "#9a3412",
+            "tertiary-container": "#7c2d12",
+            "on-tertiary-container": "#ffedd5",
             "tertiary-fixed": "#ffedd5",
             "tertiary-fixed-dim": "#fed7aa",
             "on-tertiary-fixed": "#301400",
             "on-tertiary-fixed-variant": "#713700",
-            "surface": "#FAF8F5",
-            "surface-bright": "#ffffff",
-            "surface-dim": "#ede5dc",
-            "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#f8f3ee",
-            "surface-container": "#f3ece5",
-            "surface-container-high": "#ebe3db",
-            "surface-container-highest": "#e2d8ce",
-            "on-surface": "#181512",
-            "on-surface-variant": "#5e564e",
-            "outline": "#8c7f73",
-            "outline-variant": "#dcd2c6",
+            "surface": "#07080b",
+            "surface-bright": "#1a1d2e",
+            "surface-dim": "#07080b",
+            "surface-container-lowest": "#07080b",
+            "surface-container-low": "#0d0f17",
+            "surface-container": "#11131c",
+            "surface-container-high": "#161926",
+            "surface-container-highest": "#1c1f30",
+            "on-surface": "#f8fafc",
+            "on-surface-variant": "#94a3b8",
+            "outline": "#334155",
+            "outline-variant": "#1e2438",
             "citrus": "#f59e0b",
             "citrus-glow": "#ffb703",
             "terracotta": "#ea580c",
-            "ink": "#181512",
-            "ink-card": "#211d19",
+            "ink": "#f8fafc",
+            "ink-card": "#11131c",
             "error": "#dc2626",
-            "error-container": "#fee2e2",
+            "error-container": "#450a0a",
             "on-error": "#ffffff",
-            "on-error-container": "#991b1b",
-            "background": "#FAF8F5",
-            "on-background": "#181512",
+            "on-error-container": "#fecaca",
+            "background": "#07080b",
+            "on-background": "#f8fafc",
             "surface-tint": "#f59e0b"
-          },
+          },,
           boxShadow: {
             "tactile": "0 4px 0 #181512, 0 8px 16px rgba(24,21,18,0.08)",
             "tactile-press": "0 2px 0 #181512, 0 4px 8px rgba(24,21,18,0.1)",
@@ -130,13 +130,13 @@
   <link rel="stylesheet" href="styles.css?v=5.4.2">
 </head>
 
-<body class="bg-[#FAF8F5] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-citrus selection:text-ink">
+<body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-citrus selection:text-ink">
 
   <!-- ================= AUTHENTICATION / LOGIN SCREEN ================= -->
   <div id="loginScreen"
-    class="hidden fixed inset-0 z-[100] bg-[#FAF8F5] flex flex-col justify-between overflow-y-auto">
+    class="hidden fixed inset-0 z-[100] bg-[#07080b] flex flex-col justify-between overflow-y-auto">
     <div
-      class="w-full max-w-[440px] mx-auto min-h-screen flex flex-col justify-between p-6 bg-[#FAF8F5] border-x border-[#e8dfd5] shadow-2xl">
+      class="w-full max-w-[440px] mx-auto min-h-screen flex flex-col justify-between p-6 bg-[#07080b] border-x border-[#1c1f2e] shadow-2xl">
 
       <!-- Top Branding (Clean & Minimalist) -->
       <div class="pt-12 text-center">
@@ -152,7 +152,7 @@
       <div class="bg-white rounded-[28px] p-6 shadow-tactile border-2 border-stone-900 my-auto">
 
         <!-- Tabs: Masuk / Daftar -->
-        <div class="grid grid-cols-2 p-1 bg-[#FAF8F5] border border-stone-300 rounded-xl mb-4 font-mono text-xs font-bold">
+        <div class="grid grid-cols-2 p-1 bg-[#07080b] border border-stone-300 rounded-xl mb-4 font-mono text-xs font-bold">
           <button type="button" id="tabLoginBtn" class="py-2 rounded-lg bg-ink text-white shadow-xs transition-all cursor-pointer">
             Masuk
           </button>
@@ -174,7 +174,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">person</span>
               <input type="text" id="inputLoginUsername" placeholder="Username atau email kamu" required autocomplete="username"
-                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
             </div>
           </div>
 
@@ -183,7 +183,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">lock</span>
               <input type="password" id="inputLoginPassword" placeholder="Masukkan password akun kamu" required autocomplete="current-password"
-                class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+                class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
               <button type="button" id="btnToggleLoginPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">visibility</span>
               </button>
@@ -210,7 +210,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">badge</span>
               <input type="text" id="inputRegUsername" placeholder="Contoh: Bambang atau Budi" required autocomplete="username"
-                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
             </div>
           </div>
 
@@ -219,7 +219,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">mail</span>
               <input type="email" id="inputRegEmail" placeholder="nama@email.com" required autocomplete="email"
-                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+                class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
             </div>
           </div>
 
@@ -228,7 +228,7 @@
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">lock</span>
               <input type="password" id="inputRegPassword" placeholder="Minimal 4 karakter" required autocomplete="new-password"
-                class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+                class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
               <button type="button" id="btnToggleRegPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">visibility</span>
               </button>
@@ -288,8 +288,8 @@
 
   <!-- ================= TOP APP HEADER ================= -->
   <header
-    class="fixed top-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#FAF8F5] pt-safe border-b border-[#e2d8cb] shadow-sm"
-    style="background-color: #FAF8F5 !important; opacity: 1 !important;">
+    class="fixed top-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#07080b] pt-safe border-b border-[#1c1f2e] shadow-sm"
+    style="background-color: #07080b !important; opacity: 1 !important;">
     <div class="px-3 py-2 flex items-center justify-between gap-2">
       <!-- Left: Big Squircle Bag Icon & Stacked 3-Line Info -->
       <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -338,7 +338,7 @@
 
         <!-- Budget Quick Trigger -->
         <button
-          class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white text-ink border border-[#dcd2c6] shadow-sm hover:bg-stone-50 transition-all cursor-pointer whitespace-nowrap shrink-0 active:scale-95"
+          class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white text-ink border border-[#1c1f2e] shadow-sm hover:bg-stone-50 transition-all cursor-pointer whitespace-nowrap shrink-0 active:scale-95"
           id="btnEditBudgetTrigger" title="Ketuk untuk ubah limit dompet">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span class="material-symbols-outlined text-[14px] text-citrus-dark">account_balance_wallet</span>
@@ -360,7 +360,7 @@
 
   <!-- ================= MAIN SCROLLABLE VIEWPORT (ANDROID VIEWPORT) ================= -->
   <main
-    class="flex-1 w-full max-w-[480px] mx-auto bg-[#FAF8F5] pt-[88px] sm:pt-[94px] pb-40 px-3.5 sm:px-4 border-x border-[#e8dfd5] shadow-xl min-h-screen">
+    class="flex-1 w-full max-w-[480px] mx-auto bg-[#07080b] pt-[88px] sm:pt-[94px] pb-40 px-3.5 sm:px-4 border-x border-[#1c1f2e] shadow-xl min-h-screen">
 
     <!-- ==========================================================================
          TAB 1: TROLI AKTIF (STITCH SCREEN 4)
@@ -1459,8 +1459,8 @@
 
   <!-- ================= DOCKED BOTTOM NAVIGATION (FROSTED GLASS SEMI-TRANSPARENT) ================= -->
   <nav
-    class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#FAF8F5]/90 backdrop-blur-2xl border-t border-x border-[#dcd2c6] shadow-[0_-8px_32px_rgba(24,21,18,0.12)] pb-safe"
-    style="background-color: rgba(250, 248, 245, 0.90) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);">
+    class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#07080b]/90 backdrop-blur-2xl border-t border-x border-[#1c1f2e] shadow-[0_-8px_32px_rgba(24,21,18,0.12)] pb-safe"
+    style="background-color: rgba(7, 8, 11, 0.92) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);">
     <div class="px-2.5 py-1.5 flex items-center justify-around relative">
 
       <!-- 1. Troli Aktif -->
@@ -1492,7 +1492,7 @@
       <!-- 3. SCAN BARCODE & PROMO (CENTER HERO BUTTON - ENLARGED & DEAD CENTER) -->
       <div class="flex-1 flex flex-col items-center justify-center relative -top-3.5 z-20">
         <button
-          class="dock-tab dock-tab-hero w-[56px] h-[56px] rounded-2xl bg-gradient-to-tr from-ink via-stone-900 to-amber-600 text-white flex flex-col items-center justify-center shadow-[0_6px_22px_rgba(245,158,11,0.45)] ring-4 ring-[#FAF8F5] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group"
+          class="dock-tab dock-tab-hero w-[56px] h-[56px] rounded-2xl bg-gradient-to-tr from-ink via-stone-900 to-amber-600 text-white flex flex-col items-center justify-center shadow-[0_6px_22px_rgba(245,158,11,0.45)] ring-4 ring-[#07080b] hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer group"
           id="navBtnScan" data-tab="tabScan" title="Buka Kamera Barcode Scanner &amp; Hitung Promo">
           <div class="relative flex items-center justify-center">
             <span
@@ -2541,7 +2541,7 @@
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">mail</span>
             <input type="email" id="inputForgotEmail" placeholder="nama@email.com" required autocomplete="email"
-              class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+              class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
           </div>
         </div>
 
@@ -2569,7 +2569,7 @@
         <div>
           <label class="font-mono text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-1 text-center">Kode Verifikasi (6 Angka)</label>
           <input type="text" id="inputForgotOtp" maxlength="6" placeholder="000000" inputmode="numeric" required
-            class="w-full py-3 text-center font-mono text-xl font-black tracking-[0.3em] rounded-xl bg-[#FAF8F5] text-ink border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:text-stone-300">
+            class="w-full py-3 text-center font-mono text-xl font-black tracking-[0.3em] rounded-xl bg-[#07080b] text-ink border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:text-stone-300">
         </div>
 
         <div>
@@ -2577,7 +2577,7 @@
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">lock</span>
             <input type="password" id="inputForgotNewPassword" placeholder="Minimal 4 karakter" required autocomplete="new-password"
-              class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#FAF8F5] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
+              class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#07080b] text-ink font-body-md text-sm font-bold border-2 border-stone-300 focus:border-stone-900 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-400">
             <button type="button" id="btnToggleForgotPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">visibility</span>
             </button>

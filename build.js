@@ -84,3 +84,4 @@ if (fs.existsSync(assetsDir)) {
 }
 
 console.log('✅ Build successful! All web assets copied to dist/ for Vercel deployment.');
+
