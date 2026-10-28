@@ -43,6 +43,23 @@ export const App: React.FC = () => {
   const [history, setHistory] = useState<ShoppingTrip[]>(() => loadShoppingHistory());
   const [budgetSettings, setBudgetSettings] = useState<BudgetSettings>(() => loadBudgetSettings());
 
+  // Sesi Belanja Aktif (SRS F-01: Lokasi Toko Supermarket & Tanggal Transaksi)
+  const [selectedStore, setSelectedStore] = useState<string>(() => {
+    try {
+      return localStorage.getItem('smart_grocery_store_location') || 'Lotte Mart Grocery - Puri Indah';
+    } catch {
+      return 'Lotte Mart Grocery - Puri Indah';
+    }
+  });
+
+  const [sessionDate, setSessionDate] = useState<string>(() => {
+    try {
+      return localStorage.getItem('smart_grocery_session_date') || new Date().toISOString().slice(0, 10);
+    } catch {
+      return new Date().toISOString().slice(0, 10);
+    }
+  });
+
   // User & Auth State
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => getSavedUser());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -70,6 +87,21 @@ export const App: React.FC = () => {
     setTimeout(() => {
       setToastMessage(null);
     }, 3200);
+  };
+
+  const handleStoreChange = (newStore: string) => {
+    setSelectedStore(newStore);
+    try {
+      localStorage.setItem('smart_grocery_store_location', newStore);
+    } catch {}
+    showToast(`Lokasi toko: ${newStore.split(' - ')[0]}`);
+  };
+
+  const handleDateChange = (newDate: string) => {
+    setSessionDate(newDate);
+    try {
+      localStorage.setItem('smart_grocery_session_date', newDate);
+    } catch {}
   };
 
   // Inisialisasi Auth Google & status koneksi Supabase & Tarik data Cloud otomatis saat aplikasi dibuka
@@ -234,7 +266,7 @@ export const App: React.FC = () => {
 
     setIsCheckoutModalOpen(false);
     setActiveTab('history');
-    showToast('Belanja selesai! Struk kasir tersimpan rapi di Riwayat.');
+    showToast(`Belanja selesai! Struk ${trip.storeName.split(' - ')[0]} tersimpan di Riwayat.`);
   };
 
   // Handler: Simpan Anggaran
@@ -253,7 +285,7 @@ export const App: React.FC = () => {
     setBudgetSettings(INITIAL_BUDGET);
     saveBudgetSettings(INITIAL_BUDGET);
     pushAllDataToCloud();
-    showToast('Data kasus Rian berhasil dipulihkan di Cloud Supabase!');
+    showToast('Data kasus Rian di Lotte Mart Puri Indah berhasil dipulihkan!');
   };
 
   // Handler: Pasang PWA
@@ -310,6 +342,10 @@ export const App: React.FC = () => {
             <GroceryList
               items={items}
               budgetLimit={budgetSettings.monthlyBudget}
+              selectedStore={selectedStore}
+              sessionDate={sessionDate}
+              onStoreChange={handleStoreChange}
+              onDateChange={handleDateChange}
               onAddItem={() => {
                 setItemToEdit(null);
                 setIsAddModalOpen(true);
@@ -429,6 +465,8 @@ export const App: React.FC = () => {
           isOpen={isCheckoutModalOpen}
           items={items}
           budgetSettings={budgetSettings}
+          sessionStoreName={selectedStore}
+          sessionDate={sessionDate}
           onClose={() => setIsCheckoutModalOpen(false)}
           onConfirmCheckout={handleConfirmCheckout}
         />
