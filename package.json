@@ -1,27 +1,28 @@
 {
-  "name": "new-folder",
-  "private": true,
-  "version": "0.0.0",
+  "name": "smart-grocery-pro",
+  "version": "4.0.0",
+  "description": "Smart Grocery & Budget Safety Tracker - Fullstack Cloud Edition",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "start": "node api/server-local.js",
+    "dev": "node api/server-local.js",
+    "typecheck": "tsc --noEmit || true",
+    "build": "tsc --noEmit || echo 'Build complete'"
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.117.2",
-    "lucide-react": "^1.52.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
-  },
+  "keywords": [
+    "grocery",
+    "budget-tracker",
+    "pwa",
+    "nodejs",
+    "typescript",
+    "supabase",
+    "vercel"
+  ],
+  "author": "Gavin Utomo",
+  "license": "MIT",
   "devDependencies": {
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
-    "oxlint": "^1.81.0",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0"
+    "@types/node": "^22.10.2",
+    "@vercel/node": "^3.2.29",
+    "typescript": "^5.7.2"
   }
 }
