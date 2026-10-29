@@ -1937,20 +1937,20 @@
           </div>
 
           <!-- Bottom Row: Tactile POS Stepper & Chunky Subtotal -->
-          <div class="flex items-center justify-between pt-2 border-t border-stone-200/80 mt-1">
-            <div class="flex items-center gap-1.5 bg-[#FAF8F5] p-1 rounded-xl border border-stone-300 shadow-pos-key">
-              <button type="button" class="w-11 h-11 rounded-lg bg-white border border-stone-400 text-ink font-black flex items-center justify-center hover:bg-stone-100 active:scale-95 cursor-pointer ${item.qty === 1 ? 'text-rose-600' : ''}" onclick="window.changeItemQty('${item.id}', -1)" title="${item.qty === 1 ? 'Hapus Barang' : 'Kurangi'}">
+          <div class="flex items-center justify-between pt-2 border-t border-[#222638] mt-1">
+            <div class="flex items-center gap-1.5 bg-[#0b0c14] p-1 rounded-xl border border-[#222638] shadow-pos-key">
+              <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer ${item.qty === 1 ? 'text-rose-400' : ''}" onclick="window.changeItemQty('${item.id}', -1)" title="${item.qty === 1 ? 'Hapus Barang' : 'Kurangi'}">
                 <i data-lucide="${item.qty === 1 ? 'trash-2' : 'minus'}"></i>
               </button>
-              <input type="number" inputmode="numeric" min="1" class="w-12 text-center font-mono font-black text-sm text-ink bg-transparent border-0 focus:ring-1 focus:ring-stone-400 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${item.id}', this.value)" oninput="window.setItemQty('${item.id}', this.value)" title="Ketik kuantitas langsung" />
-              <button type="button" class="w-11 h-11 rounded-lg bg-white border border-stone-400 text-ink font-black flex items-center justify-center hover:bg-stone-100 active:scale-95 cursor-pointer" onclick="window.changeItemQty('${item.id}', 1)" title="Tambah">
+              <input type="number" inputmode="numeric" min="1" class="w-12 text-center font-mono font-black text-sm text-white bg-transparent border-0 focus:ring-1 focus:ring-amber-500 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${item.id}', this.value)" oninput="window.setItemQty('${item.id}', this.value)" title="Ketik kuantitas langsung" />
+              <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer" onclick="window.changeItemQty('${item.id}', 1)" title="Tambah">
                 <i data-lucide="plus"></i>
               </button>
             </div>
 
             <div class="text-right">
-              <div class="font-mono text-[9px] text-stone-500 font-bold uppercase tracking-wider">SUBTOTAL (${item.qty} ${item.unit})</div>
-              <div class="font-headline-md text-[18px] font-black text-ink tracking-tight">Rp ${formatNumber(lineTotal)}</div>
+              <div class="font-mono text-[9px] text-stone-400 font-bold uppercase tracking-wider">SUBTOTAL (${item.qty} ${item.unit})</div>
+              <div class="font-headline-md text-[18px] font-black text-amber-400 tracking-tight">Rp ${formatNumber(lineTotal)}</div>
             </div>
           </div>
         </div>
@@ -5323,16 +5323,16 @@
     // Tab Switching Logic: Masuk vs Daftar
     if (tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
       tabLoginBtn.addEventListener('click', () => {
-        tabLoginBtn.className = 'py-2 rounded-lg bg-ink text-white shadow-xs transition-all cursor-pointer';
-        tabRegisterBtn.className = 'py-2 rounded-lg text-stone-600 hover:text-ink transition-all cursor-pointer';
+        tabLoginBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-amber-400 font-extrabold border border-amber-500/30 shadow-xs transition-all cursor-pointer';
+        tabRegisterBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
         formLogin.classList.remove('hidden');
         formRegister.classList.add('hidden');
         if (inputUsername) inputUsername.focus();
       });
 
       tabRegisterBtn.addEventListener('click', () => {
-        tabRegisterBtn.className = 'py-2 rounded-lg bg-ink text-white shadow-xs transition-all cursor-pointer';
-        tabLoginBtn.className = 'py-2 rounded-lg text-stone-600 hover:text-ink transition-all cursor-pointer';
+        tabRegisterBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-amber-400 font-extrabold border border-amber-500/30 shadow-xs transition-all cursor-pointer';
+        tabLoginBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
         formRegister.classList.remove('hidden');
         formLogin.classList.add('hidden');
         if (inputRegUsername) inputRegUsername.focus();
@@ -6545,7 +6545,7 @@
       } else if (appState.currentUser.provider === 'google') {
         avatarEl.className = 'w-6 h-6 rounded-full bg-blue-600 text-white text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else {
-        avatarEl.className = 'w-6 h-6 rounded-full bg-citrus text-ink text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
+        avatarEl.className = 'w-6 h-6 rounded-full bg-citrus text-[#07080b] text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       }
     }
     if (nameEl) nameEl.textContent = appState.currentUser.displayName || appState.currentUser.username || 'User';

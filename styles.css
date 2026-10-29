@@ -1185,14 +1185,22 @@ body {
 /* ==========================================================================
    MIDNIGHT / DEEP BLACK OLED FINTECH THEME
    ========================================================================== */
+:root {
+  --color-surface: #07080b;
+  --color-surface-card: #11131c;
+  --color-text-dark: #f8fafc;
+  --color-text-muted: #94a3b8;
+}
+
 html, body {
   background-color: #07080b !important;
   color: #f8fafc !important;
 }
 
 header {
-  background-color: #07080b !important;
+  background-color: rgba(7, 8, 11, 0.95) !important;
   border-bottom: 1px solid #1c1f2e !important;
+  backdrop-filter: blur(20px) !important;
 }
 
 main {
@@ -1202,7 +1210,7 @@ main {
 }
 
 nav.fixed.bottom-0 {
-  background-color: rgba(7, 8, 11, 0.92) !important;
+  background-color: rgba(7, 8, 11, 0.94) !important;
   border-top: 1px solid #1c1f2e !important;
   border-left: 1px solid #1c1f2e !important;
   border-right: 1px solid #1c1f2e !important;
@@ -1217,20 +1225,24 @@ nav.fixed.bottom-0 {
   color: #f59e0b !important;
 }
 
-/* Modals & Sheets */
+.dock-tab:hover {
+  color: #f8fafc !important;
+}
+
+/* Modals & Backdrops */
 .modal-backdrop {
   background-color: rgba(0, 0, 0, 0.85) !important;
-  backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
 .modal-backdrop > div {
   background-color: #11131c !important;
-  border: 1px solid #222638 !important;
+  border: 1.5px solid #222638 !important;
   color: #f8fafc !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85) !important;
 }
 
-/* Forms & Inputs in Midnight */
+/* Form inputs & controls */
 input[type="text"],
 input[type="password"],
 input[type="email"],
@@ -1243,12 +1255,19 @@ textarea {
   border: 1.5px solid #222638 !important;
 }
 
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #f59e0b !important;
+  outline: none !important;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: #64748b !important;
 }
 
-/* Header Pills */
+/* Header pills */
 #btnEditBudgetTrigger,
 #btnStoreSelector {
   background-color: #11131c !important;
@@ -1256,7 +1275,7 @@ textarea::placeholder {
   color: #f8fafc !important;
 }
 
-#btnEditBudgetTrigger span.text-ink,
+#btnEditBudgetTrigger span,
 #activeStoreName {
   color: #f8fafc !important;
 }
@@ -1267,7 +1286,7 @@ textarea::placeholder {
   border-color: #222638 !important;
 }
 
-/* Auth Card & Login Screen */
+/* Auth card & login screen */
 #loginScreen {
   background-color: #07080b !important;
 }
@@ -1277,15 +1296,9 @@ textarea::placeholder {
   border-color: #1c1f2e !important;
 }
 
-#loginScreen .bg-white {
-  background-color: #11131c !important;
-  border-color: #222638 !important;
-  color: #f8fafc !important;
-}
-
 #btnGoogleLoginTrigger {
-  background-color: #171a27 !important;
-  border-color: #282d42 !important;
+  background-color: #161928 !important;
+  border-color: #242b42 !important;
   color: #f8fafc !important;
 }
 
@@ -1294,7 +1307,7 @@ textarea::placeholder {
   background-color: #1e2233 !important;
 }
 
-/* Tab Cards & Lists */
+/* Cards & lists */
 .stitch-card,
 .neo-card-row,
 .neo-ticket-card,
@@ -1303,6 +1316,19 @@ textarea::placeholder {
   background-color: #11131c !important;
   border: 1.5px solid #222638 !important;
   color: #f8fafc !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.neo-card-row.in-physical-cart,
+.neo-ticket-card.is-checked {
+  background-color: #0d1a16 !important;
+  border-color: #059669 !important;
+  box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15) !important;
+}
+
+.neo-ticket-card.is-pending {
+  background-color: #11131c !important;
+  border: 2px dashed #283048 !important;
 }
 
 .ticket-perforation-left::before {
@@ -1310,7 +1336,25 @@ textarea::placeholder {
   border: 2px solid #222638 !important;
 }
 
-/* Thermal Receipt in Midnight OLED */
+.barcode-strip {
+  background: repeating-linear-gradient(90deg, #94a3b8 0px, #94a3b8 2px, transparent 2px, transparent 4px, #94a3b8 4px, #94a3b8 7px, transparent 7px, transparent 9px, #94a3b8 9px, #94a3b8 10px, transparent 10px, transparent 12px) !important;
+  opacity: 0.6;
+}
+
+/* Cart item check button */
+.cart-check-btn {
+  background: #0b0c14;
+  border-color: #2a3148;
+  box-shadow: 0 2px 0 #181c2b;
+}
+
+.cart-check-btn.checked {
+  background: #059669 !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+/* Thermal receipt */
 .thermal-receipt-roll {
   background: #0d0f17 !important;
   color: #f8fafc !important;
@@ -1319,7 +1363,7 @@ textarea::placeholder {
 }
 
 .thermal-receipt-roll * {
-  color: #f8fafc !important;
+  color: #f8fafc;
 }
 
 .thermal-receipt-roll .text-stone-500,
@@ -1328,17 +1372,32 @@ textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-/* White background overrides across components */
+/* Contrast rule for amber / citrus elements */
+.bg-citrus,
+.bg-amber-400,
+.bg-amber-500,
+button.bg-citrus,
+button.bg-amber-500 {
+  color: #07080b !important;
+}
+
+.bg-citrus *,
+.bg-amber-400 *,
+.bg-amber-500 * {
+  color: #07080b !important;
+}
+
+/* White background replacements */
 .bg-white {
   background-color: #11131c !important;
-  color: #f8fafc;
+  border-color: #222638 !important;
 }
 
 .bg-stone-50,
 .bg-stone-100,
 .bg-gray-50,
 .bg-slate-50 {
-  background-color: #0d0f17 !important;
+  background-color: #0b0c14 !important;
 }
 
 .border-stone-200,
@@ -1347,20 +1406,20 @@ textarea::placeholder {
 .border-\[\#dcd2c6\],
 .border-\[\#e2d8cb\],
 .border-\[\#e8dfd5\] {
-  border-color: #1c1f2e !important;
-}
-
-.text-ink {
-  color: #f8fafc !important;
+  border-color: #222638 !important;
 }
 
 .text-stone-700,
-.text-stone-600,
-.text-stone-500 {
+.text-stone-600 {
+  color: #cbd5e1 !important;
+}
+
+.text-stone-500,
+.text-stone-400 {
   color: #94a3b8 !important;
 }
 
-/* Scrollbar styling */
+/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
