@@ -3748,11 +3748,11 @@
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         chips.forEach(c => {
-          c.classList.remove('active', 'bg-primary', 'text-secondary-fixed', 'font-bold');
-          c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+          c.classList.remove('active', 'bg-[#181d30]', 'text-amber-400', 'border-amber-500/50', 'font-black', 'bg-primary', 'text-secondary-fixed');
+          c.classList.add('bg-[#11131c]', 'text-stone-300', 'border-[#222638]', 'font-semibold');
         });
-        chip.classList.add('active', 'bg-primary', 'text-secondary-fixed', 'font-bold');
-        chip.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+        chip.classList.add('active', 'bg-[#181d30]', 'text-amber-400', 'border-amber-500/50', 'font-black');
+        chip.classList.remove('bg-[#11131c]', 'text-stone-300', 'border-[#222638]', 'font-semibold');
 
         appState.astroCategory = chip.getAttribute('data-astro-cat') || 'ALL';
         AudioEngine.playTap();
@@ -3814,10 +3814,10 @@
 
     if (items.length === 0) {
       grid.innerHTML = `
-        <div class="col-span-2 text-center py-8 text-on-surface-variant">
-          <span class="material-symbols-outlined text-[32px] text-outline-variant block mb-1">search_off</span>
-          <p class="text-xs font-semibold">Produk Lotte Mart tidak ditemukan</p>
-          <p class="text-[11px] text-outline">Coba kata kunci lain seperti "Beras", "Minyak", atau "Susu"</p>
+        <div class="col-span-2 text-center py-8 text-stone-400 bg-[#11131c] rounded-2xl border border-[#222638]">
+          <span class="material-symbols-outlined text-[32px] text-stone-500 block mb-1">search_off</span>
+          <p class="text-xs font-bold text-white">Produk Lotte Mart tidak ditemukan</p>
+          <p class="text-[11px] text-stone-400 mt-0.5">Coba kata kunci lain seperti "Beras", "Minyak", atau "Susu"</p>
         </div>
       `;
       return;
@@ -3834,32 +3834,32 @@
           <div>
             <!-- Top Badges -->
             <div class="flex items-center justify-between gap-1 mb-2">
-              <span class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-lg shadow-xs shrink-0 select-none">${prod.emoji || '🛒'}</span>
-              <span class="px-1.5 py-0.5 rounded-full bg-secondary/15 text-secondary text-[9px] font-bold truncate max-w-[85px]">${escapeHtml(prod.badge || 'Lotte Mart')}</span>
+              <span class="w-8 h-8 rounded-xl bg-[#181d30] border border-[#262f4c] flex items-center justify-center text-lg shadow-xs shrink-0 select-none">${prod.emoji || '🛒'}</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9.5px] font-extrabold truncate max-w-[90px]">${escapeHtml(prod.badge || 'Lotte Mart')}</span>
             </div>
 
             <!-- Title & Size -->
-            <h4 class="font-headline-sm text-xs font-bold text-primary line-clamp-2 leading-snug mb-0.5" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
-            <div class="text-[10px] text-on-surface-variant font-medium mb-1.5">${escapeHtml(prod.unit)}</div>
+            <h4 class="font-headline-sm text-xs font-bold text-white line-clamp-2 leading-snug mb-1" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
+            <div class="text-[11px] text-stone-400 font-medium mb-2">${escapeHtml(prod.unit)}</div>
 
             <!-- Pricing -->
-            <div class="flex items-baseline gap-1 mb-2.5">
-              ${hasDiscount ? `<del class="text-[10px] text-outline font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
-              <span class="font-bold text-xs text-secondary font-mono">Rp ${formatNumber(prod.price)}</span>
+            <div class="flex items-baseline gap-1.5 mb-2.5">
+              ${hasDiscount ? `<del class="text-[10px] text-stone-500 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
+              <span class="font-extrabold text-[13px] text-emerald-400 font-mono">Rp ${formatNumber(prod.price)}</span>
             </div>
           </div>
 
           <!-- Bottom Action Button / Stepper -->
           <div>
             ${inCartQty > 0 ? `
-              <div class="flex items-center justify-between bg-primary rounded-xl p-1 text-white shadow-xs">
-                <button type="button" class="w-6 h-6 rounded-lg bg-white/10 hover:bg-white/20 active:scale-90 text-white flex items-center justify-center font-bold text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', -1)" title="Kurangi">-</button>
-                <span class="font-bold text-[11px] text-secondary-fixed px-1 font-mono">${inCartQty} di Troli</span>
-                <button type="button" class="w-6 h-6 rounded-lg bg-secondary-fixed text-primary hover:bg-white active:scale-90 flex items-center justify-center font-bold text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', 1)" title="Tambah">+</button>
+              <div class="flex items-center justify-between bg-[#0b0c14] border border-[#222638] rounded-xl p-1 shadow-xs">
+                <button type="button" class="w-7 h-7 rounded-lg bg-[#181d30] border border-[#262f4c] hover:bg-rose-900/60 hover:text-rose-300 active:scale-90 text-white flex items-center justify-center font-bold text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', -1)" title="Kurangi">-</button>
+                <span class="font-black text-[11px] text-amber-400 px-1 font-mono">${inCartQty} di Troli</span>
+                <button type="button" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 active:scale-90 flex items-center justify-center font-black text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', 1)" title="Tambah">+</button>
               </div>
             ` : `
               <button type="button"
-                class="w-full py-2 px-2.5 rounded-xl bg-primary hover:bg-secondary text-secondary-fixed hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer shadow-xs active:scale-95"
+                class="w-full py-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-pos-key active:scale-95"
                 onclick="window.addAstroToCart('${prod.id}', 1)">
                 <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                 <span>+ Keranjang</span>

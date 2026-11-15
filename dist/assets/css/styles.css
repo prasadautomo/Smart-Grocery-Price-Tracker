@@ -911,36 +911,47 @@ body {
    ASTRO OFFICIAL CATALOG & INTERACTIVE CASHIER CHECKOUT STYLES
    ========================================================================== */
 .astro-product-card {
-  background: #ffffff;
+  background: #11131c !important;
   border-radius: 1.25rem;
-  border: 1.5px solid #e7ded4;
-  padding: 0.75rem;
+  border: 1.5px solid #222638 !important;
+  padding: 0.85rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 3px 0 #e4dbd0, 0 6px 14px rgba(24, 21, 18, 0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  color: #f8fafc !important;
 }
 
 .astro-product-card:hover {
   transform: translateY(-2px);
-  border-color: #d5c8b8;
-  box-shadow: 0 5px 0 #d0c3b3, 0 10px 20px rgba(24, 21, 18, 0.08);
+  border-color: #3b4668 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
 }
 
-.astro-cat-chip {
+.astro-cat-chip,
+.neo-cat-chip {
   transition: all 0.2s ease;
   user-select: none;
   cursor: pointer;
-  border: 1px solid #e4dbd0;
+  background-color: #11131c !important;
+  border: 1px solid #222638 !important;
+  color: #94a3b8 !important;
 }
 
-.astro-cat-chip.active {
-  background-color: #181512 !important;
+.astro-cat-chip:hover,
+.neo-cat-chip:hover {
+  color: #ffffff !important;
+  border-color: #3b4668 !important;
+}
+
+.astro-cat-chip.active,
+.neo-cat-chip.active {
+  background-color: #181d30 !important;
   color: #f59e0b !important;
-  border-color: #181512 !important;
-  font-weight: 700;
-  box-shadow: 0 2px 0 #000000;
+  border-color: #f59e0b !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
 }
 
 /* Thermal Paper Roll with jagged edges */
@@ -1312,7 +1323,8 @@ textarea::placeholder {
 .neo-card-row,
 .neo-ticket-card,
 .preset-card,
-.pos-register-panel {
+.pos-register-panel,
+.astro-product-card {
   background-color: #11131c !important;
   border: 1.5px solid #222638 !important;
   color: #f8fafc !important;
