@@ -52,7 +52,6 @@ const rootFiles = [
   'favicon.svg',
   'pwa-icon.svg',
   'icons.svg',
-  'auth-helper-server.js',
   'auth-helper-server.cjs'
 ];
 
