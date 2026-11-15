@@ -1694,28 +1694,28 @@
       if (statusBadge) {
         statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-black tracking-widest';
       }
-      if (statusText) statusText.textContent = '● STATUS: AMAN';
-      if (statusIcon) statusIcon.innerHTML = '<span class="material-symbols-outlined text-[11px]">verified_user</span> STATUS: AMAN';
-      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-stone-700/80"><span class="text-stone-400 text-[10px]">Sisa Aman:</span><strong class="text-citrus font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      if (statusText) statusText.textContent = '';
+      if (statusIcon) statusIcon.innerHTML = '';
+      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-stone-700/80"><span class="text-stone-400 text-[10px]">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
       if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
-      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-citrus absolute -top-0.5 -right-1';
+      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
     } else if (percentage >= 90 && percentage <= 100) {
       if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono text-[10px] font-black tracking-widest';
+        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-mono text-[10px] font-black tracking-widest';
       }
-      if (statusText) statusText.textContent = '▲ PERINGATAN WASPADA (≥90%)';
-      if (statusIcon) statusIcon.innerHTML = '<span class="material-symbols-outlined text-[11px]">warning</span> WASPADA (≥90%)';
-      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-amber-500/40"><span class="text-stone-400 text-[10px]">Sisa Kritis:</span><strong class="text-amber-300 font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      if (statusText) statusText.textContent = '';
+      if (statusIcon) statusIcon.innerHTML = '';
+      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-yellow-500/40"><span class="text-stone-400 text-[10px]">Sisa Kritis:</span><strong class="text-yellow-300 font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
       if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
-      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-amber-400 absolute -top-0.5 -right-1';
-      if (progressBar) progressBar.className = 'h-full bg-amber-400 rounded-full transition-all duration-300';
+      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
+      if (progressBar) progressBar.className = 'h-full bg-yellow-400 rounded-full transition-all duration-300';
     } else {
       if (statusBadge) {
         statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-500/25 text-rose-300 border border-rose-500/50 font-mono text-[10px] font-black tracking-widest animate-pulse';
       }
-      if (statusText) statusText.textContent = '🚨 OVER BUDGET (>100%)';
-      if (statusIcon) statusIcon.innerHTML = '<span class="material-symbols-outlined text-[11px]">emergency</span> DEFISIT KUOTA';
+      if (statusText) statusText.textContent = '';
+      if (statusIcon) statusIcon.innerHTML = '';
       const overAmount = Math.abs(remaining);
       if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-rose-950/80 border border-rose-600/60"><span class="text-rose-300 text-[10px]">Defisit:</span><strong class="text-rose-400 font-black text-[12px]">Rp ${formatNumber(overAmount)}</strong></span>`;
       if (overBudgetBanner) {
@@ -1777,7 +1777,7 @@
       if (percentage < 90) {
         planMeter.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
       } else if (percentage <= 100) {
-        planMeter.className = 'h-full bg-amber-500 rounded-full transition-all duration-300';
+        planMeter.className = 'h-full bg-yellow-500 rounded-full transition-all duration-300';
       } else {
         planMeter.className = 'h-full bg-rose-600 rounded-full transition-all duration-300';
       }
@@ -1793,7 +1793,7 @@
         budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold';
       } else if (percentage <= 100) {
         budgetTabStatusPill.textContent = '▲ WASPADA (90-100%)';
-        budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-extrabold';
+        budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 font-extrabold';
       } else {
         budgetTabStatusPill.textContent = '🚨 DEFISIT (>100%)';
         budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-extrabold animate-pulse';
@@ -1874,7 +1874,7 @@
               ${isChecked ? `
                 <span class="rubber-stamp rubber-stamp-green text-[9px]">DI RAK ✓</span>
               ` : `
-                <span class="rubber-stamp rubber-stamp-amber text-[9px]">PENDING</span>
+                <span class="rubber-stamp rubber-stamp-pending text-[9px]">PENDING</span>
               `}
               <div class="flex items-center gap-0.5 ml-1">
                 <button class="btn-ico-subtle" onclick="window.editCartItem('${item.id}')" title="Edit">
@@ -1899,7 +1899,7 @@
                     <span>Rencana</span>
                   </span>
                 ` : `
-                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200" title="Di luar daftar rencana">
+                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 border border-yellow-200" title="Di luar daftar rencana">
                     <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
                     <span>Impulsif</span>
                   </span>
@@ -1942,7 +1942,7 @@
               <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer ${item.qty === 1 ? 'text-rose-400' : ''}" onclick="window.changeItemQty('${item.id}', -1)" title="${item.qty === 1 ? 'Hapus Barang' : 'Kurangi'}">
                 <i data-lucide="${item.qty === 1 ? 'trash-2' : 'minus'}"></i>
               </button>
-              <input type="number" inputmode="numeric" min="1" class="w-12 text-center font-mono font-black text-sm text-white bg-transparent border-0 focus:ring-1 focus:ring-amber-500 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${item.id}', this.value)" oninput="window.setItemQty('${item.id}', this.value)" title="Ketik kuantitas langsung" />
+              <input type="number" inputmode="numeric" min="1" class="w-12 text-center font-mono font-black text-sm text-white bg-transparent border-0 focus:ring-1 focus:ring-emerald-500 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${item.id}', this.value)" oninput="window.setItemQty('${item.id}', this.value)" title="Ketik kuantitas langsung" />
               <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer" onclick="window.changeItemQty('${item.id}', 1)" title="Tambah">
                 <i data-lucide="plus"></i>
               </button>
@@ -1950,7 +1950,7 @@
 
             <div class="text-right">
               <div class="font-mono text-[9px] text-stone-400 font-bold uppercase tracking-wider">SUBTOTAL (${item.qty} ${item.unit})</div>
-              <div class="font-headline-md text-[18px] font-black text-amber-400 tracking-tight">Rp ${formatNumber(lineTotal)}</div>
+              <div class="font-headline-md text-[18px] font-black text-emerald-400 tracking-tight">Rp ${formatNumber(lineTotal)}</div>
             </div>
           </div>
         </div>
@@ -3322,7 +3322,7 @@
         capEl.className = 'text-rose-400 font-bold';
       } else if (info.sisa < appState.budgetLimit * 0.2) {
         capEl.textContent = `Waspada ⚠️ (Sisa Rp ${formatNumber(info.sisa)})`;
-        capEl.className = 'text-amber-300 font-bold';
+        capEl.className = 'text-yellow-300 font-bold';
       } else {
         capEl.textContent = `Aman ✅ (Sisa Rp ${formatNumber(info.sisa)})`;
         capEl.className = 'text-secondary-fixed font-bold';
@@ -3333,8 +3333,8 @@
   async function runPythonScanAnalysis(barcode, discount) {
     const statusBadge = document.getElementById('pyEngineStatusBadge');
     if (statusBadge) {
-      statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span> Menganalisis Promo...';
-      statusBadge.className = 'px-2.5 py-0.5 rounded-full bg-amber-500/30 text-[10.5px] font-semibold text-amber-300 flex items-center gap-1';
+      statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-ping"></span> Menganalisis Promo...';
+      statusBadge.className = 'px-2.5 py-0.5 rounded-full bg-yellow-500/30 text-[10.5px] font-semibold text-yellow-300 flex items-center gap-1';
     }
 
     const code = barcode || (currentScannedItem ? currentScannedItem.barcode : '8991002105432');
@@ -3394,7 +3394,7 @@
           capEl.className = 'text-rose-400 font-bold';
         } else if (remaining < appState.budgetLimit * 0.2) {
           capEl.textContent = `Waspada ⚠️ (Sisa Rp ${formatNumber(remaining)})`;
-          capEl.className = 'text-amber-300 font-bold';
+          capEl.className = 'text-yellow-300 font-bold';
         } else {
           capEl.textContent = `Aman ✅ (Sisa Rp ${formatNumber(remaining)})`;
           capEl.className = 'text-secondary-fixed font-bold';
@@ -3604,7 +3604,7 @@
       const isDanger = (insightData.status || 'SAFE') === 'DANGER';
       const isWarning = (insightData.status || 'SAFE') === 'WARNING';
       const scoreBadgeColor = isDanger ? 'bg-rose-100 text-rose-700 border-rose-300'
-        : isWarning ? 'bg-amber-100 text-amber-800 border-amber-300'
+        : isWarning ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
         : 'bg-emerald-100 text-emerald-800 border-emerald-300';
 
       let recomHtml = '';
@@ -3748,10 +3748,10 @@
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         chips.forEach(c => {
-          c.classList.remove('active', 'bg-[#181d30]', 'text-amber-400', 'border-amber-500/50', 'font-black', 'bg-primary', 'text-secondary-fixed');
+          c.classList.remove('active', 'bg-[#181d30]', 'text-emerald-400', 'border-emerald-500/50', 'font-black', 'bg-primary', 'text-secondary-fixed');
           c.classList.add('bg-[#11131c]', 'text-stone-300', 'border-[#222638]', 'font-semibold');
         });
-        chip.classList.add('active', 'bg-[#181d30]', 'text-amber-400', 'border-amber-500/50', 'font-black');
+        chip.classList.add('active', 'bg-[#181d30]', 'text-emerald-400', 'border-emerald-500/50', 'font-black');
         chip.classList.remove('bg-[#11131c]', 'text-stone-300', 'border-[#222638]', 'font-semibold');
 
         appState.astroCategory = chip.getAttribute('data-astro-cat') || 'ALL';
@@ -3833,9 +3833,8 @@
         <div class="astro-product-card" data-astro-id="${prod.id}">
           <div>
             <!-- Top Badges -->
-            <div class="flex items-center justify-between gap-1 mb-2">
+            <div class="flex items-center justify-start gap-1 mb-2">
               <span class="w-8 h-8 rounded-xl bg-[#181d30] border border-[#262f4c] flex items-center justify-center text-lg shadow-xs shrink-0 select-none">${prod.emoji || '🛒'}</span>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[9.5px] font-extrabold truncate max-w-[90px]">${escapeHtml(prod.badge || 'Lotte Mart')}</span>
             </div>
 
             <!-- Title & Size -->
@@ -3854,12 +3853,12 @@
             ${inCartQty > 0 ? `
               <div class="flex items-center justify-between bg-[#0b0c14] border border-[#222638] rounded-xl p-1 shadow-xs">
                 <button type="button" class="w-7 h-7 rounded-lg bg-[#181d30] border border-[#262f4c] hover:bg-rose-900/60 hover:text-rose-300 active:scale-90 text-white flex items-center justify-center font-bold text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', -1)" title="Kurangi">-</button>
-                <span class="font-black text-[11px] text-amber-400 px-1 font-mono">${inCartQty} di Troli</span>
-                <button type="button" class="w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 active:scale-90 flex items-center justify-center font-black text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', 1)" title="Tambah">+</button>
+                <span class="font-black text-[11px] text-emerald-400 px-1 font-mono">${inCartQty} di Troli</span>
+                <button type="button" class="w-7 h-7 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-stone-950 active:scale-90 flex items-center justify-center font-black text-xs cursor-pointer transition-all" onclick="window.addAstroToCart('${prod.id}', 1)" title="Tambah">+</button>
               </div>
             ` : `
               <button type="button"
-                class="w-full py-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-pos-key active:scale-95"
+                class="w-full py-2 px-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-pos-key active:scale-95"
                 onclick="window.addAstroToCart('${prod.id}', 1)">
                 <span class="material-symbols-outlined text-[15px]">add_shopping_cart</span>
                 <span>+ Keranjang</span>
@@ -5323,7 +5322,7 @@
     // Tab Switching Logic: Masuk vs Daftar
     if (tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
       tabLoginBtn.addEventListener('click', () => {
-        tabLoginBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-amber-400 font-extrabold border border-amber-500/30 shadow-xs transition-all cursor-pointer';
+        tabLoginBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-emerald-400 font-extrabold border border-emerald-500/30 shadow-xs transition-all cursor-pointer';
         tabRegisterBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
         formLogin.classList.remove('hidden');
         formRegister.classList.add('hidden');
@@ -5331,7 +5330,7 @@
       });
 
       tabRegisterBtn.addEventListener('click', () => {
-        tabRegisterBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-amber-400 font-extrabold border border-amber-500/30 shadow-xs transition-all cursor-pointer';
+        tabRegisterBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-emerald-400 font-extrabold border border-emerald-500/30 shadow-xs transition-all cursor-pointer';
         tabLoginBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
         formRegister.classList.remove('hidden');
         formLogin.classList.add('hidden');
@@ -5413,7 +5412,7 @@
         alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-red-100 border-2 border-red-500 text-red-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
         if (alertIcon) alertIcon.textContent = 'error';
       } else if (type === 'warning') {
-        alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-amber-100 border-2 border-amber-500 text-amber-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
+        alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-yellow-100 border-2 border-yellow-500 text-yellow-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
         if (alertIcon) alertIcon.textContent = 'warning';
       } else {
         alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-emerald-100 border-2 border-emerald-500 text-emerald-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm';
@@ -6539,13 +6538,13 @@
       } else if (appState.currentUser.avatarClass === 'avatar-dark') {
         avatarEl.className = 'w-6 h-6 rounded-full bg-stone-900 text-white text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm border border-stone-700 pointer-events-none';
       } else if (appState.currentUser.avatarClass === 'avatar-amber') {
-        avatarEl.className = 'w-6 h-6 rounded-full bg-amber-500 text-white text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
+        avatarEl.className = 'w-6 h-6 rounded-full bg-emerald-500 text-stone-950 text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else if (appState.currentUser.avatarClass === 'avatar-brown') {
-        avatarEl.className = 'w-6 h-6 rounded-full bg-amber-900 text-white text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
+        avatarEl.className = 'w-6 h-6 rounded-full bg-stone-800 text-white text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else if (appState.currentUser.provider === 'google') {
         avatarEl.className = 'w-6 h-6 rounded-full bg-blue-600 text-white text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else {
-        avatarEl.className = 'w-6 h-6 rounded-full bg-citrus text-[#07080b] text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
+        avatarEl.className = 'w-6 h-6 rounded-full bg-emerald-500 text-[#07080b] text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       }
     }
     if (nameEl) nameEl.textContent = appState.currentUser.displayName || appState.currentUser.username || 'User';
@@ -6582,7 +6581,7 @@
       if (appState.currentUser.avatarClass === 'avatar-green') {
         avatar.className = 'w-14 h-14 rounded-2xl bg-emerald-600 text-white text-2xl font-bold flex items-center justify-center shadow-md shrink-0';
       } else if (appState.currentUser.avatarClass === 'avatar-amber') {
-        avatar.className = 'w-14 h-14 rounded-2xl bg-amber-500 text-white text-2xl font-bold flex items-center justify-center shadow-md shrink-0';
+        avatar.className = 'w-14 h-14 rounded-2xl bg-emerald-500 text-stone-950 text-2xl font-bold flex items-center justify-center shadow-md shrink-0';
       } else if (appState.currentUser.avatarClass === 'avatar-dark') {
         avatar.className = 'w-14 h-14 rounded-2xl bg-stone-900 text-white text-2xl font-bold flex items-center justify-center shadow-md shrink-0 border border-stone-700';
       } else if (isGoogle) {

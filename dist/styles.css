@@ -9,11 +9,11 @@
   --color-primary-container: #241f1a;
   --color-secondary: #007432;
   --color-secondary-container: #dcf4e3;
-  --color-secondary-fixed: #f59e0b;
-  --color-citrus: #f59e0b;
-  --color-citrus-glow: #ffb703;
-  --color-terracotta: #ea580c;
-  --color-tertiary: #ea580c;
+  --color-secondary-fixed: #10b981;
+  --color-citrus: #10b981;
+  --color-citrus-glow: #34d399;
+  --color-terracotta: #059669;
+  --color-tertiary: #10b981;
   --color-surface: #07080b;
   --color-surface-card: #11131c;
   --color-text-dark: #f8fafc;
@@ -309,11 +309,11 @@ body {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 800;
-  background: #ffedd5;
-  color: #ea580c;
+  background: #064e3b;
+  color: #34d399;
   padding: 2px 7px;
   border-radius: 6px;
-  border: 1px dashed #fdba74;
+  border: 1px dashed #10b981;
 }
 
 .neo-promo-chip svg,
@@ -363,9 +363,9 @@ body {
 }
 
 .stepper-tap-btn:hover {
-  background: #f59e0b;
-  border-color: #d97706;
-  color: #181512;
+  background: #10b981;
+  border-color: #059669;
+  color: #07080b;
 }
 
 .stepper-tap-btn.is-trash:hover {
@@ -775,7 +775,7 @@ body {
 }
 
 .neo-toast.success {
-  border-color: #f59e0b;
+  border-color: #10b981;
 }
 
 .neo-toast.warning {
@@ -861,7 +861,7 @@ body {
 }
 
 .dock-tab.active:not(.dock-tab-hero) .material-symbols-outlined {
-  color: #f59e0b !important;
+  color: #10b981 !important;
 }
 
 .dock-tab.active:not(.dock-tab-hero) span {
@@ -871,14 +871,14 @@ body {
 
 .dock-tab-hero {
   position: relative;
-  background: linear-gradient(135deg, #181512 0%, #b45309 50%, #f59e0b 100%) !important;
-  box-shadow: 0 8px 24px -2px rgba(245, 158, 11, 0.45), 0 4px 10px rgba(24, 21, 18, 0.25);
+  background: linear-gradient(135deg, #181512 0%, #064e3b 50%, #10b981 100%) !important;
+  box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.45), 0 4px 10px rgba(24, 21, 18, 0.25);
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dock-tab-hero:hover {
   transform: translateY(-3px) scale(1.08);
-  box-shadow: 0 12px 30px -2px rgba(245, 158, 11, 0.6), 0 6px 14px rgba(24, 21, 18, 0.3);
+  box-shadow: 0 12px 30px -2px rgba(16, 185, 129, 0.6), 0 6px 14px rgba(24, 21, 18, 0.3);
 }
 
 .dock-tab-hero:active {
@@ -886,8 +886,8 @@ body {
 }
 
 .dock-tab-hero.active {
-  ring-color: #f59e0b !important;
-  box-shadow: 0 0 28px rgba(245, 158, 11, 0.75), 0 8px 22px rgba(24, 21, 18, 0.4) !important;
+  ring-color: #10b981 !important;
+  box-shadow: 0 0 28px rgba(16, 185, 129, 0.75), 0 8px 22px rgba(24, 21, 18, 0.4) !important;
   animation: heroPulse 2s infinite ease-in-out;
 }
 
@@ -947,11 +947,11 @@ body {
 
 .astro-cat-chip.active,
 .neo-cat-chip.active {
-  background-color: #181d30 !important;
-  color: #f59e0b !important;
-  border-color: #f59e0b !important;
+  background-color: #0d2319 !important;
+  color: #10b981 !important;
+  border-color: #10b981 !important;
   font-weight: 800 !important;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
 }
 
 /* Thermal Paper Roll with jagged edges */
@@ -1059,9 +1059,9 @@ body {
 }
 
 .segment-block.active-safe {
-  background: #f59e0b;
-  border-color: #fbbf24;
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.75);
+  background: #10b981;
+  border-color: #34d399;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.75);
 }
 
 .segment-block.active-warn {
@@ -1101,10 +1101,10 @@ body {
 }
 
 .rubber-stamp-terracotta {
-  background: #c84b31;
-  color: #ffffff;
-  border: 1.5px dashed #ffa590;
-  box-shadow: 0 2px 0 rgba(200, 75, 49, 0.4);
+  background: #064e3b;
+  color: #34d399;
+  border: 1.5px dashed #059669;
+  box-shadow: 0 2px 0 rgba(5, 150, 105, 0.4);
 }
 
 .rubber-stamp-green {
@@ -1114,11 +1114,12 @@ body {
   box-shadow: 0 2px 0 rgba(0, 116, 50, 0.3);
 }
 
+.rubber-stamp-pending,
 .rubber-stamp-amber {
-  background: #f59e0b;
-  color: #181512;
-  border: 1.5px solid #181512;
-  box-shadow: 0 2px 0 #181512;
+  background: #064e3b;
+  color: #34d399;
+  border: 1.5px solid #059669;
+  box-shadow: 0 2px 0 #042f24;
 }
 
 /* ==========================================================================
@@ -1154,7 +1155,8 @@ body {
 }
 
 .pos-dial-pill:hover {
-  background: #f59e0b;
+  background: #10b981;
+  color: #07080b;
 }
 
 .pos-dial-pill:active {
@@ -1233,7 +1235,7 @@ nav.fixed.bottom-0 {
 }
 
 .dock-tab.active {
-  color: #f59e0b !important;
+  color: #10b981 !important;
 }
 
 .dock-tab:hover {
@@ -1269,7 +1271,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #f59e0b !important;
+  border-color: #10b981 !important;
   outline: none !important;
 }
 
@@ -1314,7 +1316,7 @@ textarea::placeholder {
 }
 
 #btnGoogleLoginTrigger:hover {
-  border-color: #f59e0b !important;
+  border-color: #10b981 !important;
   background-color: #1e2233 !important;
 }
 
@@ -1384,18 +1386,18 @@ textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-/* Contrast rule for amber / citrus elements */
+/* Contrast rule for emerald / citrus elements */
 .bg-citrus,
-.bg-amber-400,
-.bg-amber-500,
+.bg-emerald-400,
+.bg-emerald-500,
 button.bg-citrus,
-button.bg-amber-500 {
+button.bg-emerald-500 {
   color: #07080b !important;
 }
 
 .bg-citrus *,
-.bg-amber-400 *,
-.bg-amber-500 * {
+.bg-emerald-400 *,
+.bg-emerald-500 * {
   color: #07080b !important;
 }
 
