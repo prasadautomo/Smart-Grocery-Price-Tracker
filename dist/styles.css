@@ -102,15 +102,15 @@ body {
 
 .neo-card-row.in-physical-cart,
 .neo-ticket-card.is-checked {
-  background: #fdfdfb;
-  border-color: #181512;
-  box-shadow: 0 4px 0 #181512, 0 8px 18px rgba(0, 116, 50, 0.08);
+  background: #0d1a16;
+  border-color: #059669;
+  box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15);
 }
 
 .neo-ticket-card.is-pending {
-  border: 2px dashed #8c7f73;
-  box-shadow: 0 3px 0 #d8cfc6;
-  background: #faf8f5;
+  border: 2px dashed #283048;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background: #11131c;
 }
 
 /* Perforated Ticket Notches (Cutouts on left edge) */
@@ -202,7 +202,7 @@ body {
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: #727973;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,13 +211,17 @@ body {
 }
 
 .btn-ico-subtle:hover {
-  background: #eaf7ec;
-  color: #001d0f;
+  background: #1e2438;
+  color: #ffffff;
+}
+
+.btn-ico-subtle.trash {
+  color: #fca5a5;
 }
 
 .btn-ico-subtle.trash:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: #450a0a;
+  color: #f87171;
 }
 
 .btn-ico-subtle svg,
@@ -230,7 +234,7 @@ body {
   font-family: var(--font-body);
   font-size: 0.98rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #ffffff;
   line-height: 1.25;
   margin: 0;
   letter-spacing: -0.01em;
@@ -239,7 +243,8 @@ body {
 .card-item-spec {
   font-family: var(--font-body);
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 .card-badges-flow {
@@ -545,12 +550,12 @@ body {
 
 /* History Card & Receipt Modal (Screen 1 Stitch) */
 .neo-history-card {
-  background: #ffffff;
-  border: 1px solid rgba(17, 51, 34, 0.08);
+  background: #11131c;
+  border: 1px solid #222638;
   border-radius: 1.25rem;
   padding: 1rem;
   margin-bottom: 0.75rem;
-  box-shadow: 0 2px 8px rgba(0, 29, 15, 0.03);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .neo-history-card .h-top {
@@ -563,8 +568,8 @@ body {
 .neo-history-card .h-date {
   font-family: var(--font-display);
   font-size: 0.75rem;
-  font-weight: 600;
-  color: #526056;
+  font-weight: 700;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -580,13 +585,14 @@ body {
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 800;
-  color: #001d0f;
+  color: #ffffff;
 }
 
 .neo-history-card .h-sub {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: #006e2f;
+  color: #34d399;
+  font-weight: 700;
   margin-bottom: 0.75rem;
 }
 
@@ -594,12 +600,12 @@ body {
   width: 100%;
   padding: 0.55rem;
   border-radius: 9999px;
-  border: 1px solid rgba(0, 110, 47, 0.2);
-  background: #eaf7ec;
-  color: #006e2f;
+  border: 1px solid #059669;
+  background: #064e3b;
+  color: #ffffff;
   font-family: var(--font-display);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -609,8 +615,8 @@ body {
 }
 
 .neo-history-card .btn-neo-secondary:hover {
-  background: #6bff8f;
-  color: #002109;
+  background: #059669;
+  color: #ffffff;
 }
 
 /* Master Database Row */
@@ -618,30 +624,31 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
+  background: #11131c;
   padding: 0.75rem 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(17, 51, 34, 0.08);
+  border: 1px solid #222638;
 }
 
 .neo-master-row .m-name {
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 700;
-  color: #001d0f;
+  color: #ffffff;
 }
 
 .neo-master-row .m-spec {
   font-family: var(--font-body);
   font-size: 0.72rem;
-  color: #526056;
+  color: #e2e8f0;
+  font-weight: 600;
 }
 
 .neo-master-row .m-price {
   font-family: var(--font-display);
   font-size: 0.88rem;
   font-weight: 800;
-  color: #006e2f;
+  color: #34d399;
 }
 
 /* Budget Macro Category Rows */
@@ -838,17 +845,17 @@ body {
 }
 
 .dock-tab:not(.active):not(.dock-tab-hero) {
-  color: #383431 !important;
-  opacity: 1 !important;
+  color: #ffffff !important;
+  opacity: 0.9 !important;
 }
 
 .dock-tab:not(.active):not(.dock-tab-hero) .material-symbols-outlined {
-  color: #383431 !important;
-  opacity: 1 !important;
+  color: #ffffff !important;
+  opacity: 0.9 !important;
 }
 
 .dock-tab:not(.active):not(.dock-tab-hero) span {
-  color: #383431 !important;
+  color: #ffffff !important;
   opacity: 1 !important;
   font-weight: 800 !important;
 }
@@ -936,7 +943,8 @@ body {
   cursor: pointer;
   background-color: #11131c !important;
   border: 1px solid #222638 !important;
-  color: #94a3b8 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
 }
 
 .astro-cat-chip:hover,
@@ -1423,14 +1431,48 @@ button.bg-emerald-500 {
   border-color: #222638 !important;
 }
 
+/* High-Contrast White Text Overrides for Dark Backgrounds (WCAG AAA) */
+.text-stone-300,
+.text-stone-400,
+.text-stone-500,
+.text-stone-600,
 .text-stone-700,
-.text-stone-600 {
-  color: #cbd5e1 !important;
+.text-slate-300,
+.text-slate-400,
+.text-slate-500,
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-on-surface-variant {
+  color: #ffffff !important;
 }
 
-.text-stone-500,
-.text-stone-400 {
-  color: #94a3b8 !important;
+/* Prevent any dark text on dark surfaces from being invisible */
+.tab-pane .text-ink,
+.tab-pane .text-gray-700,
+.tab-pane .text-gray-800,
+.tab-pane .text-gray-900,
+.tab-pane .text-stone-800,
+.tab-pane .text-stone-900,
+.modal-backdrop .text-ink,
+.modal-backdrop .text-gray-700,
+.modal-backdrop .text-gray-800,
+.modal-backdrop .text-gray-900,
+.modal-backdrop .text-stone-700,
+.modal-backdrop .text-stone-800,
+.modal-backdrop .text-stone-900 {
+  color: #ffffff !important;
+}
+
+/* Thermal receipt text contrast */
+.thermal-receipt-roll,
+.thermal-receipt-roll * {
+  color: #ffffff !important;
+}
+
+.thermal-receipt-roll strong,
+.thermal-receipt-roll span {
+  color: #ffffff !important;
 }
 
 /* Custom scrollbars */

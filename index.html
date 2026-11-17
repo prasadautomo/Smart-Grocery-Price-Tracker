@@ -60,14 +60,14 @@
             "surface-container": "#11131c",
             "surface-container-high": "#161926",
             "surface-container-highest": "#1c1f30",
-            "on-surface": "#f8fafc",
-            "on-surface-variant": "#94a3b8",
+            "on-surface": "#ffffff",
+            "on-surface-variant": "#ffffff",
             "outline": "#334155",
             "outline-variant": "#1e2438",
             "citrus": "#10b981",
             "citrus-glow": "#34d399",
             "terracotta": "#059669",
-            "ink": "#0e1017",
+            "ink": "#ffffff",
             "ink-card": "#11131c",
             "error": "#dc2626",
             "error-container": "#450a0a",
@@ -126,7 +126,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=5.4.2">
+  <link rel="stylesheet" href="styles.css?v=6.9.0">
 </head>
 
 <body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-400 selection:text-stone-950">
@@ -308,19 +308,18 @@
           <!-- Line 2: Store Selector with Dropdown Arrow -->
           <div class="flex items-center gap-1 mt-0.5">
             <button
-              class="flex items-center gap-1 text-stone-400 hover:text-white transition-colors text-left cursor-pointer truncate max-w-[125px] sm:max-w-[155px]"
+              class="flex items-center gap-1 text-white hover:text-emerald-300 transition-colors text-left cursor-pointer truncate max-w-[125px] sm:max-w-[155px]"
               id="btnStoreSelector" title="Pilih Lokasi Toko Belanja">
               <span class="material-symbols-outlined text-[13px] text-emerald-400 shrink-0">storefront</span>
               <span class="font-label-sm text-[11px] font-bold text-white truncate" id="activeStoreName">Lotte Mart Grocery - Puri Indah</span>
-              <span class="material-symbols-outlined text-[13px] text-stone-500 shrink-0">expand_more</span>
+              <span class="material-symbols-outlined text-[13px] text-white shrink-0">expand_more</span>
             </button>
-            <span class="w-1 h-1 rounded-full bg-stone-600 shrink-0"></span>
           </div>
 
           <!-- Line 3: Compact Date Picker -->
           <div class="flex items-center gap-1 mt-0.5">
             <div class="flex items-center gap-0.5 text-[10.5px] font-bold text-white bg-[#11131c] px-1.5 py-0.5 rounded-md border border-[#222638] shadow-2xs shrink-0" title="Selector Tanggal Belanja Aktif (SRS F-01)">
-              <span class="material-symbols-outlined text-[12px] text-stone-400">calendar_month</span>
+              <span class="material-symbols-outlined text-[12px] text-white">calendar_month</span>
               <input type="date" id="sessionDatePicker" class="bg-transparent border-0 p-0 text-[10px] font-mono font-bold text-white cursor-pointer focus:outline-none" value="2026-10-26" />
             </div>
           </div>
@@ -387,7 +386,7 @@
           <!-- Main Numbers Group -->
           <div class="relative z-10 flex flex-col mb-3">
             <div class="flex items-baseline justify-between">
-              <span class="font-mono text-[10px] tracking-wider text-stone-400 uppercase font-semibold">Total Belanja Berjalan</span>
+              <span class="font-mono text-[10.5px] tracking-wider text-white uppercase font-bold">Total Belanja Berjalan</span>
             </div>
             <div class="flex items-baseline justify-between gap-space-xs mt-1">
               <div class="flex items-baseline gap-1.5">
@@ -396,7 +395,7 @@
                   id="hudTotalSpending">0</span>
               </div>
               <div class="text-right">
-                <span class="font-mono text-[10px] text-stone-400 block uppercase">Pemakaian</span>
+                <span class="font-mono text-[10px] text-white/90 block uppercase font-bold">Pemakaian</span>
                 <span class="font-mono text-xs text-citrus font-bold" id="budgetPercentLabel">0% / 100%</span>
               </div>
             </div>
@@ -407,7 +406,7 @@
             <div class="flex items-center justify-between font-mono text-[11px]">
               <div class="flex items-center gap-1.5 text-stone-300" id="hudRemainingText">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-stone-700/80">
-                  <span class="text-stone-400 text-[10px]">Sisa Aman:</span>
+                  <span class="text-white text-[10px] font-bold">Sisa Aman:</span>
                   <strong class="text-citrus font-black text-[12px]">Rp 350.000</strong>
                 </span>
               </div>
@@ -429,7 +428,7 @@
             <div class="hidden" id="budgetProgressBar" style="width: 0%;"></div>
 
             <!-- Gauge Sub-ticks -->
-            <div class="flex justify-between px-0.5 text-[9px] font-mono text-stone-400">
+            <div class="flex justify-between px-0.5 text-[9px] font-mono text-white/90 font-bold">
               <span>Rp 0</span>
               <span>50%</span>
               <span class="text-yellow-400 font-bold">80% Waspada</span>
@@ -498,7 +497,7 @@
                     <span>Grosir &amp; Fresh</span>
                   </span>
                 </div>
-                <p class="font-body-sm text-[11px] text-stone-400 truncate mt-0.5">Daftar rak Puri Indah • Klik <strong class="text-emerald-400">+ Keranjang</strong> untuk belanja langsung</p>
+                <p class="font-body-sm text-[11px] text-white font-medium truncate mt-0.5">Daftar rak Puri Indah • Klik <strong class="text-emerald-400">+ Keranjang</strong> untuk belanja langsung</p>
               </div>
             </div>
           </div>
@@ -534,11 +533,11 @@
           <!-- Lotte Mart Search Bar -->
           <div class="relative mb-3">
             <span
-              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">search</span>
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white text-[18px]">search</span>
             <input type="text" id="inputAstroSearch" placeholder="Cari barang Lotte Mart (Beras, Minyak, Telur, Mie)..."
-              class="w-full pl-9 pr-8 py-2 rounded-xl bg-[#0d0f17] text-white font-body-sm text-xs border border-[#1e2338] placeholder-stone-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all">
+              class="w-full pl-9 pr-8 py-2 rounded-xl bg-[#0d0f17] text-white font-body-sm text-xs border border-[#1e2338] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500/50 transition-all">
             <button type="button" id="btnClearAstroSearch"
-              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white hidden">
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-white hover:text-emerald-300 hidden">
               <span class="material-symbols-outlined text-[16px]">close</span>
             </button>
           </div>
@@ -549,22 +548,22 @@
               class="astro-cat-chip px-3 py-1 rounded-full bg-[#0d2319] text-emerald-400 border border-emerald-500/50 font-label-sm text-xs font-black shrink-0 active"
               data-astro-cat="ALL">Semua (32)</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Bahan Pokok">🌾 Bahan Pokok</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Susu & Minuman">🥛 Susu & Minuman</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Segar & Daging">🥩 Segar & Daging</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Dapur & Bumbu">🍳 Dapur & Bumbu</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Kebersihan">🧺 Kebersihan</button>
             <button
-              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-stone-300 border border-[#222638] font-label-sm text-xs font-semibold shrink-0 hover:text-white hover:border-stone-600"
+              class="astro-cat-chip px-3 py-1 rounded-full bg-[#11131c] text-white border border-[#262f4c] font-label-sm text-xs font-bold shrink-0 hover:text-emerald-300 hover:border-emerald-500"
               data-astro-cat="Camilan & Roti">🍫 Camilan</button>
           </div>
 
@@ -947,7 +946,7 @@
       <!-- Live Financial Radar Card (Macro Allocation & Meter) -->
       <div class="w-full bg-gradient-to-br from-stone-900 via-stone-850 to-stone-900 text-white rounded-2xl p-space-md shadow-pos-key border-2 border-stone-800">
         <div class="flex items-center justify-between mb-3 border-b border-stone-800 pb-2.5">
-          <span class="text-[11px] font-mono font-bold text-stone-400 tracking-wider uppercase flex items-center gap-1.5">
+          <span class="text-[11px] font-mono font-bold text-white tracking-wider uppercase flex items-center gap-1.5">
             <span class="material-symbols-outlined text-citrus text-[15px]">donut_large</span>
             <span>Ringkasan Saldo Belanja</span>
           </span>
@@ -956,29 +955,29 @@
 
         <div class="grid grid-cols-3 gap-2 text-center mb-3.5">
           <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Batas Pagu</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-stone-100" id="hudDompetLimitDisplay">Rp 350.000</strong>
+            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Batas Pagu</span>
+            <strong class="font-mono text-xs sm:text-sm font-black text-white" id="hudDompetLimitDisplay">Rp 350.000</strong>
           </div>
           <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Isi Troli</span>
+            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Isi Troli</span>
             <strong class="font-mono text-xs sm:text-sm font-black text-emerald-300" id="budgetCurrentSpend">Rp 0</strong>
           </div>
           <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Sisa Saldo</span>
+            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Sisa Saldo</span>
             <strong class="font-mono text-xs sm:text-sm font-black text-citrus" id="budgetRemainingAmount">Rp 350.000</strong>
           </div>
         </div>
 
         <!-- Meter Gauge Bar -->
         <div class="space-y-1.5">
-          <div class="flex items-center justify-between text-[10px] font-mono font-bold text-stone-400">
+          <div class="flex items-center justify-between text-[10px] font-mono font-bold text-white">
             <span>Rp 0</span>
-            <span class="text-stone-300">Pagu Maksimal</span>
+            <span class="text-white">Pagu Maksimal</span>
           </div>
           <div class="w-full h-3 bg-stone-800 rounded-full overflow-hidden p-0.5 border border-stone-700">
             <div id="budgetHealthMeter" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
           </div>
-          <div class="flex items-center justify-between text-[9px] font-mono text-stone-500 font-semibold">
+          <div class="flex items-center justify-between text-[9px] font-mono text-white font-semibold">
             <span class="text-emerald-400">● Aman (&lt;90%)</span>
             <span class="text-yellow-400">▲ Waspada (90-100%)</span>
             <span class="text-rose-400">🚨 Defisit (&gt;100%)</span>
@@ -1074,7 +1073,7 @@
 
       <!-- 2. Shopping Planner & Rencana -->
       <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-stone-400 hover:text-white cursor-pointer"
+        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
         id="navBtnBudget" data-tab="tabBudget">
         <div class="relative flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">checklist</span>
@@ -1089,7 +1088,7 @@
 
       <!-- 4. Riwayat & Struk Kasir -->
       <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-stone-400 hover:text-white cursor-pointer"
+        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
         id="navBtnHistory" data-tab="tabHistory">
         <span class="material-symbols-outlined text-[22px]">receipt_long</span>
         <span class="font-label-sm text-[10px] mt-0.5 whitespace-nowrap uppercase tracking-wider font-extrabold">Struk</span>
@@ -1097,7 +1096,7 @@
 
       <!-- 5. Dompet & Anggaran Safety Cap (SRS F-05) -->
       <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-stone-400 hover:text-white cursor-pointer"
+        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
         id="navBtnDompet" data-tab="tabDompet" title="Batas Dompet & Status Anggaran">
         <div class="relative flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
@@ -1303,37 +1302,37 @@
           <!-- Input utama diskon -->
           <div class="relative">
             <input type="text" id="inputItemDiscount" placeholder="Ketik diskon, contoh: 10% + 10% atau 25% atau 5000"
-              class="w-full pl-3 pr-16 py-2.5 rounded-xl bg-white text-on-surface font-body-md text-body-md border border-outline-variant/40 focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">
+              class="w-full pl-3 pr-16 py-2.5 rounded-xl bg-[#0b0c14] text-white font-body-md text-body-md border border-[#222638] focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">
             <button type="button" id="btnClearDiscountPill"
-              class="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-[10px] font-bold text-red-600 hover:bg-red-50 cursor-pointer">
+              class="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-[10px] font-bold text-red-400 hover:bg-red-950/50 cursor-pointer">
               Hapus
             </button>
           </div>
 
           <!-- Tombol Pilihan Cepat Tambah Persen (+10%, +20%, +25%, dll) -->
           <div>
-            <span class="text-[10px] text-on-surface-variant font-bold block mb-1">PILIHAN PERSEN CEPAT (KLIK UNTUK BERTUMPUK):</span>
+            <span class="text-[10px] text-white/90 font-bold block mb-1">PILIHAN PERSEN CEPAT (KLIK UNTUK BERTUMPUK):</span>
             <div class="flex items-center gap-1.5 flex-wrap">
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="10%">+ 10%</button>
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="20%">+ 20%</button>
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="25%">+ 25%</button>
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="50%">+ 50%</button>
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="5%">+ 5%</button>
-              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-white border border-outline-variant/40 text-primary font-bold text-xs hover:bg-secondary/10 hover:border-secondary transition-all cursor-pointer shadow-2xs" data-val="Rp 5000">Rp 5.000</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="10%">+ 10%</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="20%">+ 20%</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="25%">+ 25%</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="50%">+ 50%</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="5%">+ 5%</button>
+              <button type="button" class="btn-add-discount-pill px-2.5 py-1 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-bold text-xs hover:bg-[#202742] hover:border-emerald-500 transition-all cursor-pointer shadow-2xs" data-val="Rp 5000">Rp 5.000</button>
             </div>
           </div>
 
           <!-- Preview Realtime Perhitungan Diskon -->
-          <div class="mt-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs hidden space-y-1" id="modalDiscountPreview">
+          <div class="mt-2 p-2.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-white text-xs hidden space-y-1" id="modalDiscountPreview">
             <div class="flex items-center justify-between font-bold">
-              <span class="flex items-center gap-1 text-emerald-800">
+              <span class="flex items-center gap-1 text-emerald-300">
                 <span class="material-symbols-outlined text-[15px]">price_check</span>
                 <span>Harga Setelah Diskon:</span>
               </span>
-              <span class="text-sm font-mono text-emerald-900 font-extrabold" id="modalDiscountFinalPrice">Rp 0</span>
+              <span class="text-sm font-mono text-emerald-300 font-extrabold" id="modalDiscountFinalPrice">Rp 0</span>
             </div>
-            <div class="text-[11px] text-emerald-700 font-semibold" id="modalDiscountSavedText">Hemat Rp 0</div>
-            <div class="text-[10px] font-mono text-purple-900 bg-purple-100/70 p-1.5 rounded-lg border border-purple-200 mt-1 hidden" id="modalDiscountBreakdown"></div>
+            <div class="text-[11px] text-white font-semibold" id="modalDiscountSavedText">Hemat Rp 0</div>
+            <div class="text-[10px] font-mono text-white bg-purple-950/70 p-1.5 rounded-lg border border-purple-400 mt-1 hidden" id="modalDiscountBreakdown"></div>
           </div>
         </div>
 
@@ -1417,7 +1416,7 @@
     class="modal-backdrop hidden fixed inset-0 z-[120] bg-black/60 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
     id="modalAstroCheckout">
     <div
-      class="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-outline-variant/30 max-h-[92vh] flex flex-col overflow-hidden animate-slide-up">
+      class="w-full max-w-md bg-[#0d0f17] rounded-t-[32px] sm:rounded-[32px] shadow-2xl border border-[#222638] max-h-[92vh] flex flex-col overflow-hidden animate-slide-up">
 
       <!-- STAGE 1: PILIH METODE BAYAR & VOUCHER -->
       <div id="checkoutStageReview" class="flex flex-col h-full max-h-[92vh]">
@@ -1435,7 +1434,7 @@
                 <span
                   class="px-2 py-0.5 rounded-full bg-emerald-500 text-stone-950 text-[10px] font-black">Puri Indah</span>
               </div>
-              <p class="text-xs text-stone-400">Rincian Belanja &amp; Kasir Lotte Mart</p>
+              <p class="text-xs text-white font-medium">Rincian Belanja &amp; Kasir Lotte Mart</p>
             </div>
           </div>
           <button type="button" id="btnCloseAstroCheckout"
@@ -1455,20 +1454,20 @@
                 class="w-8 h-8 rounded-full bg-primary text-secondary-fixed text-xs font-bold flex items-center justify-center"
                 id="checkoutUserAvatar">R</div>
               <div>
-                <span class="text-xs font-bold text-primary block" id="checkoutUserName">Rian Pratama</span>
-                <span class="text-[11px] text-on-surface-variant font-semibold">Lotte Mart Grocery - Puri Indah</span>
+                <span class="text-xs font-bold text-white block" id="checkoutUserName">Rian Pratama</span>
+                <span class="text-[11px] text-white/90 font-semibold">Lotte Mart Grocery - Puri Indah</span>
               </div>
             </div>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Ready
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">Ready
               Kasir</span>
           </div>
 
           <!-- Cart Items Summary Preview (Collapsible) -->
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <span class="font-label-sm text-xs font-bold text-on-surface uppercase tracking-wider">Barang yang
+              <span class="font-label-sm text-xs font-bold text-white uppercase tracking-wider">Barang yang
                 Dibeli</span>
-              <span class="text-xs text-secondary font-bold" id="checkoutItemCountBadge">0 Produk</span>
+              <span class="text-xs text-emerald-400 font-bold" id="checkoutItemCountBadge">0 Produk</span>
             </div>
             <div class="max-h-36 overflow-y-auto space-y-1.5 pr-1" id="checkoutItemsList">
               <!-- Rendered by JS -->
@@ -1487,32 +1486,32 @@
             </div>
             <div class="grid grid-cols-2 gap-1.5" id="checkoutVoucherList">
               <button type="button"
-                class="checkout-voucher-btn p-2 rounded-xl border border-gray-200 bg-white text-left transition-all hover:bg-gray-50 cursor-pointer"
+                class="checkout-voucher-btn p-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-left transition-all hover:bg-[#202742] cursor-pointer"
                 data-code="LOTTESAVE" data-discount="15000" data-min-spend="50000">
-                <div class="font-bold text-xs text-emerald-900">LOTTESAVE</div>
-                <div class="text-[10px] text-emerald-700 font-medium">Diskon Rp 15.000</div>
-                <div class="text-[9.5px] text-gray-400 mt-0.5">Min. Belanja Rp 50rb</div>
+                <div class="font-bold text-xs text-white">LOTTESAVE</div>
+                <div class="text-[10px] text-emerald-300 font-bold">Diskon Rp 15.000</div>
+                <div class="text-[9.5px] text-white/80 mt-0.5">Min. Belanja Rp 50rb</div>
               </button>
               <button type="button"
-                class="checkout-voucher-btn p-2 rounded-xl border border-gray-200 bg-white text-left transition-all hover:bg-gray-50 cursor-pointer"
+                class="checkout-voucher-btn p-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-left transition-all hover:bg-[#202742] cursor-pointer"
                 data-code="ONGKIRGRATIS" data-discount="1000" data-min-spend="10000">
-                <div class="font-bold text-xs text-gray-800">ONGKIRGRATIS</div>
-                <div class="text-[10px] text-emerald-700 font-medium">Gratis Layanan</div>
-                <div class="text-[9.5px] text-gray-400 mt-0.5">Min. Belanja Rp 10rb</div>
+                <div class="font-bold text-xs text-white">ONGKIRGRATIS</div>
+                <div class="text-[10px] text-emerald-300 font-bold">Gratis Layanan</div>
+                <div class="text-[9.5px] text-white/80 mt-0.5">Min. Belanja Rp 10rb</div>
               </button>
               <button type="button"
-                class="checkout-voucher-btn p-2 rounded-xl border border-gray-200 bg-white text-left transition-all hover:bg-gray-50 cursor-pointer"
+                class="checkout-voucher-btn p-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-left transition-all hover:bg-[#202742] cursor-pointer"
                 data-code="ANAKKOS5K" data-discount="5000" data-min-spend="25000">
-                <div class="font-bold text-xs text-gray-800">ANAKKOS5K</div>
-                <div class="text-[10px] text-emerald-700 font-medium">Potongan Rp 5.000</div>
-                <div class="text-[9.5px] text-gray-400 mt-0.5">Min. Belanja Rp 25rb</div>
+                <div class="font-bold text-xs text-white">ANAKKOS5K</div>
+                <div class="text-[10px] text-emerald-300 font-bold">Potongan Rp 5.000</div>
+                <div class="text-[9.5px] text-white/80 mt-0.5">Min. Belanja Rp 25rb</div>
               </button>
               <button type="button"
-                class="checkout-voucher-btn p-2 rounded-xl border active border-emerald-500 bg-emerald-50 text-left transition-all hover:bg-emerald-50 cursor-pointer"
+                class="checkout-voucher-btn p-2 rounded-xl border active border-emerald-500 bg-emerald-950/70 text-left transition-all hover:bg-emerald-900/50 cursor-pointer"
                 data-code="NONE" data-discount="0" data-min-spend="0">
-                <div class="font-bold text-xs text-gray-800">Tanpa Voucher</div>
-                <div class="text-[10px] text-gray-500">Harga Standar</div>
-                <div class="text-[9.5px] text-emerald-600 font-semibold mt-0.5">Semua Belanja</div>
+                <div class="font-bold text-xs text-white">Tanpa Voucher</div>
+                <div class="text-[10px] text-white/80">Harga Standar</div>
+                <div class="text-[9.5px] text-emerald-400 font-semibold mt-0.5">Semua Belanja</div>
               </button>
             </div>
           </div>
@@ -1647,24 +1646,24 @@
                   class="btn-select-va-bank flex-1 py-1.5 rounded-xl border text-xs font-bold active border-primary bg-primary text-secondary-fixed"
                   data-bank="BCA">BCA</button>
                 <button type="button"
-                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-outline-variant/30 bg-white text-xs font-bold hover:bg-gray-50"
+                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                   data-bank="Mandiri">Mandiri</button>
                 <button type="button"
-                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-outline-variant/30 bg-white text-xs font-bold hover:bg-gray-50"
+                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                   data-bank="BRI">BRI</button>
                 <button type="button"
-                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-outline-variant/30 bg-white text-xs font-bold hover:bg-gray-50"
+                  class="btn-select-va-bank flex-1 py-1.5 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                   data-bank="BNI">BNI</button>
               </div>
-              <div class="p-3 bg-white rounded-xl border border-outline-variant/30 flex items-center justify-between">
+              <div class="p-3 bg-[#181d30] rounded-xl border border-[#262f4c] flex items-center justify-between">
                 <div>
-                  <span class="text-[10px] text-gray-500 uppercase block font-bold" id="vaBankNameLabel">NOMOR VIRTUAL
+                  <span class="text-[10px] text-white/90 uppercase block font-bold" id="vaBankNameLabel">NOMOR VIRTUAL
                     ACCOUNT BCA</span>
-                  <strong class="text-sm font-mono text-primary font-bold" id="vaNumberDisplay">8801 2948 1029
+                  <strong class="text-sm font-mono text-white font-bold" id="vaNumberDisplay">8801 2948 1029
                     3847</strong>
                 </div>
                 <button type="button" id="btnCopyVaNumber"
-                  class="px-2.5 py-1 rounded-lg bg-surface-container text-primary text-xs font-bold hover:bg-surface-container-high transition-all flex items-center gap-1 cursor-pointer">
+                  class="px-2.5 py-1 rounded-lg bg-surface-container text-white text-xs font-bold hover:bg-surface-container-high transition-all flex items-center gap-1 cursor-pointer">
                   <span class="material-symbols-outlined text-[14px]">content_copy</span>
                   <span>Salin</span>
                 </button>
@@ -1675,39 +1674,39 @@
             <div id="methodPanelCash"
               class="hidden p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 space-y-3">
               <div>
-                <label class="text-[11px] font-bold text-gray-600 block mb-1.5">PILIH NOMINAL UANG TUNAI
+                <label class="text-[11px] font-bold text-white block mb-1.5">PILIH NOMINAL UANG TUNAI
                   DIBAYARKAN:</label>
                 <div class="grid grid-cols-3 gap-1.5 mb-2">
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="pas">Uang Pas</button>
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="100000">Rp 100.000</button>
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="200000">Rp 200.000</button>
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="250000">Rp 250.000</button>
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="300000">Rp 300.000</button>
                   <button type="button"
-                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-gray-300 bg-white text-xs font-bold hover:bg-gray-50"
+                    class="btn-quick-cash py-1.5 px-2 rounded-xl border border-[#262f4c] bg-[#181d30] text-white text-xs font-bold hover:bg-[#202742]"
                     data-amount="500000">Rp 500.000</button>
                 </div>
                 <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">Rp</span>
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/80 font-bold text-xs">Rp</span>
                   <input type="number" id="inputCashPaid" placeholder="Atau ketik nominal bayar..."
-                    class="w-full pl-8 pr-3 py-2 bg-white rounded-xl border border-gray-300 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-secondary">
+                    class="w-full pl-8 pr-3 py-2 bg-[#0b0c14] text-white rounded-xl border border-[#222638] text-sm font-bold focus:outline-none focus:ring-2 focus:ring-secondary">
                 </div>
               </div>
               <!-- Realtime Kembalian Calculator -->
               <div
-                class="p-2.5 rounded-xl bg-white border border-emerald-200 flex items-center justify-between text-xs">
-                <span class="text-gray-600 font-medium">Kembalian Kasir:</span>
-                <strong class="text-sm font-bold text-secondary" id="cashChangeDisplay">Rp 0</strong>
+                class="p-2.5 rounded-xl bg-[#181d30] border border-emerald-500/40 flex items-center justify-between text-xs text-white">
+                <span class="text-white font-medium">Kembalian Kasir:</span>
+                <strong class="text-sm font-bold text-emerald-400" id="cashChangeDisplay">Rp 0</strong>
               </div>
             </div>
 
@@ -1792,35 +1791,35 @@
 
           <!-- Thermal Paper Body with Zig-Zag Cut -->
           <div
-            class="thermal-receipt-roll bg-white rounded-2xl p-5 shadow-xl border border-gray-200 text-gray-900 font-mono text-xs space-y-3">
+            class="thermal-receipt-roll bg-[#0d0f17] rounded-2xl p-5 shadow-xl border border-[#222638] text-white font-mono text-xs space-y-3">
 
             <!-- Store & Transaction Header -->
-            <div class="text-center pb-3 border-b border-dashed border-gray-300">
-              <div class="font-bold text-sm text-primary tracking-wider">LOTTE MART GROCERY - PURI INDAH</div>
-              <div class="text-[10px] text-gray-500">Puri Indah Mall Lt. LG • Kembangan, Jakarta Barat</div>
-              <div class="text-[10px] text-gray-400 mt-1" id="receiptTimestamp">Senin, 26 Okt 2026 • 19:30 WIB</div>
-              <div class="text-[10px] font-bold text-primary mt-0.5">TRX: <span
+            <div class="text-center pb-3 border-b border-dashed border-[#222638]">
+              <div class="font-bold text-sm text-white tracking-wider">LOTTE MART GROCERY - PURI INDAH</div>
+              <div class="text-[10px] text-white/90">Puri Indah Mall Lt. LG • Kembangan, Jakarta Barat</div>
+              <div class="text-[10px] text-white/80 mt-1" id="receiptTimestamp">Senin, 26 Okt 2026 • 19:30 WIB</div>
+              <div class="text-[10px] font-bold text-white mt-0.5">TRX: <span
                   id="receiptTrxId">LOTTE-PURI-20261026-98421</span></div>
             </div>
 
             <!-- Customer & Cashier Info -->
-            <div class="text-[11px] space-y-0.5 text-gray-600">
+            <div class="text-[11px] space-y-0.5 text-white">
               <div class="flex justify-between">
                 <span>Pelanggan:</span>
-                <strong class="text-gray-900" id="receiptCustomerName">Rian Pratama</strong>
+                <strong class="text-white font-bold" id="receiptCustomerName">Rian Pratama</strong>
               </div>
               <div class="flex justify-between">
                 <span>Kasir:</span>
-                <span class="text-gray-900">Sistem Mandiri Lotte Mart</span>
+                <span class="text-white">Sistem Mandiri Lotte Mart</span>
               </div>
               <div class="flex justify-between">
                 <span>Metode Bayar:</span>
-                <strong class="text-secondary" id="receiptPaymentMethodLabel">QRIS Lotte Mart (Lunas)</strong>
+                <strong class="text-emerald-400 font-bold" id="receiptPaymentMethodLabel">QRIS Lotte Mart (Lunas)</strong>
               </div>
             </div>
 
             <!-- Purchased Items Table -->
-            <div class="py-2 border-y border-dashed border-gray-300 space-y-1.5" id="receiptItemsBody">
+            <div class="py-2 border-y border-dashed border-[#222638] space-y-1.5" id="receiptItemsBody">
               <!-- Rendered by JS -->
             </div>
 
@@ -1828,32 +1827,32 @@
             <div class="space-y-1 text-[11px]">
               <div class="flex justify-between">
                 <span>Subtotal Belanja:</span>
-                <span id="receiptSubtotal">Rp 0</span>
+                <span class="text-white font-bold" id="receiptSubtotal">Rp 0</span>
               </div>
-              <div class="flex justify-between text-emerald-600">
+              <div class="flex justify-between text-emerald-400">
                 <span>Hemat Voucher:</span>
-                <span id="receiptVoucherDiscount">-Rp 15.000</span>
+                <span class="font-bold" id="receiptVoucherDiscount">-Rp 15.000</span>
               </div>
               <div class="flex justify-between">
                 <span>Biaya Layanan:</span>
-                <span id="receiptServiceFee">Rp 1.000</span>
+                <span class="text-white font-bold" id="receiptServiceFee">Rp 1.000</span>
               </div>
               <div
-                class="pt-2 border-t-2 border-dashed border-gray-400 flex justify-between items-baseline font-bold text-sm text-primary">
+                class="pt-2 border-t-2 border-dashed border-[#222638] flex justify-between items-baseline font-bold text-sm text-white">
                 <span>TOTAL AKHIR:</span>
-                <span class="text-base text-secondary" id="receiptGrandTotal">Rp 0</span>
+                <span class="text-base text-emerald-400 font-black" id="receiptGrandTotal">Rp 0</span>
               </div>
-              <div class="text-[10px] text-gray-500 flex justify-between pt-0.5" id="receiptCashDetailRow">
+              <div class="text-[10px] text-white/80 flex justify-between pt-0.5" id="receiptCashDetailRow">
                 <span>Diterima / Kembalian:</span>
-                <span id="receiptCashChangeText">-</span>
+                <span class="text-white font-bold" id="receiptCashChangeText">-</span>
               </div>
             </div>
 
             <!-- Barcode & Thank you -->
-            <div class="text-center pt-2 border-t border-dashed border-gray-300 space-y-2">
-              <div class="font-mono text-[9px] tracking-[6px] text-gray-400 select-all font-bold">||| |||| || ||||| ||||
+            <div class="text-center pt-2 border-t border-dashed border-[#222638] space-y-2">
+              <div class="font-mono text-[9px] tracking-[6px] text-white/80 select-all font-bold">||| |||| || ||||| ||||
                 || |||</div>
-              <p class="text-[10px] text-gray-500 leading-tight">Terima kasih telah berbelanja cerdas di Lotte Mart Puri Indah!
+              <p class="text-[10px] text-white/90 leading-tight">Terima kasih telah berbelanja cerdas di Lotte Mart Puri Indah!
                 Simpan struk ini sebagai bukti pembayaran sah.</p>
             </div>
 
@@ -1862,15 +1861,15 @@
         </div>
 
         <!-- Receipt Actions Footer -->
-        <div class="p-4 bg-white border-t border-outline-variant/20 shrink-0 space-y-2">
+        <div class="p-4 bg-[#0d0f17] border-t border-[#222638] shrink-0 space-y-2">
           <div class="flex gap-2">
             <button type="button" id="btnCopyReceiptText"
-              class="flex-1 py-2.5 rounded-xl bg-surface-container text-primary font-bold text-xs hover:bg-surface-container-high transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              class="flex-1 py-2.5 rounded-xl bg-[#181d30] text-white border border-[#262f4c] font-bold text-xs hover:bg-[#202742] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
               <span class="material-symbols-outlined text-[16px]">content_copy</span>
               <span>Salin Teks Struk</span>
             </button>
             <button type="button" id="btnViewHistoryFromReceipt"
-              class="flex-1 py-2.5 rounded-xl bg-surface-container text-primary font-bold text-xs hover:bg-surface-container-high transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              class="flex-1 py-2.5 rounded-xl bg-[#181d30] text-white border border-[#262f4c] font-bold text-xs hover:bg-[#202742] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
               <span class="material-symbols-outlined text-[16px]">receipt_long</span>
               <span>Buka Riwayat</span>
             </button>
@@ -2084,7 +2083,7 @@
           <span>Ganti Username / Akun Lain</span>
         </button>
         <button type="button" id="btnLogoutUser"
-          class="w-full py-3 rounded-xl bg-red-50 text-error border border-error/20 font-headline-sm text-sm font-bold hover:bg-red-100 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          class="w-full py-3 rounded-xl bg-red-950/40 text-red-400 border border-red-800/40 font-headline-sm text-sm font-bold hover:bg-red-900/60 transition-all flex items-center justify-center gap-2 cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">logout</span>
           <span>Keluar dari Akun Ini</span>
         </button>
@@ -2189,7 +2188,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=6.8.5"></script>
+  <script src="app.js?v=6.9.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {

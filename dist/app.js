@@ -1865,7 +1865,7 @@
                 <i data-lucide="check"></i>
               </button>
               <div class="flex items-center gap-1.5">
-                <span class="font-mono text-[11px] font-black text-ink tracking-tight">LOT #${lotNumber}</span>
+                <span class="font-mono text-[11px] font-black text-white tracking-tight">LOT #${lotNumber}</span>
                 <span class="cat-mono-tag">${escapeHtml(item.category)}</span>
               </div>
               <span class="barcode-strip hidden sm:inline-block" title="Barcode Lot"></span>
@@ -1890,9 +1890,9 @@
           <!-- Middle Row: Title, Spec & Status Rencana -->
           <div class="flex items-start justify-between gap-2 pt-0.5">
             <div>
-              <h4 class="card-item-title text-[15px] font-extrabold text-ink leading-snug">${escapeHtml(item.name)}</h4>
+              <h4 class="card-item-title text-[15px] font-extrabold text-white leading-snug">${escapeHtml(item.name)}</h4>
               <div class="flex items-center gap-2 mt-1">
-                <span class="font-mono text-[11px] text-stone-500 font-semibold">Kemasan: ${escapeHtml(item.unit)}</span>
+                <span class="font-mono text-[11px] text-white font-semibold">Kemasan: ${escapeHtml(item.unit)}</span>
                 ${item.isPlanned !== false ? `
                   <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
                     <i data-lucide="check-circle-2" class="w-2.5 h-2.5"></i>
@@ -3839,11 +3839,11 @@
 
             <!-- Title & Size -->
             <h4 class="font-headline-sm text-xs font-bold text-white line-clamp-2 leading-snug mb-1" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
-            <div class="text-[11px] text-stone-400 font-medium mb-2">${escapeHtml(prod.unit)}</div>
+            <div class="text-[11px] text-white font-semibold mb-2">${escapeHtml(prod.unit)}</div>
 
             <!-- Pricing -->
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              ${hasDiscount ? `<del class="text-[10px] text-stone-500 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
+              ${hasDiscount ? `<del class="text-[10px] text-slate-300 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
               <span class="font-extrabold text-[13px] text-emerald-400 font-mono">Rp ${formatNumber(prod.price)}</span>
             </div>
           </div>
@@ -4298,12 +4298,12 @@
         const disc = calculateDiscount(item.price, item.discountRaw);
         const lineTotal = disc.finalUnitPrice * item.qty;
         return `
-          <div class="flex items-center justify-between text-xs py-1 border-b border-outline-variant/15 last:border-b-0">
+          <div class="flex items-center justify-between text-xs py-1.5 border-b border-[#222638] last:border-b-0">
             <div class="flex-1 min-w-0 pr-2">
-              <span class="font-bold text-gray-800 truncate block">${escapeHtml(item.name)}</span>
-              <span class="text-[10px] text-gray-500">${item.qty} ${escapeHtml(item.unit)} x Rp ${formatNumber(disc.finalUnitPrice)}</span>
+              <span class="font-bold text-white truncate block">${escapeHtml(item.name)}</span>
+              <span class="text-[10px] text-white/90 font-medium">${item.qty} ${escapeHtml(item.unit)} x Rp ${formatNumber(disc.finalUnitPrice)}</span>
             </div>
-            <strong class="font-mono text-gray-900 shrink-0">Rp ${formatNumber(lineTotal)}</strong>
+            <strong class="font-mono text-white font-bold shrink-0">Rp ${formatNumber(lineTotal)}</strong>
           </div>
         `;
       }).join('');
@@ -4495,12 +4495,12 @@
 
     if (elItemsBody) {
       elItemsBody.innerHTML = receiptItems.map(item => `
-        <div class="flex justify-between items-start text-[11px] leading-tight">
+        <div class="flex justify-between items-start text-[11px] leading-tight py-1 border-b border-[#222638] last:border-b-0">
           <div class="flex-1 pr-2">
-            <span class="font-bold text-gray-900">${escapeHtml(item.name)}</span>
-            <span class="block text-[10px] text-gray-500">${item.qty} ${escapeHtml(item.unit)} @ Rp ${formatNumber(item.finalUnitPrice)}</span>
+            <span class="font-bold text-white">${escapeHtml(item.name)}</span>
+            <span class="block text-[10px] text-white/90 font-medium">${item.qty} ${escapeHtml(item.unit)} @ Rp ${formatNumber(item.finalUnitPrice)}</span>
           </div>
-          <strong class="font-mono text-gray-900 shrink-0">Rp ${formatNumber(item.lineTotal)}</strong>
+          <strong class="font-mono text-white font-bold shrink-0">Rp ${formatNumber(item.lineTotal)}</strong>
         </div>
       `).join('');
     }
