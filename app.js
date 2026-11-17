@@ -5616,9 +5616,6 @@
         loginAsUser(userObj, true);
         AudioEngine.playSuccess();
         showToast(`Akun ${rawUsername} berhasil dibuat! Selamat datang di KeranjangPintar.`, 'success');
-        if (window.confetti) {
-          window.confetti({ particleCount: 50, spread: 70, origin: { y: 0.2 } });
-        }
       });
     }
 
@@ -6468,9 +6465,6 @@
     if (withGreeting) {
       AudioEngine.playSuccess();
       showToast(`Halo, ${userObj.displayName}! Ruang belanja Anda aktif.`, 'success');
-      if (window.confetti) {
-        window.confetti({ particleCount: 35, spread: 60, origin: { y: 0.15 } });
-      }
     }
   }
 
