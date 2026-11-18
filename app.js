@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SMART GROCERY PRO - NEO-CYBER & SUPABASE CLOUD SYNC CORE
  * Menjawab seluruh kebutuhan SRS F-01 s/d F-06 & Cerita Belanja Rian
  * Terintegrasi Cloud Supabase Hybrid (LocalStorage + Cloud Sync)
@@ -6041,16 +6041,7 @@
 
             if (error) {
               console.warn('Supabase Google OAuth status:', error.message);
-              // Fallback langsung ke Google Account Chooser Popup agar user langsung bisa masuk
-              const width = 500;
-              const height = 650;
-              const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-              const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-              window.open(
-                'google-auth.html',
-                'GoogleSignInPopup',
-                `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`
-              );
+              showToast('Login Google resmi belum tersedia. Periksa konfigurasi provider Google di Supabase.', 'danger');
               return;
             }
 
@@ -6146,26 +6137,10 @@
             }
           } catch (err) {
             console.error('Supabase OAuth error:', err);
-            const width = 500;
-            const height = 650;
-            const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-            const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-            window.open(
-              'google-auth.html',
-              'GoogleSignInPopup',
-              `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`
-            );
+            showToast('Login Google gagal dimulai. Periksa konfigurasi OAuth Google di Supabase.', 'danger');
           }
         } else {
-          const width = 500;
-          const height = 650;
-          const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-          const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-          window.open(
-            'google-auth.html',
-            'GoogleSignInPopup',
-            `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`
-          );
+          showToast('Layanan autentikasi belum siap. Muat ulang halaman lalu coba lagi.', 'danger');
         }
       });
     }
