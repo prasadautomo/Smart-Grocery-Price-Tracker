@@ -282,155 +282,18 @@
     qrisSecondsRemaining: 900
   };
 
-  // --- AUDIO SYNTHESIZER ---
+  // Sound effects are disabled throughout Cartly.
   const AudioEngine = {
-    ctx: null,
-    init() {
-      if (!this.ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) this.ctx = new AudioCtx();
-      }
-    },
-    playTap() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(650, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.03);
-        gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.03);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.03);
-      } catch (e) { }
-    },
-    playScan() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1900, now);
-        osc.frequency.exponentialRampToValueAtTime(2200, now + 0.05);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.06);
-        if (navigator.vibrate) {
-          navigator.vibrate([40, 20, 40]);
-        }
-      } catch (e) { }
-    },
-    playCashier() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        [987.77, 1318.51, 1975.53].forEach((f, idx) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(f, now + idx * 0.06);
-          gain.gain.setValueAtTime(0.18, now + idx * 0.06);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + idx * 0.06);
-          osc.stop(now + idx * 0.06 + 0.25);
-        });
-      } catch (e) { }
-    },
-    playSuccess() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        [523.25, 659.25, 1046.50].forEach((freq, i) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, now + i * 0.05);
-          gain.gain.setValueAtTime(0.1, now + i * 0.05);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.15);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + i * 0.05);
-          osc.stop(now + i * 0.05 + 0.15);
-        });
-      } catch (e) { }
-    },
-    playAlert() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(280, now);
-        osc.frequency.setValueAtTime(180, now + 0.08);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.2);
-      } catch (e) { }
-    },
-    playBeep() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1760, now);
-        osc.frequency.setValueAtTime(2200, now + 0.04);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.12);
-      } catch (e) { }
-    },
-    playPrinter() {
-      if (!appState.soundEnabled) return;
-      this.init();
-      if (!this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        for (let i = 0; i < 6; i++) {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(280 + (i % 2) * 120, now + i * 0.04);
-          gain.gain.setValueAtTime(0.05, now + i * 0.04);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.025);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start(now + i * 0.04);
-          osc.stop(now + i * 0.04 + 0.025);
-        }
-      } catch (e) { }
-    }
+    init() {},
+    playTap() {},
+    playScan() {},
+    playCashier() {},
+    playSuccess() {},
+    playAlert() {},
+    playBeep() {},
+    playPrinter() {},
+    playLimitAlert() {}
   };
-
   // --- INITIALIZATION ---
   document.addEventListener('DOMContentLoaded', () => {
     initApp();
@@ -1389,7 +1252,6 @@
     const statusText = document.getElementById('hudStatusText');
     const statusIcon = document.getElementById('hudStatusIcon');
     const remainingText = document.getElementById('hudRemainingText');
-    const overBudgetBanner = document.getElementById('overBudgetBanner');
 
     if (progressBar) {
       progressBar.style.width = `${clampedPercentage}%`;
@@ -1424,7 +1286,6 @@
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#222638]"><span class="text-stone-400 text-[10.5px] font-semibold">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-emerald-400 font-black tracking-tight';
-      if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
     } else if (percentage >= 90 && percentage <= 100) {
@@ -1432,7 +1293,6 @@
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-yellow-500/40"><span class="text-yellow-300/80 text-[10.5px] font-semibold">Sisa Kritis:</span><strong class="text-yellow-300 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-yellow-400 font-black tracking-tight';
-      if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-yellow-400 rounded-full transition-all duration-300';
     } else {
@@ -1443,26 +1303,6 @@
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-rose-400 font-black tracking-tight animate-pulse';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-300';
-      if (overBudgetBanner) {
-        overBudgetBanner.classList.remove('hidden');
-        overBudgetBanner.className = 'neo-alert-overbudget bg-red-600 text-white border-2 border-red-800 rounded-2xl p-3.5 mb-space-md shadow-lg animate-shake';
-        overBudgetBanner.innerHTML = `
-          <div class="flex items-start gap-2.5">
-            <span class="material-symbols-outlined text-white text-[20px] shrink-0 mt-0.5 animate-bounce">warning</span>
-            <div class="flex-1">
-              <div class="font-headline-sm text-sm font-black text-white leading-tight">
-                Total belanja melebihi batas saldo dompet! Kurangi kuantitas atau batalkan barang sekunder.
-              </div>
-              <div class="font-mono text-xs text-red-100 font-bold mt-1">
-                Defisit Kuota: -Rp ${formatNumber(overAmount)} (Total: Rp ${formatNumber(totalSpent)} / Limit: Rp ${formatNumber(limit)})
-              </div>
-            </div>
-            <button id="btnSuggestTrim" onclick="window.suggestTrimItems ? window.suggestTrimItems() : null" class="px-2.5 py-1 rounded-lg bg-white text-red-700 text-xs font-black shadow-sm shrink-0 cursor-pointer hover:bg-red-50 active:scale-95">
-              Pangkas
-            </button>
-          </div>
-        `;
-      }
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-1 animate-ping';
       if (progressBar) progressBar.className = 'h-full bg-rose-600 rounded-full transition-all duration-300';
       AudioEngine.playAlert();
@@ -2250,7 +2090,6 @@
     if (btnSyncNow) btnSyncNow.addEventListener('click', syncCloudData);
 
     // Trim Helper
-    document.getElementById('btnSuggestTrim').addEventListener('click', openTrimModal);
     document.getElementById('btnCloseTrimModal').addEventListener('click', () => {
       document.getElementById('modalTrimBackdrop').classList.add('hidden');
     });
