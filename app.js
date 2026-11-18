@@ -1313,9 +1313,6 @@
   function renderCart() {
     const container = document.getElementById('cartItemsList');
     const summaryBottom = document.getElementById('cartSummaryBottom');
-    const headerCount = document.getElementById('cartHeaderPillCount');
-    if (headerCount) headerCount.textContent = `${appState.cart.length} LOT`;
-
     let filteredItems = appState.cart.filter(item => {
       const matchCat = appState.activeCategory === 'ALL' || item.category === appState.activeCategory;
       const matchSearch = appState.searchQuery === '' || item.name.toLowerCase().includes(appState.searchQuery.toLowerCase());
@@ -1347,18 +1344,16 @@
       const lineTotal = discount.finalUnitPrice * item.qty;
       const hasDiscount = discount.savedPerUnit > 0;
       const isChecked = !!item.inPhysicalCart;
-      const lotNumber = String(index + 1).padStart(2, '0');
 
       html += `
         <div class="neo-ticket-card ticket-perforation-left ${isChecked ? 'is-checked' : 'is-pending'}" data-id="${item.id}">
-          <!-- Top Row: Checkbox, LOT #, Category, Barcode Strip & Quick Actions -->
+          <!-- Top Row: Checkbox, Category, Barcode Strip & Quick Actions -->
           <div class="flex items-center justify-between border-b border-stone-200/80 pb-2">
             <div class="flex items-center gap-2">
               <button type="button" class="cart-check-btn ${isChecked ? 'checked' : ''}" onclick="window.toggleItemInCart('${item.id}')" title="Centang jika sudah di rak troli">
                 <i data-lucide="check"></i>
               </button>
               <div class="flex items-center gap-1.5">
-                <span class="font-mono text-[11px] font-black text-white tracking-tight">LOT #${lotNumber}</span>
                 <span class="cat-mono-tag">${escapeHtml(item.category)}</span>
               </div>
               <span class="barcode-strip hidden sm:inline-block" title="Barcode Lot"></span>
