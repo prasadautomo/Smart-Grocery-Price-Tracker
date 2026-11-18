@@ -990,9 +990,10 @@
       if (!rcpErr && receiptsData && receiptsData.length > 0) {
         // Struk riwayat transaksi selesai (filter out active cart / planner)
         const actualReceipts = receiptsData.filter(r => !r.id.startsWith('active_cart_') && !r.id.startsWith('active_planner_'));
-        appState.history = actualReceipts.map(r => ({
+        const cloudHistory = actualReceipts.map(r => ({
           id: r.id,
           date: (r.date_label || '').replace(/[\r\n]+/g, ' ').replace(/(.)\1{8,}/g, '$1$1$1...').trim() || 'Struk Belanja',
+          createdAt: r.created_at || '',
           budgetLimit: Number(r.budget_limit) || 0,
           grandTotal: Number(r.grand_total) || 0,
           totalSaved: Number(r.total_saved) || 0,
@@ -1001,7 +1002,13 @@
           paymentMethod: r.payment_method || '',
           paymentStatus: r.payment_method && !/belum dibayar|catatan belanja/i.test(r.payment_method) ? 'paid' : 'unpaid'
         }));
+        const cloudReceiptIds = new Set(cloudHistory.map(receipt => String(receipt.id)));
+        appState.history = [
+          ...cloudHistory,
+          ...appState.history.filter(receipt => !cloudReceiptIds.has(String(receipt.id)))
+        ];
         saveHistory();
+        renderHistoryList();
 
         // Sinkronisasi Troli Aktif Pengguna dari Cloud
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
@@ -3661,6 +3668,7 @@
     const newReceipt = {
       id: trxId,
       date: nowStr,
+      createdAt: new Date().toISOString(),
       budgetLimit: appState.budgetLimit,
       grandTotal,
       totalSaved: discount,
@@ -3672,10 +3680,11 @@
       cashChange: checkoutPaymentMethod === 'cash' ? cashPaid - grandTotal : null
     };
 
-    appState.history.unshift(newReceipt);
+    appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
+    saveHistory();
+    renderHistoryList();
     appState.cart = [];
 
-    saveHistory();
     saveCart();
     saveMaster();
 
@@ -3684,7 +3693,7 @@
 
     // Auto push receipt to Supabase if connected
     if (appState.supabaseClient) {
-      if (appState.currentUser?.id) appState.supabaseClient.from('receipts').insert({
+      if (appState.currentUser?.id) appState.supabaseClient.from('receipts').upsert({
         id: newReceipt.id,
         owner_id: appState.currentUser?.id,
         date_label: newReceipt.date,
@@ -3694,8 +3703,8 @@
         item_count: newReceipt.itemCount,
         items: newReceipt.items,
         payment_method: newReceipt.paymentMethod,
-        created_at: new Date().toISOString()
-      }).then(({ error }) => {
+        created_at: newReceipt.createdAt
+      }, { onConflict: 'owner_id,id' }).then(({ error }) => {
         if (error) {
           console.error('Receipt sync failed:', error);
           showToast('Pembayaran tercatat di perangkat. Sinkronisasi cloud gagal; jalankan pembaruan skema Supabase.', 'warning');
@@ -3750,7 +3759,7 @@
         <div class="neo-empty-box">
           <div class="empty-glyph">🧾</div>
           <h3>Belum Ada Struk Riwayat</h3>
-          <p>Setelah belanja selesai, klik "Selesaikan Belanja" untuk menyimpan struk digital di sini.</p>
+          <p>Struk dari transaksi yang selesai akan tersimpan otomatis di sini.</p>
         </div>
       `;
       return;
