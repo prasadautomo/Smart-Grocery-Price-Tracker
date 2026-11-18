@@ -293,6 +293,7 @@
     initAuthModule();
     initSupabaseClient();
     setupNavigation();
+    initAstroCheckoutModule();
     setupEventListeners();
     setupSoundToggle();
     initShelfAdderTray();
@@ -3472,7 +3473,6 @@
     }
 
     renderAstroCatalog();
-    initAstroCheckoutModule();
   }
 
   function renderAstroCatalog() {
