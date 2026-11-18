@@ -4256,7 +4256,7 @@
     const purchasedItems = appState.planner.filter(p => p.isPurchased);
 
     if (pill) {
-      pill.textContent = `${purchasedItems.length}/${appState.planner.length} Terbeli`;
+      pill.textContent = `${purchasedItems.length}/${appState.planner.length} Terbeli`;`r`n      pill.classList.toggle('hidden', appState.planner.length === 0);
     }
 
     const plannerBadge = document.getElementById('navPlannerBadge');
@@ -4271,12 +4271,7 @@
 
     if (shelfContainer) {
       if (pendingItems.length === 0) {
-        shelfContainer.innerHTML = `
-          <div class="p-3 bg-secondary-fixed/20 rounded-2xl text-center text-secondary font-label-sm text-label-sm font-semibold flex items-center justify-center gap-2 border border-secondary/20">
-            <span class="material-symbols-outlined text-[18px]">verified</span>
-            <span>Semua kebutuhan terencana sudah dimasukkan ke troli! 🎉</span>
-          </div>
-        `;
+        shelfContainer.innerHTML = '';
       } else {
         let html = '';
         pendingItems.forEach(item => {
