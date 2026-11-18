@@ -687,50 +687,6 @@
         </div>
       </div>
 
-      <!-- Section: Atur Batas Dompet Belanja (Limit Uang Saku) -->
-      <div class="w-full bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-headline-sm text-base text-white font-bold flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-emerald-400 text-[20px]">tune</span>
-            <span>Atur Batas Uang Saku Dompet</span>
-          </h3>
-        </div>
-        <p class="font-body-sm text-xs text-stone-400 mb-space-sm">
-          Tentukan pagu maksimal anggaran belanja agar sistem memberikan peringatan saat troli mendekati batas:
-        </p>
-
-        <div class="flex gap-2 mb-space-sm">
-          <div class="relative flex-1">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-emerald-400">Rp</span>
-            <input type="number" id="inputBudgetSetting" placeholder="350000"
-              class="w-full pl-9 pr-3 py-2 bg-[#07080b] rounded-xl text-white font-numeric-md text-sm font-bold focus:outline-none focus:ring-1 focus:ring-emerald-400 border border-[#22293d]">
-          </div>
-          <button id="btnSaveBudgetSetting"
-            class="px-5 py-2 rounded-xl bg-emerald-600 text-white font-mono text-xs font-black shadow-md hover:bg-emerald-500 active:scale-95 transition-all cursor-pointer flex items-center gap-1 border border-emerald-500/40">
-            <span class="material-symbols-outlined text-[16px]">save</span>
-            <span>Simpan</span>
-          </button>
-        </div>
-
-        <div class="grid grid-cols-5 gap-1.5">
-          <button type="button"
-            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
-            onclick="setBudgetSetting(100000)">Rp 100k</button>
-          <button type="button"
-            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
-            onclick="setBudgetSetting(250000)">Rp 250k</button>
-          <button type="button"
-            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
-            onclick="setBudgetSetting(350000)">Rp 350k</button>
-          <button type="button"
-            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
-            onclick="setBudgetSetting(500000)">Rp 500k</button>
-          <button type="button"
-            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
-            onclick="setBudgetSetting(750000)">Rp 750k</button>
-        </div>
-      </div>
-
       <!-- Section: Alokasi Belanja per Kategori -->
       <div class="w-full bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
         <div class="flex items-center justify-between mb-3">

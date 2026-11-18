@@ -1330,11 +1330,6 @@
       budgetTabStatusPill.classList.add('hidden');
     }
 
-    const inputBudget = document.getElementById('inputBudgetSetting');
-    if (inputBudget && document.activeElement !== inputBudget) {
-      inputBudget.value = limit;
-    }
-
     if (window.lucide) {
       lucide.createIcons();
     }
@@ -1964,22 +1959,6 @@
         showToast('Batas anggaran berhasil disimpan', 'success');
       }
     });
-
-    // Budget Tab Save (tabDompet)
-    const btnSaveBudget = document.getElementById('btnSaveBudgetSetting');
-    if (btnSaveBudget) {
-      btnSaveBudget.addEventListener('click', () => {
-        const val = parseFloat(document.getElementById('inputBudgetSetting').value) || 0;
-        if (val > 0) {
-          appState.budgetLimit = val;
-          saveBudget();
-          updateBudgetHud();
-          renderBudgetBreakdown();
-          AudioEngine.playSuccess();
-          showToast('Batas anggaran dompet berhasil disimpan', 'success');
-        }
-      });
-    }
 
     // Cloud Sync Buttons
     const btnSyncHeader = document.getElementById('btnSyncCloudHeader');
@@ -3209,16 +3188,6 @@
     document.getElementById('inputQuickBudget').value = amount;
     AudioEngine.playTap();
   };
-  window.setBudgetSetting = function (amount) {
-    const el = document.getElementById('inputBudgetSetting');
-    if (el) el.value = amount;
-    appState.budgetLimit = amount;
-    saveBudget();
-    updateBudgetHud();
-    renderBudgetBreakdown();
-    AudioEngine.playTap();
-    showToast(`Batas anggaran disetel: Rp ${formatNumber(amount)}`, 'info');
-  };
 
   // ==========================================================================
   // SARAN PANGKAS BELANJAAN
@@ -3904,10 +3873,6 @@
   }
 
   function renderBudgetBreakdown() {
-    const inputEl = document.getElementById('inputBudgetSetting');
-    if (inputEl && document.activeElement !== inputEl) {
-      inputEl.value = appState.budgetLimit;
-    }
     const container = document.getElementById('categoryBreakdownList');
     if (!container) return;
 
