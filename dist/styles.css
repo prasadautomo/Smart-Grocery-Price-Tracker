@@ -1627,3 +1627,416 @@ button.bg-emerald-500 {
 .store-item-btn:active {
   transform: scale(0.99);
 }
+
+/* Cartly light mobile dashboard theme */
+:root {
+  --color-primary: #16243b;
+  --color-primary-container: #eef2f7;
+  --color-secondary: #079b70;
+  --color-secondary-container: #dff8ef;
+  --color-secondary-fixed: #00b981;
+  --color-citrus: #00b981;
+  --color-citrus-glow: #37d8ad;
+  --color-terracotta: #079b70;
+  --color-tertiary: #079b70;
+  --color-surface: #f4f7fb;
+  --color-surface-card: #ffffff;
+  --color-text-dark: #16243b;
+  --color-text-muted: #64748b;
+}
+
+html,
+body {
+  background: #f4f7fb !important;
+  color: #16243b !important;
+}
+
+body > header {
+  background: #ffffff !important;
+  border-color: #e5eaf1 !important;
+  box-shadow: 0 2px 12px rgba(28, 45, 71, 0.04) !important;
+}
+
+body > main {
+  background: #f4f7fb !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body > nav {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: #e3eaf2 !important;
+  box-shadow: 0 -5px 22px rgba(32, 50, 76, 0.08) !important;
+}
+
+nav.fixed.bottom-0 {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: #e3eaf2 !important;
+}
+
+.dock-tab:not(.dock-tab-hero) {
+  color: #7b8ba2 !important;
+}
+
+.dock-tab:not(.dock-tab-hero) span,
+.dock-tab:not(.dock-tab-hero) .material-symbols-outlined {
+  color: inherit !important;
+}
+
+.dock-tab:not(.active):not(.dock-tab-hero) span,
+.dock-tab:not(.active):not(.dock-tab-hero) .material-symbols-outlined {
+  color: #7b8ba2 !important;
+}
+
+.dock-tab.active:not(.dock-tab-hero) {
+  background: #e3f8ef !important;
+  color: #087b5c !important;
+  box-shadow: none !important;
+}
+
+.dock-tab.active:not(.dock-tab-hero) span,
+.dock-tab.active:not(.dock-tab-hero) .material-symbols-outlined {
+  color: #087b5c !important;
+}
+
+#btnEditBudgetTrigger,
+#btnStoreSelector {
+  background: #ffffff !important;
+  border-color: #e1e8f0 !important;
+  color: #263852 !important;
+}
+
+#btnEditBudgetTrigger span,
+#activeStoreName {
+  color: #263852 !important;
+}
+
+#btnGoogleLoginTrigger {
+  background: #ffffff !important;
+  border-color: #dce5ef !important;
+  color: #263852 !important;
+}
+
+#btnGoogleLoginTrigger:hover {
+  background: #f5f9fc !important;
+}
+
+.neo-toast {
+  background: #ffffff !important;
+  color: #263852 !important;
+  border-color: #dce5ef !important;
+  box-shadow: 0 10px 30px rgba(30, 50, 80, 0.16) !important;
+}
+
+#loginScreen,
+#loginScreen > div {
+  background: #f4f7fb !important;
+  border-color: #e5eaf1 !important;
+  color: #16243b !important;
+}
+
+#loginScreen .bg-emerald-950,
+#loginScreen [class*="bg-[#11131c]"],
+#loginScreen [class*="bg-[#07080b]"] {
+  background: #ffffff !important;
+}
+
+/* Replace legacy OLED surfaces with white cards across every tab and modal. */
+[class*="bg-[#07080b]"],
+[class*="bg-[#08090e]"],
+[class*="bg-[#0b0c14]"],
+[class*="bg-[#0c0e17]"],
+[class*="bg-[#0d0f17]"],
+[class*="bg-[#101722]"],
+[class*="bg-[#11131c]"],
+[class*="bg-[#111722]"],
+[class*="bg-[#151a24]"],
+[class*="bg-[#161926]"],
+[class*="bg-[#181d2a]"],
+[class*="bg-[#181d30]"],
+[class*="bg-[#202638]"],
+[class*="bg-[#202742]"],
+[class*="bg-[#202838]"],
+[class*="bg-[#20283a]"],
+[class*="bg-[#222638]"],
+[class*="bg-[#1c1f30]"],
+[class*="bg-[#1c2234]"],
+[class*="bg-[#1f2537]"] {
+  background-color: #ffffff !important;
+}
+
+[class*="bg-gradient-to-"],
+[class*="bg-gradient-to-r"] {
+  background-image: none !important;
+  background-color: #e8f8f2 !important;
+}
+
+[class*="text-white"],
+[class*="text-stone-100"],
+[class*="text-stone-200"],
+[class*="text-stone-300"],
+[class*="text-slate-100"],
+[class*="text-slate-200"],
+[class*="text-slate-300"] {
+  color: #263852 !important;
+}
+
+[class*="text-stone-600"],
+[class*="text-stone-700"],
+[class*="text-stone-800"],
+[class*="text-stone-900"],
+[class*="text-gray-700"],
+[class*="text-gray-800"],
+[class*="text-gray-900"] {
+  color: #263852 !important;
+}
+
+[class*="text-stone-400"],
+[class*="text-stone-500"],
+[class*="text-slate-400"],
+[class*="text-slate-500"],
+[class*="text-gray-400"],
+[class*="text-gray-500"],
+.text-on-surface-variant {
+  color: #687991 !important;
+}
+
+[class*="text-emerald-100"],
+[class*="text-emerald-200"],
+[class*="text-emerald-300"],
+[class*="text-emerald-400"],
+[class*="text-emerald-500"] {
+  color: #07835f !important;
+}
+
+[class*="text-amber-400"],
+[class*="text-orange-400"] {
+  color: #a85b09 !important;
+}
+
+[class*="text-rose-400"],
+[class*="text-red-400"] {
+  color: #b4233b !important;
+}
+
+[class*="border-[#1c"],
+[class*="border-[#1e"],
+[class*="border-[#20"],
+[class*="border-[#22"],
+[class*="border-[#26"],
+[class*="border-[#30"],
+[class*="border-[#39"],
+[class*="border-[#47"],
+[class*="border-stone-"] {
+  border-color: #e1e8f0 !important;
+}
+
+[class*="bg-emerald-950"],
+[class*="bg-emerald-900"],
+[class*="bg-emerald-800/"],
+[class*="bg-emerald-700/"],
+[class*="bg-emerald-600/"],
+[class*="bg-[#064e3b]"],
+[class*="bg-[#043427]"],
+[class*="bg-[#022c22]"] {
+  background-color: #e4f8f0 !important;
+}
+
+[class*="bg-emerald-600"],
+[class*="bg-emerald-700"] {
+  background-color: #11b98a !important;
+}
+
+.stitch-card,
+.neo-card-row,
+.neo-ticket-card,
+.neo-ticket-card.is-pending,
+.neo-ticket-card.is-checked,
+.neo-history-card,
+.neo-empty-box,
+.astro-product-card,
+.store-item-row,
+.cat-neo-row {
+  background: #ffffff !important;
+  color: #16243b !important;
+  border-color: #e2e9f1 !important;
+  box-shadow: 0 4px 16px rgba(37, 57, 85, 0.055) !important;
+}
+
+.neo-card-row.in-physical-cart,
+.neo-ticket-card.is-checked {
+  background: #f0faf6 !important;
+  border-color: #b9ead7 !important;
+}
+
+#astroCatalogGrid > div,
+#astroCatalogGrid h4,
+.astro-product-card h4 {
+  background-color: #ffffff !important;
+  color: #16243b !important;
+  border-color: #e2e9f1 !important;
+}
+
+.pos-register-panel,
+.pos-inset-slot {
+  background: #ffffff !important;
+  border-color: #e2e9f1 !important;
+  color: #263852 !important;
+  box-shadow: 0 4px 16px rgba(37, 57, 85, 0.055) !important;
+}
+
+.pos-dial-pill {
+  background: #f2f7fb !important;
+  border-color: #dfe7ef !important;
+  color: #263852 !important;
+  box-shadow: none !important;
+}
+
+.neo-history-card .h-date {
+  color: #263852 !important;
+}
+
+.neo-history-card .h-sub {
+  color: #687991 !important;
+}
+
+.neo-history-card .btn-neo-secondary,
+.neo-history-card .btn-neo-secondary:hover {
+  background: #e3f8ef !important;
+  border-color: #b9ead7 !important;
+  color: #087b5c !important;
+}
+
+.ticket-perforation-left::before {
+  background-color: #f4f7fb !important;
+  border-color: #dce5ef !important;
+}
+
+.cart-check-btn {
+  background: #ffffff !important;
+  border-color: #d2dce7 !important;
+  box-shadow: 0 2px 0 #e7edf4 !important;
+}
+
+.cart-check-btn.checked {
+  background: #11b98a !important;
+  border-color: #11b98a !important;
+  color: #ffffff !important;
+}
+
+.modal-backdrop {
+  background: rgba(32, 48, 70, 0.34) !important;
+}
+
+.modal-backdrop > div {
+  background: #ffffff !important;
+  border-color: #e0e7ef !important;
+  color: #16243b !important;
+  box-shadow: 0 18px 48px rgba(34, 52, 78, 0.18) !important;
+}
+
+.thermal-receipt-roll,
+.thermal-receipt-roll * {
+  background-color: #ffffff !important;
+  color: #263852 !important;
+}
+
+input,
+select,
+textarea {
+  background-color: #ffffff !important;
+  color: #16243b !important;
+  border-color: #dce5ef !important;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  background-color: #ffffff !important;
+  color: #16243b !important;
+  border-color: #dce5ef !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8a98aa !important;
+}
+
+#budgetHudCard,
+#budgetHudCard > div,
+.budget-reference-card {
+  background: #ffffff !important;
+  border: 1px solid #e3eaf2 !important;
+  border-radius: 1.25rem !important;
+  color: #16243b !important;
+  box-shadow: 0 8px 24px rgba(34, 53, 80, 0.07) !important;
+}
+
+#budgetHudCard .pointer-events-none {
+  display: none !important;
+}
+
+#budgetHudCard [class*="border-[#1c"] {
+  border-color: #e8edf3 !important;
+}
+
+#budgetHudCard [class*="bg-[#0b0c14]"],
+#budgetHudCard [class*="bg-[#202838]"] {
+  background: #edf8f4 !important;
+  border-color: #d9eee6 !important;
+}
+
+#budgetProgressTrack,
+#budgetHealthMeter {
+  border-color: #d8e7e0 !important;
+  box-shadow: none !important;
+}
+
+#budgetProgressTrack {
+  background: #e9f2ee !important;
+}
+
+.cat-track-neo {
+  background: #edf2f7 !important;
+  border-color: #dfe7ef !important;
+  box-shadow: none !important;
+}
+
+.cat-fill-neo {
+  box-shadow: none !important;
+}
+
+.bg-white,
+.bg-stone-50,
+.bg-stone-100,
+.bg-gray-50,
+.bg-slate-50 {
+  background-color: #ffffff !important;
+  border-color: #e1e8f0 !important;
+}
+
+#cartSummaryBottom > div {
+  background: #ffffff !important;
+  border: 1px solid #e4eaf1 !important;
+  box-shadow: 0 10px 30px rgba(30, 50, 80, 0.15) !important;
+}
+
+.neo-bottom-dock .dock-tab {
+  color: #7b8ba2 !important;
+}
+
+.neo-bottom-dock .dock-tab.active {
+  color: #07835f !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f7fb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}

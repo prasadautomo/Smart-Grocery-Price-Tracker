@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark h-full bg-[#07080b]" lang="id">
+<html class="h-full bg-[#f4f7fb]" lang="id">
 
 <head>
   <meta charset="utf-8" />
@@ -9,8 +9,8 @@
   <title>Cartly - Smart Grocery &amp; Budget Companion</title>
 
   <!-- PWA Settings -->
-  <link rel="manifest" href="manifest.json?v=5.3">
-  <meta name="theme-color" content="#07080b">
+  <link rel="manifest" href="manifest.json?v=5.4">
+  <meta name="theme-color" content="#f4f7fb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SmartGrocery">
@@ -33,14 +33,14 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#f8fafc",
-            "primary-container": "#161926",
-            "on-primary": "#07080b",
-            "on-primary-container": "#f1f5f9",
+            "primary": "#16243b",
+            "primary-container": "#eef2f7",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#263852",
             "secondary": "#10b981",
-            "secondary-container": "#064e3b",
+            "secondary-container": "#dff8ef",
             "on-secondary": "#ffffff",
-            "on-secondary-container": "#a7f3d0",
+            "on-secondary-container": "#087b5c",
             "secondary-fixed": "#10b981",
             "secondary-fixed-dim": "#059669",
             "on-secondary-fixed": "#07080b",
@@ -52,29 +52,29 @@
             "tertiary-fixed-dim": "#6ee7b7",
             "on-tertiary-fixed": "#022c22",
             "on-tertiary-fixed-variant": "#065f46",
-            "surface": "#07080b",
-            "surface-bright": "#1a1d2e",
-            "surface-dim": "#07080b",
-            "surface-container-lowest": "#07080b",
-            "surface-container-low": "#0d0f17",
-            "surface-container": "#11131c",
-            "surface-container-high": "#161926",
-            "surface-container-highest": "#1c1f30",
-            "on-surface": "#ffffff",
-            "on-surface-variant": "#ffffff",
-            "outline": "#334155",
-            "outline-variant": "#1e2438",
+            "surface": "#f4f7fb",
+            "surface-bright": "#ffffff",
+            "surface-dim": "#e9eef5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f8fafc",
+            "surface-container": "#ffffff",
+            "surface-container-high": "#f1f5f9",
+            "surface-container-highest": "#e7edf5",
+            "on-surface": "#16243b",
+            "on-surface-variant": "#64748b",
+            "outline": "#cbd5e1",
+            "outline-variant": "#e2e8f0",
             "citrus": "#10b981",
             "citrus-glow": "#34d399",
             "terracotta": "#059669",
-            "ink": "#0b0c14",
-            "ink-card": "#11131c",
+            "ink": "#f8fafc",
+            "ink-card": "#ffffff",
             "error": "#dc2626",
             "error-container": "#450a0a",
             "on-error": "#ffffff",
             "on-error-container": "#fecaca",
-            "background": "#07080b",
-            "on-background": "#f8fafc",
+            "background": "#f4f7fb",
+            "on-background": "#16243b",
             "surface-tint": "#10b981"
           },
           boxShadow: {
@@ -126,16 +126,16 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.3.0">
+  <link rel="stylesheet" href="styles.css?v=7.4.0">
 </head>
 
-<body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-400 selection:text-stone-950">
+<body class="bg-[#f4f7fb] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-200 selection:text-emerald-950">
 
   <!-- ================= AUTHENTICATION / LOGIN SCREEN ================= -->
   <div id="loginScreen"
-    class="hidden fixed inset-0 z-[100] bg-[#07080b] flex flex-col justify-between overflow-y-auto">
+    class="hidden fixed inset-0 z-[100] bg-[#f4f7fb] flex flex-col justify-between overflow-y-auto">
     <div
-      class="w-full max-w-[440px] mx-auto min-h-screen flex flex-col justify-between p-6 bg-[#07080b] border-x border-[#1c1f2e] shadow-2xl">
+      class="w-full max-w-[440px] mx-auto min-h-screen flex flex-col justify-between p-6 bg-white border-x border-slate-200 shadow-2xl">
 
       <!-- Top Branding (Clean & Minimalist) -->
       <div class="pt-12 text-center">
@@ -280,7 +280,7 @@
   <!-- ================= TOP APP HEADER ================= -->
   <header
     class="fixed top-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#07080b] pt-safe border-b border-[#1c1f2e] shadow-sm"
-    style="background-color: #07080b !important; opacity: 1 !important;">
+    style="background-color: #f4f7fb !important; opacity: 1 !important;">
     <div class="px-3 py-2 flex items-center justify-between gap-2">
       <!-- Left: Big Squircle Bag Icon & Stacked 3-Line Info -->
       <div class="flex items-center gap-2 min-w-0 flex-1">
@@ -354,7 +354,7 @@
 
       <!-- Top Live Gauge Card (Tactile Segmented Radar Display) -->
       <section class="w-full mb-space-md" id="budgetHudCard">
-        <div class="relative overflow-hidden rounded-[26px] bg-[#0c0e17] border-2 border-[#1e2438] p-4.5 pt-4 pb-5 shadow-2xl text-white">
+        <div class="budget-reference-card relative overflow-hidden rounded-[26px] bg-[#0c0e17] border-2 border-[#1e2438] p-4.5 pt-4 pb-5 shadow-2xl text-white">
           <!-- Subtle Glow Gradients -->
           <div
             class="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none">
@@ -955,7 +955,7 @@
   <!-- ================= DOCKED BOTTOM NAVIGATION (FROSTED GLASS SEMI-TRANSPARENT) ================= -->
   <nav
     class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#07080b]/90 backdrop-blur-2xl border-t border-x border-[#1c1f2e] shadow-[0_-8px_32px_rgba(24,21,18,0.12)] pb-safe"
-    style="background-color: rgba(7, 8, 11, 0.92) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);">
+    style="background-color: rgba(255, 255, 255, 0.96) !important; -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);">
     <div class="px-2.5 py-1.5 flex items-center justify-around relative">
 
       <!-- 1. Troli Aktif -->
@@ -1752,7 +1752,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=8.3.0"></script>
+  <script src="app.js?v=8.4.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {

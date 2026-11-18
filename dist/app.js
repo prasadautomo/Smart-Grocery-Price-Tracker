@@ -3523,7 +3523,7 @@
       const hasDiscount = prod.originalPrice && prod.originalPrice > prod.price;
 
       return `
-        <div class="astro-product-card bg-[#11131c] text-white border border-[#222638] rounded-2xl p-3 shadow-md flex flex-col justify-between" style="background-color: #11131c !important; color: #ffffff !important;" data-astro-id="${prod.id}">
+        <div class="astro-product-card bg-white text-slate-900 border border-slate-200 rounded-2xl p-3 shadow-sm flex flex-col justify-between" data-astro-id="${prod.id}">
           <div>
             <!-- Top Badges: Icon Only -->
             <div class="flex items-center justify-start gap-1 mb-2">
@@ -3531,13 +3531,13 @@
             </div>
 
             <!-- Title & Size: Guaranteed High Contrast White -->
-            <h4 class="font-headline-sm text-xs font-black text-white line-clamp-2 leading-snug mb-1" style="color: #ffffff !important; font-weight: 800 !important;" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
-            <div class="text-[11px] text-slate-300 font-semibold mb-2" style="color: #cbd5e1 !important;">${escapeHtml(prod.unit)}</div>
+              <h4 class="font-headline-sm text-xs font-black text-slate-900 line-clamp-2 leading-snug mb-1" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
+              <div class="text-[11px] text-slate-500 font-semibold mb-2">${escapeHtml(prod.unit)}</div>
 
             <!-- Pricing -->
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              ${hasDiscount ? `<del class="text-[10px] text-slate-400 font-mono" style="color: #94a3b8 !important;">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
-              <span class="font-extrabold text-[13px] text-emerald-400 font-mono" style="color: #34d399 !important;">Rp ${formatNumber(prod.price)}</span>
+              ${hasDiscount ? `<del class="text-[10px] text-slate-400 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
+              <span class="font-extrabold text-[13px] text-emerald-700 font-mono">Rp ${formatNumber(prod.price)}</span>
             </div>
           </div>
 
