@@ -563,14 +563,7 @@
 
       appState.soundEnabled = savedSound !== null ? savedSound === 'true' : true;
       appState.activeStore = savedStore || localStorage.getItem('smart_grocery_store') || 'Lotte Mart Grocery - Puri Indah';
-      if (appState.activeStore === 'GrandLucky SCBD') {
-        appState.activeStore = 'Lotte Mart Grocery - Puri Indah';
-        localStorage.setItem('smart_grocery_store', 'Lotte Mart Grocery - Puri Indah');
-      }
-      const storeEl = document.getElementById('activeStoreName');
-      if (storeEl) storeEl.textContent = appState.activeStore;
-      const scanViewStore = document.getElementById('scanViewStoreName');
-      if (scanViewStore) scanViewStore.textContent = appState.activeStore;
+      updateStoreAcrossApp(appState.activeStore);
 
       appState.supabaseUrl = SUPABASE_CONFIG.URL;
       appState.supabaseKey = SUPABASE_CONFIG.KEY;
@@ -3160,24 +3153,203 @@
   }
 
   // ==========================================================================
-  // SUPERMARKET STORE SELECTOR MODULE
+  // SUPERMARKET STORE SELECTOR MODULE (DYNAMIC & CUSTOM STORES)
   // ==========================================================================
+  const DEFAULT_SUPERMARKET_STORES = [
+    'Lotte Mart Grocery - Puri Indah',
+    'GrandLucky SCBD',
+    'Superindo Express',
+    'Hypermart Mega Mall',
+    'Alfamidi Super'
+  ];
+
+  function getStoredSupermarkets() {
+    try {
+      const raw = localStorage.getItem('smart_grocery_stores');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [...DEFAULT_SUPERMARKET_STORES];
+  }
+
+  function saveSupermarkets(list) {
+    try {
+      localStorage.setItem('smart_grocery_stores', JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  function renderStoreButtonsList() {
+    const container = document.getElementById('storeButtonsList');
+    if (!container) return;
+
+    const stores = getStoredSupermarkets();
+    const active = appState.activeStore || DEFAULT_SUPERMARKET_STORES[0];
+
+    let html = '';
+    stores.forEach(store => {
+      const isSelected = store === active;
+      const isCustom = !DEFAULT_SUPERMARKET_STORES.includes(store);
+
+      html += `
+        <div class="store-item-row flex items-center gap-2 p-1 rounded-xl transition-all ${isSelected ? 'bg-emerald-950/40 border border-emerald-500/40 shadow-sm' : 'bg-[#181d2a] border border-[#22293d] hover:border-stone-600'}">
+          <button type="button"
+            class="store-item-btn flex-1 p-2.5 text-left text-white flex items-center justify-between font-mono text-xs font-bold cursor-pointer transition-all min-w-0"
+            data-store="${escapeHtml(store)}"
+            onclick="window.selectStore('${escapeHtml(store)}')">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="material-symbols-outlined text-[16px] ${isSelected ? 'text-emerald-400' : 'text-stone-400'} shrink-0">storefront</span>
+              <span class="truncate ${isSelected ? 'text-emerald-300 font-black' : 'text-white'}">${escapeHtml(store)}</span>
+            </div>
+            <span class="material-symbols-outlined text-emerald-400 text-[18px] store-check-icon shrink-0 ${isSelected ? '' : 'hidden'}">check_circle</span>
+          </button>
+          ${isCustom ? `
+            <button type="button"
+              class="p-2 text-stone-500 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
+              onclick="window.removeCustomStore('${escapeHtml(store)}', event)"
+              title="Hapus supermarket ini">
+              <span class="material-symbols-outlined text-[16px]">delete</span>
+            </button>
+          ` : ''}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  window.addNewSupermarket = function () {
+    const input = document.getElementById('inputNewStoreName');
+    if (!input) return;
+    const name = input.value.trim();
+    if (!name || name.length < 2) {
+      showToast('Masukkan nama supermarket yang valid (min. 2 karakter)', 'warning');
+      AudioEngine.playLimitAlert();
+      return;
+    }
+
+    const stores = getStoredSupermarkets();
+    const existing = stores.find(s => s.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      selectStore(existing);
+      input.value = '';
+      showToast(`Supermarket "${existing}" sudah ada dan kini dipilih`, 'info');
+      return;
+    }
+
+    stores.unshift(name);
+    saveSupermarkets(stores);
+    input.value = '';
+
+    selectStore(name);
+    showToast(`✨ Supermarket baru ditambahkan: "${name}"`, 'success');
+    AudioEngine.playSuccess();
+  };
+
+  window.removeCustomStore = function (storeName, event) {
+    if (event) event.stopPropagation();
+    if (!confirm(`Hapus "${storeName}" dari daftar pilihan supermarket?`)) return;
+
+    let stores = getStoredSupermarkets();
+    stores = stores.filter(s => s !== storeName);
+    saveSupermarkets(stores);
+
+    if (appState.activeStore === storeName) {
+      selectStore(stores[0] || DEFAULT_SUPERMARKET_STORES[0]);
+    } else {
+      renderStoreButtonsList();
+    }
+    showToast(`Supermarket "${storeName}" dihapus`, 'info');
+  };
+
+  function updateStoreAcrossApp(storeName) {
+    if (!storeName) return;
+    const storeUpper = storeName.toUpperCase();
+
+    // 1. Top Header
+    const activeLabel = document.getElementById('activeStoreName');
+    if (activeLabel) activeLabel.textContent = storeName;
+
+    // 2. Scan View
+    const scanViewStore = document.getElementById('scanViewStoreName');
+    if (scanViewStore) scanViewStore.textContent = storeName;
+
+    // 3. Catalog Section
+    const catalogTitle = document.getElementById('catalogStoreTitle');
+    if (catalogTitle) catalogTitle.textContent = `Katalog ${storeName}`;
+
+    const catalogSub = document.getElementById('catalogStoreSubtitle');
+    if (catalogSub) catalogSub.innerHTML = `Daftar rak ${escapeHtml(storeName)} • Klik <strong class="text-emerald-400">+ Keranjang</strong> untuk belanja langsung`;
+
+    const bundleTitle = document.getElementById('bundleStoreTitle');
+    if (bundleTitle) bundleTitle.textContent = `Paket Sembako Komplit ${storeName}`;
+
+    const searchInput = document.getElementById('inputAstroSearch');
+    if (searchInput) searchInput.placeholder = `Cari barang di ${storeName} (Beras, Minyak, Telur, Mie)...`;
+
+    // 4. Checkout Modal
+    const checkoutTitle = document.getElementById('checkoutModalStoreTitle');
+    if (checkoutTitle) checkoutTitle.textContent = `Kasir Pembayaran ${storeName}`;
+
+    const checkoutPill = document.getElementById('checkoutModalStorePill');
+    if (checkoutPill) checkoutPill.textContent = storeName.split(/[\s-]+/)[0];
+
+    const checkoutSub = document.getElementById('checkoutModalStoreSubtitle');
+    if (checkoutSub) checkoutSub.textContent = `Rincian Belanja & Kasir ${storeName}`;
+
+    const checkoutStore = document.getElementById('checkoutStoreName');
+    if (checkoutStore) checkoutStore.textContent = storeName;
+
+    const voucherHeader = document.getElementById('checkoutVoucherHeaderTitle');
+    if (voucherHeader) voucherHeader.textContent = `VOUCHER PROMO ${storeUpper}`;
+
+    const qrisLabel = document.getElementById('checkoutQrisLabel');
+    if (qrisLabel) qrisLabel.textContent = `QRIS ${storeName}`;
+
+    const qrisImg = document.getElementById('checkoutQrisImage');
+    if (qrisImg) {
+      qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(storeName + '-QRIS-PAYMENT')}`;
+    }
+
+    // 5. POS Animation & Receipts
+    const posBadge = document.getElementById('posRegisterBadge');
+    if (posBadge) posBadge.textContent = `Kasir ${storeName}`;
+
+    const receiptHeader = document.getElementById('receiptStoreHeader');
+    if (receiptHeader) receiptHeader.textContent = storeUpper;
+
+    const receiptSystem = document.getElementById('receiptSystemLabel');
+    if (receiptSystem) receiptSystem.textContent = `Sistem Mandiri ${storeName}`;
+
+    const receiptFooter = document.getElementById('receiptFooterNote');
+    if (receiptFooter) receiptFooter.textContent = `Terima kasih telah berbelanja cerdas di ${storeName}! Simpan struk ini sebagai bukti pembayaran sah.`;
+
+    // 6. Update selection in store modal
+    renderStoreButtonsList();
+  }
+  window.updateStoreAcrossApp = updateStoreAcrossApp;
+
   function initStoreSelectorModule() {
-    const storeButtons = document.querySelectorAll('.store-item-btn');
-    storeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const storeName = btn.getAttribute('data-store');
-        if (storeName) {
-          selectStore(storeName);
+    renderStoreButtonsList();
+    const inputNew = document.getElementById('inputNewStoreName');
+    if (inputNew) {
+      inputNew.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          window.addNewSupermarket();
         }
       });
-    });
+    }
   }
 
   function openStoreModal() {
     AudioEngine.playTap();
+    renderStoreButtonsList();
     const modal = document.getElementById('modalStoreBackdrop');
     if (modal) modal.classList.remove('hidden');
+    const inputNew = document.getElementById('inputNewStoreName');
+    if (inputNew) setTimeout(() => inputNew.focus(), 150);
   }
 
   function closeStoreModal() {
@@ -3190,22 +3362,10 @@
     appState.selectedStore = storeName;
     saveStore(storeName);
 
-    const activeLabel = document.getElementById('activeStoreName');
-    if (activeLabel) activeLabel.textContent = storeName;
-    const scanViewStore = document.getElementById('scanViewStoreName');
-    if (scanViewStore) scanViewStore.textContent = storeName;
-
-    const storeButtons = document.querySelectorAll('.store-item-btn');
-    storeButtons.forEach(btn => {
-      const match = btn.getAttribute('data-store') === storeName;
-      btn.classList.toggle('active', match);
-      const chk = btn.querySelector('.store-check-icon');
-      if (chk) chk.classList.toggle('hidden', !match);
-    });
-
+    updateStoreAcrossApp(storeName);
     closeStoreModal();
     AudioEngine.playSuccess();
-    showToast(`Lokasi diubah: ${storeName}`, 'info');
+    showToast(`Lokasi supermarket diubah: ${storeName}`, 'info');
   }
   window.selectStore = selectStore;
 
@@ -4067,7 +4227,7 @@
 
     // Phase 1 (0ms - 1200ms): Connect to Gateway
     if (stepBadge) stepBadge.textContent = 'FASE 1 / 3';
-    if (stepTitle) stepTitle.textContent = '📡 Menghubungkan ke Lotte Mart Payment Gateway...';
+    if (stepTitle) stepTitle.textContent = `📡 Menghubungkan ke ${appState.activeStore} Payment Gateway...`;
     if (stepDesc) stepDesc.textContent = 'Mengunci pesanan dan memvalidasi saluran pembayaran terenkripsi.';
     if (progressBar) progressBar.style.width = '35%';
     AudioEngine.playBeep();
@@ -4084,7 +4244,7 @@
       currentProcessingTimer = setTimeout(() => {
         if (stepBadge) stepBadge.textContent = 'FASE 3 / 3';
         if (stepTitle) stepTitle.textContent = '🖨️ Mencetak Struk Kasir Thermal Digital...';
-        if (stepDesc) stepDesc.textContent = 'Mengesahkan struk bukti transaksi resmi Lotte Mart Grocery - Puri Indah.';
+        if (stepDesc) stepDesc.textContent = `Mengesahkan struk bukti transaksi resmi ${appState.activeStore}.`;
         if (progressBar) progressBar.style.width = '100%';
         AudioEngine.playPrinter();
 
@@ -4111,7 +4271,8 @@
     const serviceFee = astroCheckoutState.voucherCode === 'ONGKIRGRATIS' ? 0 : 1000;
     const grandTotal = Math.max(0, subtotal - discount + serviceFee);
 
-    const trxId = 'LOTTE-20261026-' + Math.floor(10000 + Math.random() * 90000);
+    const storePrefix = (appState.activeStore || 'CARTLY').split(/[\s-]+/)[0].toUpperCase();
+    const trxId = `${storePrefix}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
     const nowStr = new Date().toLocaleDateString('id-ID', {
       weekday: 'long',
       year: 'numeric',
@@ -4124,12 +4285,12 @@
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
     const methodLabels = {
-      'qris': 'QRIS Lotte Mart Instant (LUNAS)',
-      'astropay': 'LottePay E-Wallet (LUNAS)',
+      'qris': `QRIS ${appState.activeStore} Instant (LUNAS)`,
+      'astropay': `${storePrefix}Pay E-Wallet (LUNAS)`,
       'va': `Virtual Account ${astroCheckoutState.selectedVaBank} (LUNAS)`,
       'cash': 'Tunai di Kasir (LUNAS)'
     };
-    const paymentMethodLabel = methodLabels[astroCheckoutState.selectedMethod] || 'QRIS Lotte Mart (LUNAS)';
+    const paymentMethodLabel = methodLabels[astroCheckoutState.selectedMethod] || `QRIS ${appState.activeStore} (LUNAS)`;
 
     // Populate Thermal Receipt Elements
     const elTrx = document.getElementById('receiptTrxId');
@@ -4247,7 +4408,7 @@
     const elMethod = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
-    const text = `🧾 STRUK PEMBAYARAN LOTTE MART GROCERY - PURI INDAH\nNo. TRX: ${elTrx}\nPelanggan: ${elCust}\nMetode: ${elMethod}\nTOTAL: ${elGrand}\nStatus: LUNAS\nTerima kasih telah berbelanja di Lotte Mart Puri Indah!`;
+    const text = `🧾 STRUK PEMBAYARAN ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. TRX: ${elTrx}\nPelanggan: ${elCust}\nMetode: ${elMethod}\nTOTAL: ${elGrand}\nStatus: LUNAS\nTerima kasih telah berbelanja di ${appState.activeStore}!`;
 
     navigator.clipboard?.writeText(text);
     AudioEngine.playTap();
@@ -6454,6 +6615,8 @@
     renderBudgetBreakdown();
     renderHistoryList();
     renderMasterList();
+    updateStoreAcrossApp(appState.activeStore);
+    renderStoreButtonsList();
   }
 
 })();
