@@ -4907,7 +4907,6 @@
 
     const avatar = document.getElementById('profileModalAvatar');
     const displayName = document.getElementById('profileModalDisplayName');
-    const badge = document.getElementById('profileModalProviderBadge');
     const subtitle = document.getElementById('profileModalSubtitle');
     const cartCount = document.getElementById('profileModalCartCount');
     const budgetCap = document.getElementById('profileModalBudgetCap');
@@ -4932,12 +4931,6 @@
       }
     }
     if (displayName) displayName.textContent = appState.currentUser.displayName || appState.currentUser.username;
-    if (badge) {
-      badge.textContent = isGoogle ? 'Akun Google' : 'Email & Password';
-      badge.className = isGoogle
-        ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700'
-        : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-fixed/30 text-secondary';
-    }
     if (subtitle) {
       subtitle.textContent = isGoogle && appState.currentUser.email
         ? appState.currentUser.email
