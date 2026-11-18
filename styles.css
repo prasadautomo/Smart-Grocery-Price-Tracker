@@ -2019,6 +2019,11 @@ textarea::placeholder {
   border-radius: 1.15rem !important;
 }
 
+.cat-neo-meta,
+.cat-neo-meta strong {
+  color: #263852 !important;
+}
+
 .budget-reference-header,
 .budget-reference-usage,
 .budget-reference-limits {
