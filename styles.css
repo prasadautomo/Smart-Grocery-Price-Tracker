@@ -1074,6 +1074,11 @@ body {
   box-shadow: 0 2px 8px rgba(0, 184, 138, 0.3) !important;
 }
 
+.neo-cat-chip #countAll {
+  background-color: #222638 !important;
+  color: #d1d5db !important;
+}
+
 .neo-cat-chip.active #countAll {
   background-color: rgba(6, 37, 29, 0.18) !important;
   color: #06251d !important;
