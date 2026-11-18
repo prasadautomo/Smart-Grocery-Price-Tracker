@@ -1375,7 +1375,7 @@
     }
 
     emptyState.classList.add('hidden');
-    summaryBottom.classList.remove('hidden');
+    summaryBottom.classList.toggle('hidden', !document.getElementById('tabCart')?.classList.contains('active'));
 
     if (filteredItems.length === 0) {
       container.innerHTML = `
@@ -1800,6 +1800,7 @@
   function setupNavigation() {
     const navButtons = document.querySelectorAll('.dock-tab');
     const panes = document.querySelectorAll('.tab-pane');
+    const floatingCartSummary = document.getElementById('cartSummaryBottom');
 
     navButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1826,6 +1827,9 @@
         if (targetPane) {
           targetPane.classList.add('active');
           targetPane.classList.remove('hidden');
+        }
+        if (floatingCartSummary) {
+          floatingCartSummary.classList.toggle('hidden', paneId !== 'tabCart' || appState.cart.length === 0);
         }
 
         AudioEngine.playTap();

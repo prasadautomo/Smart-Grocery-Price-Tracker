@@ -126,7 +126,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.2.0">
+  <link rel="stylesheet" href="styles.css?v=7.3.0">
 </head>
 
 <body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-400 selection:text-stone-950">
@@ -641,35 +641,6 @@
         </div>
       </div>
 
-      <!-- Sticky Bottom Summary Dock Bar (Stitch Screen 4) -->
-      <div class="fixed bottom-[108px] z-40 w-full" id="cartSummaryBottom">
-        <div
-          class="bg-[#11131c]/95 backdrop-blur-xl rounded-[24px] p-3 shadow-2xl flex items-center justify-between gap-space-sm border-2 border-[#1e2338]">
-          <div class="flex flex-col pl-1">
-            <div class="flex items-center gap-1.5">
-              <span class="font-mono text-[10px] text-stone-400 font-bold uppercase" id="summaryTotalItems">0
-                Jenis (0 Pcs)</span>
-              <span class="w-1 h-1 rounded-full bg-stone-600"></span>
-              <span class="font-mono text-[10px] text-emerald-300 font-extrabold bg-emerald-950/70 border border-emerald-700/50 px-1.5 py-0.5 rounded-full" id="summaryTotalSaved">Hemat Rp
-                0</span>
-            </div>
-            <div class="flex items-baseline gap-1 mt-0.5">
-              <span class="font-mono text-[10px] text-stone-400 font-bold uppercase">Total</span>
-              <span class="font-headline-md text-[20px] font-black text-white tracking-tight"
-                id="cartBottomGrandTotal">Rp 0</span>
-            </div>
-          </div>
-          <button
-            class="min-h-12 px-4 sm:px-5 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-[#052016] border border-emerald-300 shadow-pos-key active:scale-[0.98] flex items-center justify-center gap-2 transition-all cursor-pointer font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white touch-manipulation"
-            id="btnFinishShopping" type="button" aria-label="Bayar dan buat struk">
-            <span class="material-symbols-outlined text-[20px]" aria-hidden="true">payments</span>
-            <span class="flex flex-col text-left leading-tight">
-              <span class="text-[13px] font-black uppercase tracking-wide">Bayar Sekarang</span>
-              <span class="text-[10px] font-semibold">Lanjut ke pembayaran</span>
-            </span>
-          </button>
-        </div>
-      </div>
     </section>
 
     <!-- ==========================================================================
@@ -954,6 +925,32 @@
     </section>
 
   </main>
+
+  <!-- Floating cart checkout, kept outside transformed tab panels so taps reach it -->
+  <div class="fixed bottom-[108px] z-40 w-full hidden" id="cartSummaryBottom">
+    <div class="bg-[#11131c]/95 backdrop-blur-xl rounded-[24px] p-3 shadow-2xl flex items-center justify-between gap-space-sm border-2 border-[#1e2338]">
+      <div class="flex flex-col pl-1 min-w-0">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="font-mono text-[10px] text-stone-300 font-bold uppercase truncate" id="summaryTotalItems">0 Jenis (0 Pcs)</span>
+          <span class="w-1 h-1 rounded-full bg-stone-500 shrink-0"></span>
+          <span class="font-mono text-[10px] text-emerald-300 font-extrabold bg-emerald-950/70 border border-emerald-700/50 px-1.5 py-0.5 rounded-full shrink-0" id="summaryTotalSaved">Hemat Rp 0</span>
+        </div>
+        <div class="flex items-baseline gap-1 mt-0.5">
+          <span class="font-mono text-[10px] text-stone-300 font-bold uppercase">Total</span>
+          <span class="font-headline-md text-[20px] font-black text-white tracking-tight" id="cartBottomGrandTotal">Rp 0</span>
+        </div>
+      </div>
+      <button
+        class="min-h-12 shrink-0 px-4 sm:px-5 rounded-2xl bg-emerald-400 hover:bg-emerald-300 text-[#052016] border border-emerald-300 shadow-pos-key active:scale-[0.98] flex items-center justify-center gap-2 transition-all cursor-pointer font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white touch-manipulation"
+        id="btnFinishShopping" type="button" aria-label="Bayar dan buat struk">
+        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">payments</span>
+        <span class="flex flex-col text-left leading-tight">
+          <span class="text-[13px] font-black uppercase tracking-wide">Bayar Sekarang</span>
+          <span class="text-[10px] font-semibold">Lanjut ke pembayaran</span>
+        </span>
+      </button>
+    </div>
+  </div>
 
   <!-- ================= DOCKED BOTTOM NAVIGATION (FROSTED GLASS SEMI-TRANSPARENT) ================= -->
   <nav
@@ -1755,7 +1752,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=8.2.0"></script>
+  <script src="app.js?v=8.3.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {
