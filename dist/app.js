@@ -4400,17 +4400,28 @@
       grandTotal += line;
     });
 
-    const categories = ['Bahan Pokok', 'Makanan & Minuman', 'Kebersihan', 'Dapur & Bumbu', 'Lainnya'];
+    const categories = [
+      { name: 'Bahan Pokok', icon: '🌾' },
+      { name: 'Makanan & Minuman', icon: '🍜' },
+      { name: 'Kebersihan', icon: '🧺' },
+      { name: 'Dapur & Bumbu', icon: '🍳' },
+      { name: 'Lainnya', icon: '📦' }
+    ];
     let html = '';
-    categories.forEach(cat => {
+    categories.forEach(item => {
+      const cat = item.name;
       const total = catTotals[cat] || 0;
       const pct = grandTotal > 0 ? ((total / grandTotal) * 100).toFixed(1) : 0;
 
       html += `
         <div class="cat-neo-row">
-          <div class="cat-neo-meta">
-            <span><strong>${cat}</strong> (${pct}%)</span>
-            <span>Rp ${formatNumber(total)}</span>
+          <div class="cat-neo-meta flex items-center justify-between mb-1.5 text-xs">
+            <span class="flex items-center gap-1.5">
+              <span class="text-sm">${item.icon}</span>
+              <strong class="text-white font-bold">${cat}</strong>
+              <span class="cat-pct text-stone-400 font-mono text-xs font-semibold">(${pct}%)</span>
+            </span>
+            <span class="cat-amt text-emerald-400 font-mono font-black text-xs">Rp ${formatNumber(total)}</span>
           </div>
           <div class="cat-track-neo">
             <div class="cat-fill-neo" style="width: ${pct}%;"></div>

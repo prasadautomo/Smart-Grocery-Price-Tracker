@@ -651,33 +651,56 @@ body {
   color: #34d399;
 }
 
-/* Budget Macro Category Rows */
+/* Budget Macro Category Rows (OLED Midnight Edition) */
 .cat-neo-row {
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.85rem;
 }
 
 .cat-neo-meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-family: var(--font-display);
-  font-size: 0.78rem;
-  color: #001d0f;
-  margin-bottom: 4px;
+  font-size: 0.82rem;
+  color: #ffffff !important;
+  margin-bottom: 6px;
+}
+
+.cat-neo-meta strong {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+.cat-neo-meta .cat-pct {
+  color: #94a3b8 !important;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+.cat-neo-meta .cat-amt {
+  color: #10b981 !important;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.82rem;
 }
 
 .cat-track-neo {
   width: 100%;
   height: 8px;
   border-radius: 9999px;
-  background: #e4f1e6;
+  background: #181d2a !important;
+  border: 1px solid #22293d !important;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6) !important;
 }
 
 .cat-fill-neo {
   height: 100%;
   border-radius: 9999px;
-  background: #006e2f;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6) !important;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Thermal Receipt Slip */
@@ -1497,6 +1520,7 @@ button.bg-emerald-500 {
 /* ==========================================================================
    BUDGET RADAR HUD CARD (OLED FINTECH EDITION)
    ========================================================================== */
+#budgetHudCard,
 #budgetHudCard > div {
   background: linear-gradient(145deg, #121522 0%, #0c0e17 60%, #07080d 100%) !important;
   border: 1.5px solid #1e2438 !important;

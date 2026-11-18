@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="dark h-full bg-[#07080b]" lang="id">
 
 <head>
@@ -126,7 +126,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=6.9.0">
+  <link rel="stylesheet" href="styles.css?v=7.0.0">
 </head>
 
 <body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-400 selection:text-stone-950">
@@ -919,86 +919,86 @@
     <section id="tabDompet" class="tab-pane flex-col w-full gap-space-md hidden">
 
       <!-- Header: Kendali Anggaran & Dompet -->
-      <div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20">
+      <div class="bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
               <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
             </div>
             <div>
-              <h2 class="font-headline-sm text-headline-sm text-primary font-bold">Kendali Anggaran &amp; Dompet</h2>
-              <span class="text-[10px] font-mono text-stone-500 uppercase tracking-wider font-bold">Safety Cap SRS F-05 • Dompet Kos</span>
+              <h2 class="font-headline-sm text-base text-white font-bold">Kendali Anggaran &amp; Dompet</h2>
+              <span class="text-[10px] font-mono text-stone-400 uppercase tracking-wider font-bold">Safety Cap SRS F-05 • Dompet Kos</span>
             </div>
           </div>
-          <span class="font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold" id="budgetTabStatusPill">● AMAN</span>
+          <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold" id="budgetTabStatusPill">● AMAN</span>
         </div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        <p class="font-body-sm text-xs text-stone-400 leading-relaxed">
           Pantau batas maksimal pengeluaran belanja bulanan agar kantong tetap aman, terkendali, dan bebas defisit di supermarket.
         </p>
       </div>
 
       <!-- Live Financial Radar Card (Macro Allocation & Meter) -->
-      <div class="w-full bg-gradient-to-br from-stone-900 via-stone-850 to-stone-900 text-white rounded-2xl p-space-md shadow-pos-key border-2 border-stone-800">
-        <div class="flex items-center justify-between mb-3 border-b border-stone-800 pb-2.5">
+      <div class="w-full bg-[#0c0e17] text-white rounded-2xl p-space-md shadow-pos-key border-2 border-[#1e2438]">
+        <div class="flex items-center justify-between mb-3 border-b border-[#1c2234] pb-2.5">
           <span class="text-[11px] font-mono font-bold text-white tracking-wider uppercase flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-citrus text-[15px]">donut_large</span>
+            <span class="material-symbols-outlined text-emerald-400 text-[15px]">donut_large</span>
             <span>Ringkasan Saldo Belanja</span>
           </span>
-          <span class="font-mono text-xs font-black text-citrus" id="budgetHealthPercent">0% Terpakai</span>
+          <span class="font-mono text-xs font-black text-emerald-400" id="budgetHealthPercent">0% Terpakai</span>
         </div>
 
         <div class="grid grid-cols-3 gap-2 text-center mb-3.5">
-          <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Batas Pagu</span>
+          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
+            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Batas Pagu</span>
             <strong class="font-mono text-xs sm:text-sm font-black text-white" id="hudDompetLimitDisplay">Rp 350.000</strong>
           </div>
-          <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Isi Troli</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-emerald-300" id="budgetCurrentSpend">Rp 0</strong>
+          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
+            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Isi Troli</span>
+            <strong class="font-mono text-xs sm:text-sm font-black text-emerald-400" id="budgetCurrentSpend">Rp 0</strong>
           </div>
-          <div class="bg-stone-800/80 rounded-xl p-2.5 border border-stone-700/60">
-            <span class="block text-[10px] font-mono text-white font-bold uppercase mb-0.5">Sisa Saldo</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-citrus" id="budgetRemainingAmount">Rp 350.000</strong>
+          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
+            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Sisa Saldo</span>
+            <strong class="font-mono text-xs sm:text-sm font-black text-emerald-400" id="budgetRemainingAmount">Rp 350.000</strong>
           </div>
         </div>
 
         <!-- Meter Gauge Bar -->
         <div class="space-y-1.5">
-          <div class="flex items-center justify-between text-[10px] font-mono font-bold text-white">
+          <div class="flex items-center justify-between text-[10px] font-mono font-bold text-stone-400">
             <span>Rp 0</span>
             <span class="text-white">Pagu Maksimal</span>
           </div>
-          <div class="w-full h-3 bg-stone-800 rounded-full overflow-hidden p-0.5 border border-stone-700">
+          <div class="w-full h-3 bg-[#08090e] rounded-full overflow-hidden p-0.5 border border-[#1f2537]">
             <div id="budgetHealthMeter" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
           </div>
           <div class="flex items-center justify-between text-[9px] font-mono text-white font-semibold">
             <span class="text-emerald-400">● Aman (&lt;90%)</span>
-            <span class="text-yellow-400">▲ Waspada (90-100%)</span>
+            <span class="text-amber-400">▲ Waspada (90-100%)</span>
             <span class="text-rose-400">🚨 Defisit (&gt;100%)</span>
           </div>
         </div>
       </div>
 
       <!-- Section: Atur Batas Dompet Belanja (Limit Uang Saku) -->
-      <div class="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20">
+      <div class="w-full bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
         <div class="flex items-center justify-between mb-2">
-          <h3 class="font-headline-sm text-headline-sm text-primary font-bold flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-secondary text-[20px]">tune</span>
+          <h3 class="font-headline-sm text-base text-white font-bold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">tune</span>
             <span>Atur Batas Uang Saku Dompet</span>
           </h3>
         </div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant mb-space-sm">
+        <p class="font-body-sm text-xs text-stone-400 mb-space-sm">
           Tentukan pagu maksimal anggaran belanja agar sistem memberikan peringatan saat troli mendekati batas:
         </p>
 
         <div class="flex gap-2 mb-space-sm">
           <div class="relative flex-1">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-stone-500">Rp</span>
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs font-bold text-emerald-400">Rp</span>
             <input type="number" id="inputBudgetSetting" placeholder="350000"
-              class="w-full pl-9 pr-3 py-2 bg-surface-container-low rounded-xl text-on-surface font-numeric-md text-numeric-md font-bold focus:outline-none focus:ring-1 focus:ring-secondary border border-outline-variant/30">
+              class="w-full pl-9 pr-3 py-2 bg-[#07080b] rounded-xl text-white font-numeric-md text-sm font-bold focus:outline-none focus:ring-1 focus:ring-emerald-400 border border-[#22293d]">
           </div>
           <button id="btnSaveBudgetSetting"
-            class="px-5 py-2 rounded-xl bg-primary text-on-primary font-label-sm text-label-sm font-bold shadow-md hover:bg-primary-container active:scale-95 transition-all cursor-pointer flex items-center gap-1">
+            class="px-5 py-2 rounded-xl bg-emerald-600 text-white font-mono text-xs font-black shadow-md hover:bg-emerald-500 active:scale-95 transition-all cursor-pointer flex items-center gap-1 border border-emerald-500/40">
             <span class="material-symbols-outlined text-[16px]">save</span>
             <span>Simpan</span>
           </button>
@@ -1006,36 +1006,36 @@
 
         <div class="grid grid-cols-5 gap-1.5">
           <button type="button"
-            class="py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-xs font-bold hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/20"
+            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
             onclick="setBudgetSetting(100000)">Rp 100k</button>
           <button type="button"
-            class="py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-xs font-bold hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/20"
+            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
             onclick="setBudgetSetting(250000)">Rp 250k</button>
           <button type="button"
-            class="py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-xs font-bold hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/20"
+            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
             onclick="setBudgetSetting(350000)">Rp 350k</button>
           <button type="button"
-            class="py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-xs font-bold hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/20"
+            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
             onclick="setBudgetSetting(500000)">Rp 500k</button>
           <button type="button"
-            class="py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-xs font-bold hover:bg-surface-container active:scale-95 transition-all cursor-pointer border border-outline-variant/20"
+            class="py-1.5 rounded-lg bg-[#181d2a] text-stone-300 font-mono text-xs font-bold hover:text-white hover:bg-[#22293d] active:scale-95 transition-all cursor-pointer border border-[#22293d]"
             onclick="setBudgetSetting(750000)">Rp 750k</button>
         </div>
       </div>
 
       <!-- Section: Alokasi Kategori Belanja (SRS F-05 Macro Allocator) -->
-      <div class="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20">
+      <div class="w-full bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-secondary text-[20px]">pie_chart</span>
-            <h3 class="font-headline-sm text-headline-sm text-primary font-bold">Alokasi Kategori Belanja</h3>
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">pie_chart</span>
+            <h3 class="font-headline-sm text-base text-white font-bold tracking-tight">Alokasi Kategori Belanja</h3>
           </div>
-          <span class="text-[11px] font-bold text-secondary bg-surface-container-low px-2 py-0.5 rounded-full">Pantauan Realtime</span>
+          <span class="text-[11px] font-mono font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">Pantauan Realtime</span>
         </div>
-        <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+        <p class="font-body-sm text-xs text-stone-400 mb-3.5">
           Sebaran pemakaian dompet saat ini per kelompok kebutuhan belanja:
         </p>
-        <div id="categoryBreakdownList" class="space-y-2">
+        <div id="categoryBreakdownList" class="space-y-3">
           <!-- Rendered by JavaScript -->
         </div>
       </div>
@@ -2182,7 +2182,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=6.9.1"></script>
+  <script src="app.js?v=7.0.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {
