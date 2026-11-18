@@ -126,7 +126,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.4.0">
+  <link rel="stylesheet" href="styles.css?v=7.5.0">
 </head>
 
 <body class="bg-[#f4f7fb] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-200 selection:text-emerald-950">
@@ -354,74 +354,34 @@
 
       <!-- Top Live Gauge Card (Tactile Segmented Radar Display) -->
       <section class="w-full mb-space-md" id="budgetHudCard">
-        <div class="budget-reference-card relative overflow-hidden rounded-[26px] bg-[#0c0e17] border-2 border-[#1e2438] p-4.5 pt-4 pb-5 shadow-2xl text-white">
-          <!-- Subtle Glow Gradients -->
-          <div
-            class="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none">
-          </div>
-          <div
-            class="absolute -left-6 -bottom-6 w-36 h-36 rounded-full bg-emerald-600/10 blur-2xl pointer-events-none">
-          </div>
-
-          <!-- Top Row: Live Tracker Title & Savings Badge -->
-          <div class="relative z-10 flex items-center justify-between mb-3.5 border-b border-[#1c2234] pb-3">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-emerald-400 text-[18px]">query_stats</span>
-              <span class="font-mono text-xs font-black text-white uppercase tracking-wider">Live Budget Tracker</span>
-            </div>
-            <!-- Hidden anchor for script compatibility -->
-            <div id="hudStatusBadge" class="hidden" style="display:none !important;"><span id="hudStatusText"></span></div>
-            <!-- Savings Badge: Tactile Rubber Stamp with slight tilt -->
-            <div
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600/90 text-white font-mono text-[10.5px] font-black uppercase tracking-wider shadow-sm border border-emerald-400/30"
-              id="hudSavingsBadge">
-              <span class="material-symbols-outlined text-[14px]"
-                style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
-              <span id="hudTotalSavingsText">HEMAT Rp 0</span>
+        <div class="budget-reference-card">
+          <div class="budget-reference-header">
+            <span class="budget-reference-label">Total Belanja Berjalan</span>
+            <div class="budget-reference-usage">
+              <span class="budget-reference-label">Pemakaian</span>
+              <span id="budgetPercentBadge"><span id="budgetPercentLabel">0%</span></span>
             </div>
           </div>
 
-          <!-- Main Numbers Group -->
-          <div class="relative z-10 flex flex-col mb-3.5">
-            <div class="flex items-center justify-between mb-1">
-              <span class="font-mono text-[11px] tracking-wide text-slate-300 uppercase font-bold">Total Belanja Berjalan</span>
-              <span class="font-mono text-[11px] text-slate-300 uppercase font-bold">Pemakaian Anggaran</span>
-            </div>
-            <div class="flex items-baseline justify-between gap-space-xs">
-              <div class="flex items-baseline gap-1.5">
-                <span class="font-headline-md text-emerald-400 text-[24px] sm:text-[26px] font-black leading-none drop-shadow">Rp</span>
-                <span class="font-numeric-lg text-[36px] sm:text-[40px] text-white tracking-tight font-black leading-none drop-shadow-md"
-                  id="hudTotalSpending">0</span>
-              </div>
-              <div class="text-right">
-                <span class="font-mono text-sm sm:text-base text-emerald-300 font-black tracking-tight" id="budgetPercentLabel">0%</span>
-              </div>
-            </div>
+          <div class="budget-reference-total">
+            <span>Rp</span>
+            <strong id="hudTotalSpending">0</strong>
           </div>
 
-          <!-- Tactile Gauge Bar -->
-          <div class="relative z-10 space-y-2">
-            <div class="flex items-center justify-between font-mono text-[11px]" id="hudRemainingContainer">
-              <div class="flex items-center gap-1.5" id="hudRemainingText">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#222638]">
-                  <span class="text-stone-400 text-[10.5px] font-semibold">Sisa Aman:</span>
-                  <strong class="text-emerald-400 font-black text-[12.5px]">Rp 350.000</strong>
-                </span>
-              </div>
-              <div class="text-[11px] font-mono text-slate-300 font-semibold">
-                Batas: <span class="text-white font-bold" id="hudSubtickLimit">Rp 350.000</span>
-              </div>
+          <div class="budget-reference-limits" id="hudRemainingContainer">
+            <div id="hudRemainingText">
+              <span><span>Sisa anggaran:</span><strong>Rp 350.000</strong></span>
             </div>
-
-            <div id="budgetProgressTrack" class="w-full h-2.5 rounded-full bg-[#202838] border border-[#39445b] overflow-hidden" role="progressbar" aria-label="Pemakaian anggaran" aria-valuemin="0" aria-valuemax="100">
-              <div id="budgetProgressBar" class="h-full w-0 rounded-full bg-emerald-400 transition-all duration-300" style="width: 0%;"></div>
-            </div>
-
-            <div class="flex justify-between px-1 text-[10px] font-mono text-slate-300 font-bold">
-              <span>Rp 0</span>
-              <span id="hudSubtickMax">100% Limit</span>
-            </div>
+            <div class="budget-reference-cap">Batas: <strong id="hudSubtickLimit">Rp 350.000</strong></div>
           </div>
+
+          <div id="budgetProgressTrack" class="budget-reference-track" role="progressbar" aria-label="Pemakaian anggaran" aria-valuemin="0" aria-valuemax="100">
+            <div id="budgetProgressBar" style="width: 0%;"></div>
+          </div>
+
+          <span id="hudSubtickMax" class="hidden">100% Limit</span>
+          <span id="hudSavingsBadge" class="hidden"><span id="hudTotalSavingsText"></span></span>
+          <span id="hudStatusBadge" class="hidden" style="display:none !important;"><span id="hudStatusText"></span></span>
         </div>
       </section>
 
