@@ -257,13 +257,13 @@ body {
 .unit-rate-mono {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: #f8fafc;
+  color: #263852;
   font-weight: 600;
 }
 
 .unit-rate-mono .strike {
   text-decoration: line-through;
-  color: #9c9184;
+  color: #687991;
   margin-right: 4px;
   font-size: 0.72rem;
 }

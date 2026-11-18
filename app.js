@@ -1631,6 +1631,9 @@
     inputItemName.value = item.name;
     selectItemCategory.value = item.category;
     selectItemUnit.value = item.unit;
+    if (!inputItemPrice.value && item.lastPrice > 0) {
+      inputItemPrice.value = item.lastPrice;
+    }
     autoSuggestContainer.classList.add('hidden');
     updateModalLiveCalculations();
     AudioEngine.playTap();
