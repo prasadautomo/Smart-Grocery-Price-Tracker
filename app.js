@@ -178,7 +178,7 @@
     { id: 'plan-7', name: 'Pasta Gigi Herbal 190g', category: 'Kebersihan', unit: 'pcs', qty: 1, isPurchased: false, createdAt: Date.now() - 300000 }
   ];
 
-  // Default Cart - Skenario Uji 4: Indikator Komparasi Fluktuasi Harga Realtime Lotte Mart Puri Indah (SRS F-04)
+  // Default cart items for the starter experience.
   const DEFAULT_SAMPLE_CART = [
     {
       id: 'item-1',
@@ -1163,49 +1163,6 @@
   }
 
   // ==========================================================================
-  // F-04: DETEKSI FLUKTUASI HARGA REALTIME VS BULAN LALU
-  // ==========================================================================
-  function comparePriceWithLastMonth(currentPrice, lastMonthPrice) {
-    const cur = Number(currentPrice) || 0;
-    const last = Number(lastMonthPrice) || 0;
-
-    if (!last || last <= 0) {
-      return {
-        status: 'new',
-        text: 'BARU',
-        icon: 'sparkles',
-        badgeClass: 'new'
-      };
-    }
-
-    const diff = cur - last;
-    const pct = ((diff / last) * 100).toFixed(1);
-
-    if (diff > 0) {
-      return {
-        status: 'up',
-        text: `+Rp ${formatNumber(diff)} (+${pct}%)`,
-        icon: 'arrow-up',
-        badgeClass: 'up'
-      };
-    } else if (diff < 0) {
-      return {
-        status: 'down',
-        text: `-Rp ${formatNumber(Math.abs(diff))} (${pct}%)`,
-        icon: 'arrow-down',
-        badgeClass: 'down'
-      };
-    } else {
-      return {
-        status: 'stable',
-        text: `Tetap (Rp ${formatNumber(cur)})`,
-        icon: 'equal',
-        badgeClass: 'stable'
-      };
-    }
-  }
-
-  // ==========================================================================
   // F-05: PENGENDALI ANGGARAN (NEO-BENTO SAFETY CAP) CALCULATION & UI
   // ==========================================================================
   function updateBudgetHud() {
@@ -1390,7 +1347,6 @@
     let html = '';
     filteredItems.forEach((item, index) => {
       const discount = calculateDiscount(item.price, item.discountRaw);
-      const comparison = comparePriceWithLastMonth(item.price, item.lastMonthPrice);
       const lineTotal = discount.finalUnitPrice * item.qty;
       const hasDiscount = discount.savedPerUnit > 0;
       const isChecked = !!item.inPhysicalCart;
@@ -1453,12 +1409,6 @@
             <span class="unit-rate-mono">
               ${hasDiscount ? `<span class="strike text-stone-400">Rp ${formatNumber(item.price)}</span>` : ''}
               <strong>Rp ${formatNumber(discount.finalUnitPrice)}</strong><span class="text-stone-500">/${escapeHtml(item.unit)}</span>
-            </span>
-
-            <!-- F-04: Comparison Badge -->
-            <span class="neo-badge-indicator ${comparison.badgeClass}">
-              <i data-lucide="${comparison.icon}"></i>
-              <span>${comparison.text}</span>
             </span>
 
             <!-- F-03: Stamped Discount Rubber Stamp -->
@@ -1567,7 +1517,6 @@
   const selectItemUnit = document.getElementById('selectItemUnit');
   const inputItemQty = document.getElementById('inputItemQty');
   const inputItemPrice = document.getElementById('inputItemPrice');
-  const inputItemLastMonthPrice = document.getElementById('inputItemLastMonthPrice');
   const inputItemDiscount = document.getElementById('inputItemDiscount');
   const autoSuggestContainer = document.getElementById('autoSuggestContainer');
 
@@ -1588,7 +1537,6 @@
       selectItemUnit.value = item.unit;
       inputItemQty.value = item.qty;
       inputItemPrice.value = item.price;
-      inputItemLastMonthPrice.value = item.lastMonthPrice || '';
       inputItemDiscount.value = item.discountRaw || '';
     } else {
       title.textContent = 'Tambah ke Troli';
@@ -1616,7 +1564,6 @@
 
   function updateModalLiveCalculations() {
     const price = parseFloat(inputItemPrice.value) || 0;
-    const lastPrice = parseFloat(inputItemLastMonthPrice.value) || 0;
     const qty = parseInt(inputItemQty.value, 10) || 1;
     const discountRaw = inputItemDiscount.value.trim();
 
@@ -1643,21 +1590,7 @@
       if (discPreview) discPreview.classList.add('hidden');
     }
 
-    // 2. Comparison Badge
-    const compPill = document.getElementById('modalComparePill');
-    if (price > 0 && lastPrice > 0) {
-      const comp = comparePriceWithLastMonth(price, lastPrice);
-      compPill.className = `neo-badge-indicator ${comp.badgeClass}`;
-      compPill.innerHTML = `<i data-lucide="${comp.icon}"></i> <span>${comp.text}</span>`;
-    } else if (price > 0) {
-      compPill.className = 'neo-badge-indicator new';
-      compPill.innerHTML = `<i data-lucide="sparkles"></i> <span>Item baru atau tanpa acuan harga lalu</span>`;
-    } else {
-      compPill.className = 'neo-badge-indicator stable';
-      compPill.innerHTML = `<i data-lucide="minus"></i> <span>Masukkan harga untuk cek fluktuasi</span>`;
-    }
-
-    // 3. Subtotal
+    // 2. Subtotal
     const lineTotal = disc.finalUnitPrice * qty;
     document.getElementById('modalLineTotal').textContent = `Rp ${formatNumber(lineTotal)}`;
 
@@ -1686,9 +1619,6 @@
             <strong>${escapeHtml(m.name)}</strong>
             <small style="display:block; color:var(--text-muted); font-size:0.65rem;">${escapeHtml(m.category)} • ${escapeHtml(m.unit)}</small>
           </div>
-          <span style="font-family:var(--font-mono); color:var(--volt-main); font-size:0.72rem;">
-            Lalu: Rp ${formatNumber(m.lastPrice)}
-          </span>
         </div>
       `;
     });
@@ -1704,10 +1634,6 @@
     inputItemName.value = item.name;
     selectItemCategory.value = item.category;
     selectItemUnit.value = item.unit;
-    inputItemLastMonthPrice.value = item.lastPrice;
-    if (!inputItemPrice.value) {
-      inputItemPrice.value = item.lastPrice;
-    }
     autoSuggestContainer.classList.add('hidden');
     updateModalLiveCalculations();
     AudioEngine.playTap();
@@ -1722,7 +1648,6 @@
     const unit = selectItemUnit.value;
     const qty = parseInt(inputItemQty.value, 10) || 1;
     const price = parseFloat(inputItemPrice.value) || 0;
-    const lastMonthPrice = parseFloat(inputItemLastMonthPrice.value) || 0;
     const discountRaw = inputItemDiscount.value.trim();
 
     if (!name) {
@@ -1739,28 +1664,19 @@
       return;
     }
 
-    // Auto-detect last month price from master database if not manually specified
-    if (!lastMonthPrice) {
-      const match = appState.masterItems.find(m => m.name.toLowerCase() === name.toLowerCase())
-        || appState.masterItems.find(m => m.name.toLowerCase().includes(name.toLowerCase()));
-      if (match) {
-        lastMonthPrice = match.lastPrice;
-      }
-    }
-
     if (appState.editingItemId) {
       const idx = appState.cart.findIndex(i => i.id === appState.editingItemId);
       if (idx !== -1) {
         appState.cart[idx] = {
           ...appState.cart[idx],
-          name, category, unit, qty, price, lastMonthPrice, discountRaw
+          name, category, unit, qty, price, discountRaw
         };
         showToast(`"${name}" berhasil diubah`, 'success');
       }
     } else {
       const newItem = {
         id: 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-        name, category, unit, qty, price, lastMonthPrice, discountRaw,
+        name, category, unit, qty, price, discountRaw,
         createdAt: Date.now()
       };
       appState.cart.unshift(newItem);
@@ -1768,7 +1684,7 @@
     }
 
     AudioEngine.playTap();
-    updateMasterDatabaseItem(name, category, unit, lastMonthPrice || price);
+    updateMasterDatabaseItem(name, category, unit, price);
     saveCart();
     renderCart();
     closeItemModal();
@@ -1842,7 +1758,6 @@
           renderDompetTab();
         } else if (paneId === 'tabHistory') {
           renderHistoryList();
-          renderMasterList();
         } else if (paneId === 'tabCart') {
           renderCart();
         }
@@ -1850,36 +1765,6 @@
         if (window.lucide) lucide.createIcons();
       });
     });
-
-    // Sub tabs in History (Screen 1 Stitch)
-    const subTabHistory = document.getElementById('btnSubHistory');
-    const subTabMaster = document.getElementById('btnSubMaster');
-    const subViewHistory = document.getElementById('subViewHistory');
-    const subViewMaster = document.getElementById('subViewMaster');
-
-    if (subTabHistory && subTabMaster) {
-      subTabHistory.addEventListener('click', () => {
-        subTabHistory.classList.add('active', 'bg-emerald-600', 'text-white');
-        subTabHistory.classList.remove('text-stone-400');
-        subTabMaster.classList.remove('active', 'bg-emerald-600', 'text-white');
-        subTabMaster.classList.add('text-stone-400');
-        if (subViewHistory) subViewHistory.classList.remove('hidden');
-        if (subViewMaster) subViewMaster.classList.add('hidden');
-        AudioEngine.playTap();
-        renderHistoryList();
-      });
-
-      subTabMaster.addEventListener('click', () => {
-        subTabMaster.classList.add('active', 'bg-emerald-600', 'text-white');
-        subTabMaster.classList.remove('text-stone-400');
-        subTabHistory.classList.remove('active', 'bg-emerald-600', 'text-white');
-        subTabHistory.classList.add('text-stone-400');
-        if (subViewMaster) subViewMaster.classList.remove('hidden');
-        if (subViewHistory) subViewHistory.classList.add('hidden');
-        AudioEngine.playTap();
-        renderMasterList();
-      });
-    }
 
     // Sub-mode tabs in Scan Screen (Screen 2 Stitch)
     const btnModeBarcode = document.getElementById('tab-scan-barcode');
@@ -1995,7 +1880,6 @@
     });
 
     inputItemPrice.addEventListener('input', updateModalLiveCalculations);
-    inputItemLastMonthPrice.addEventListener('input', updateModalLiveCalculations);
     inputItemDiscount.addEventListener('input', updateModalLiveCalculations);
     inputItemQty.addEventListener('input', updateModalLiveCalculations);
 
@@ -2201,20 +2085,6 @@
       btnFlip.addEventListener('click', flipScannerCamera);
     }
 
-    // Master DB
-    document.getElementById('searchMasterInput').addEventListener('input', (e) => {
-      renderMasterList(e.target.value.trim().toLowerCase());
-    });
-    document.getElementById('btnAddMasterItem').addEventListener('click', () => {
-      const name = prompt('Nama Barang Acuan:');
-      if (!name) return;
-      const price = parseFloat(prompt('Harga Acuan Bulan Lalu (Rp):', '10000')) || 0;
-      const cat = prompt('Kategori (Bahan Pokok / Makanan & Minuman / Kebersihan / Dapur & Bumbu):', 'Bahan Pokok') || 'Lainnya';
-      updateMasterDatabaseItem(name, cat, 'pcs', price);
-      renderMasterList();
-      showToast('Acuan harga ditambahkan', 'success');
-    });
-
     // Sync & Data
     document.getElementById('btnExportData')?.addEventListener('click', exportDataJson);
     document.getElementById('btnImportDataTrigger')?.addEventListener('click', () => {
@@ -2248,16 +2118,6 @@
 
     const formShelf = document.getElementById('formShelfPriceModal');
     if (formShelf) formShelf.addEventListener('submit', applyShelfPriceModalSubmit);
-
-    const inputShelf = document.getElementById('inputShelfPrice');
-    if (inputShelf) {
-      inputShelf.addEventListener('input', () => {
-        const val = parseFloat(inputShelf.value) || 0;
-        const last = currentShelfModalPlannerItem ?
-          (appState.masterItems.find(m => m.name.toLowerCase() === currentShelfModalPlannerItem.name.toLowerCase())?.lastPrice || 0) : 0;
-        updateShelfModalFluctuation(val, last);
-      });
-    }
 
     const btnCloseShelf = document.getElementById('btnCloseShelfModal');
     if (btnCloseShelf) {
@@ -2812,7 +2672,6 @@
       finalPrice: currentPrice,
       totalDiscount: totalDiscount,
       basePrice: basePrice,
-      lastMonthPrice: currentScannedItem.lastMonthPrice || currentScannedItem.price,
       sisa: sisa
     });
   }
@@ -2820,28 +2679,12 @@
   function updatePythonAnalysisCard(info) {
     const nameEl = document.getElementById('pyScannedName');
     const formulaEl = document.getElementById('pyFormulaBreakdown');
-    const compEl = document.getElementById('pyComparisonLabel');
     const capEl = document.getElementById('pyBudgetCapStatus');
 
     if (nameEl && info.name) nameEl.textContent = info.name;
     if (formulaEl) {
       const saved = info.totalDiscount || 0;
       formulaEl.textContent = `Nett: Rp ${formatNumber(info.finalPrice)} (Hemat Rp ${formatNumber(saved)})`;
-    }
-    if (compEl) {
-      const diff = info.finalPrice - info.lastMonthPrice;
-      if (diff > 0) {
-        const pct = info.lastMonthPrice > 0 ? ((diff / info.lastMonthPrice) * 100).toFixed(1) : 0;
-        compEl.textContent = `↑ Naik Rp ${formatNumber(diff)} (+${pct}%)`;
-        compEl.className = 'text-rose-400 font-bold';
-      } else if (diff < 0) {
-        const pct = info.lastMonthPrice > 0 ? ((Math.abs(diff) / info.lastMonthPrice) * 100).toFixed(1) : 0;
-        compEl.textContent = `↓ Turun Rp ${formatNumber(Math.abs(diff))} (-${pct}%)`;
-        compEl.className = 'text-emerald-400 font-bold';
-      } else {
-        compEl.textContent = '= Stabil (Sama dgn bulan lalu)';
-        compEl.className = 'text-secondary-fixed font-bold';
-      }
     }
     if (capEl) {
       if (info.sisa < 0) {
@@ -2867,13 +2710,12 @@
     const code = barcode || (currentScannedItem ? currentScannedItem.barcode : '8991002105432');
     const disc = discount !== undefined ? discount : (currentScannedItem ? currentScannedItem.defaultDiscounts || '15+5' : '15+5');
     const shelfPrice = currentScannedItem ? currentScannedItem.price : 38500;
-    const lastPrice = currentScannedItem ? currentScannedItem.lastMonthPrice : 34000;
     const itemName = currentScannedItem ? currentScannedItem.name : 'Minyak Goreng Sania Pouch';
 
     try {
       let data = null;
       try {
-        const res = await fetch(`/api/scan-python?barcode=${encodeURIComponent(code)}&discount=${encodeURIComponent(disc)}&price=${shelfPrice}&lastPrice=${lastPrice}`);
+        const res = await fetch(`/api/scan-python?barcode=${encodeURIComponent(code)}&discount=${encodeURIComponent(disc)}&price=${shelfPrice}`);
         if (res.ok) data = await res.json();
       } catch (netErr) {
         // Fallback offline calculation
@@ -2882,36 +2724,21 @@
       if (!data) {
         // High-precision local calculation fallback
         const discRes = calculateDiscount(shelfPrice, disc);
-        const diff = discRes.finalUnitPrice - lastPrice;
-        const pct = lastPrice > 0 ? ((diff / lastPrice) * 100).toFixed(1) : 0;
         data = {
           name: itemName,
           discount_result: {
             formula_text: discRes.discountTag || (disc ? `${disc}%` : 'Harga Normal'),
             final_price: discRes.finalUnitPrice
-          },
-          comparison: {
-            status: diff > 0 ? 'UP' : diff < 0 ? 'DOWN' : 'EQUAL',
-            label: diff > 0 ? `↑ Naik Rp ${formatNumber(diff)} (+${pct}%)`
-              : diff < 0 ? `↓ Turun Rp ${formatNumber(Math.abs(diff))} (${pct}%)`
-              : '= Stabil (Sama dng Bulan Lalu)'
           }
         };
       }
 
       const nameEl = document.getElementById('pyScannedName');
       const formulaEl = document.getElementById('pyFormulaBreakdown');
-      const compEl = document.getElementById('pyComparisonLabel');
       const capEl = document.getElementById('pyBudgetCapStatus');
 
       if (nameEl) nameEl.textContent = data.name;
       if (formulaEl) formulaEl.textContent = `${data.discount_result.formula_text} = Rp ${formatNumber(data.discount_result.final_price)}`;
-      if (compEl) {
-        compEl.textContent = data.comparison.label;
-        compEl.className = data.comparison.status === 'UP' ? 'text-rose-400 font-bold'
-          : data.comparison.status === 'DOWN' ? 'text-emerald-400 font-bold'
-          : 'text-secondary-fixed font-bold';
-      }
 
       const totalCart = appState.cart.reduce((s, it) => s + (it.price * it.qty), 0);
       const remaining = appState.budgetLimit - (totalCart + data.discount_result.final_price);
@@ -2967,7 +2794,6 @@
       unit: currentScannedItem.unit,
       qty: 1,
       price: currentScannedItem.price,
-      lastMonthPrice: currentScannedItem.lastMonthPrice || currentScannedItem.price,
       discountRaw: discountEffective,
       barcode: currentScannedItem.barcode,
       createdAt: Date.now(),
@@ -4075,42 +3901,6 @@
   };
 
   // ==========================================================================
-  // MASTER PRICE DATABASE LIST
-  // ==========================================================================
-  function renderMasterList(search = '') {
-    const container = document.getElementById('masterItemsList');
-    if (!container) return;
-
-    let items = appState.masterItems;
-    if (search) {
-      items = items.filter(i => i.name.toLowerCase().includes(search));
-    }
-
-    if (items.length === 0) {
-      container.innerHTML = '<div style="text-align:center; padding:14px; color:var(--text-muted); font-size:0.75rem;">Belum ada acuan harga.</div>';
-      return;
-    }
-
-    let html = '';
-    items.forEach(item => {
-      html += `
-        <div class="neo-master-row">
-          <div>
-            <div class="m-name">${escapeHtml(item.name)}</div>
-            <div class="m-spec">${escapeHtml(item.category)} • Satuan: ${escapeHtml(item.unit)}</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="m-price">Rp ${formatNumber(item.lastPrice)}</div>
-            <small style="font-family:var(--font-mono); color:var(--text-muted); font-size:0.62rem;">Harga Acuan</small>
-          </div>
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-  }
-
-  // ==========================================================================
   // BUDGET TAB BREAKDOWN & DOMPET TAB
   // ==========================================================================
   function renderDompetTab() {
@@ -4368,9 +4158,6 @@
       } else {
         let html = '';
         pendingItems.forEach(item => {
-          const master = appState.masterItems.find(m => m.name.toLowerCase() === item.name.toLowerCase());
-          const refPrice = master ? master.lastPrice : 0;
-
           html += `
             <div class="p-3 bg-surface-container-low rounded-2xl flex items-center justify-between gap-2 border border-outline-variant/30">
               <div class="flex-1 min-w-0">
@@ -4378,7 +4165,6 @@
                   <span class="text-[10px] font-bold uppercase px-2 py-0.2 rounded-full bg-surface-container text-secondary">
                     ${escapeHtml(item.category)}
                   </span>
-                  ${refPrice > 0 ? `<span class="text-[10px] text-on-surface-variant font-mono">Acuan bulan lalu: Rp ${formatNumber(refPrice)}</span>` : ''}
                 </div>
                 <h4 class="font-headline-sm text-[14px] text-primary font-bold truncate">${escapeHtml(item.name)}</h4>
                 <span class="font-body-sm text-[12px] text-on-surface-variant font-medium">Kebutuhan: <strong>${item.qty} ${escapeHtml(item.unit)}</strong></span>
@@ -4400,19 +4186,7 @@
     // 2. Render di Tab 3 (Shopping Planner Full List: #shoppingPlannerFullList)
     const fullContainer = document.getElementById('shoppingPlannerFullList');
     const badgeCount = document.getElementById('plannerActiveCountBadge');
-    const estCostEl = document.getElementById('plannerEstimatedCostTotal');
-
     if (badgeCount) badgeCount.textContent = `${appState.planner.length} Item`;
-
-    let totalEstCost = 0;
-    appState.planner.forEach(p => {
-      const master = appState.masterItems.find(m => m.name.toLowerCase() === p.name.toLowerCase());
-      if (master) totalEstCost += master.lastPrice * p.qty;
-    });
-
-    if (estCostEl) {
-      estCostEl.textContent = `Estimasi acuan belanja bulan lalu: Rp ${formatNumber(totalEstCost)}`;
-    }
 
     if (fullContainer) {
       if (appState.planner.length === 0) {
@@ -4420,8 +4194,6 @@
       } else {
         let html = '';
         appState.planner.forEach(item => {
-          const master = appState.masterItems.find(m => m.name.toLowerCase() === item.name.toLowerCase());
-          const estPrice = master ? master.lastPrice : 0;
           const isDone = item.isPurchased;
 
           html += `
@@ -4436,7 +4208,6 @@
                     <span>${item.qty} ${escapeHtml(item.unit)}</span>
                     <span>•</span>
                     <span>${escapeHtml(item.category)}</span>
-                    ${estPrice > 0 ? `<span>• Est. Rp ${formatNumber(estPrice * item.qty)}</span>` : ''}
                   </div>
                 </div>
               </div>
@@ -4468,69 +4239,13 @@
     document.getElementById('shelfModalItemName').textContent = item.name;
     document.getElementById('shelfModalItemSpec').textContent = `${item.qty} ${item.unit} • ${item.category}`;
 
-    const master = appState.masterItems.find(m => m.name.toLowerCase() === item.name.toLowerCase());
-    const lastPrice = master ? master.lastPrice : 0;
-    document.getElementById('shelfModalLastPriceText').textContent = lastPrice > 0 ? `Rp ${formatNumber(lastPrice)} / ${item.unit}` : 'Belum ada catatan';
-
     const inputPrice = document.getElementById('inputShelfPrice');
     inputPrice.value = '';
     document.getElementById('inputShelfDiscount').value = '';
 
-    updateShelfModalFluctuation(0, lastPrice);
-
     document.getElementById('modalShelfPriceBackdrop').classList.remove('hidden');
     inputPrice.focus();
   };
-
-  function updateShelfModalFluctuation(currentPrice, lastPrice) {
-    const box = document.getElementById('shelfModalFluctuationBox');
-    const icon = document.getElementById('shelfFluctuationIcon');
-    const title = document.getElementById('shelfFluctuationText');
-    const sub = document.getElementById('shelfFluctuationSub');
-
-    if (!box || !icon || !title || !sub) return;
-
-    if (!currentPrice || currentPrice <= 0) {
-      box.className = 'p-2.5 rounded-xl bg-surface-container flex items-center gap-2';
-      icon.textContent = 'query_stats';
-      icon.className = 'material-symbols-outlined text-[18px] text-secondary';
-      title.textContent = 'Ketik harga rak untuk melihat fluktuasi';
-      sub.textContent = 'Dibandingkan dengan catatan belanja bulan lalu';
-      return;
-    }
-
-    if (!lastPrice || lastPrice <= 0) {
-      box.className = 'p-2.5 rounded-xl bg-blue-50 border border-blue-200 flex items-center gap-2 text-blue-700';
-      icon.textContent = 'sparkles';
-      icon.className = 'material-symbols-outlined text-[18px] text-blue-600';
-      title.textContent = 'Barang Baru (Belum ada catatan bulan lalu)';
-      sub.textContent = `Harga Rp ${formatNumber(currentPrice)} akan dicatat sebagai acuan`;
-      return;
-    }
-
-    const diff = currentPrice - lastPrice;
-    const pct = ((diff / lastPrice) * 100).toFixed(1);
-
-    if (diff > 0) {
-      box.className = 'p-2.5 rounded-xl bg-red-50 border border-red-200 flex items-center gap-2 text-red-700';
-      icon.textContent = 'trending_up';
-      icon.className = 'material-symbols-outlined text-[18px] text-red-600';
-      title.textContent = `↑ Harga Naik +Rp ${formatNumber(diff)} (+${pct}%)`;
-      sub.textContent = `Bulan lalu Rp ${formatNumber(lastPrice)} ➔ Sekarang Rp ${formatNumber(currentPrice)}`;
-    } else if (diff < 0) {
-      box.className = 'p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2 text-emerald-800';
-      icon.textContent = 'trending_down';
-      icon.className = 'material-symbols-outlined text-[18px] text-emerald-600';
-      title.textContent = `↓ Harga Turun -Rp ${formatNumber(Math.abs(diff))} (-${Math.abs(pct)}%)`;
-      sub.textContent = `Lebih hemat dari bulan lalu (Rp ${formatNumber(lastPrice)})`;
-    } else {
-      box.className = 'p-2.5 rounded-xl bg-gray-50 border border-gray-200 flex items-center gap-2 text-gray-700';
-      icon.textContent = 'drag_handle';
-      icon.className = 'material-symbols-outlined text-[18px] text-gray-600';
-      title.textContent = `= Harga Tetap Stabil (Rp ${formatNumber(currentPrice)})`;
-      sub.textContent = 'Sama persis dengan belanjaan bulan lalu';
-    }
-  }
 
   function applyShelfPriceModalSubmit(e) {
     if (e) e.preventDefault();
@@ -4543,9 +4258,6 @@
       return;
     }
 
-    const master = appState.masterItems.find(m => m.name.toLowerCase() === currentShelfModalPlannerItem.name.toLowerCase());
-    const lastPrice = master ? master.lastPrice : price;
-
     const newCartItem = {
       id: 'item-' + Date.now(),
       name: currentShelfModalPlannerItem.name,
@@ -4553,7 +4265,6 @@
       unit: currentShelfModalPlannerItem.unit,
       qty: currentShelfModalPlannerItem.qty,
       price: price,
-      lastMonthPrice: lastPrice,
       discountRaw: discountRaw,
       createdAt: Date.now(),
       inPhysicalCart: true,
@@ -5351,7 +5062,6 @@
     renderShoppingPlannerSection();
     renderBudgetBreakdown();
     renderHistoryList();
-    renderMasterList();
     updateStoreAcrossApp(appState.activeStore);
     renderStoreButtonsList();
   }

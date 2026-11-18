@@ -682,8 +682,6 @@
         <div class="flex items-center justify-between mb-space-sm">
           <div>
             <h3 class="font-headline-sm text-label-lg text-primary font-bold">Daftar Rencana Belanja Aktif</h3>
-            <span class="font-body-sm text-[12px] text-on-surface-variant" id="plannerEstimatedCostTotal">Estimasi acuan
-              bulan lalu: Rp 0</span>
           </div>
           <span
             class="px-2.5 py-0.5 rounded-full bg-surface-container text-secondary font-label-sm text-label-sm font-bold"
@@ -698,23 +696,9 @@
     </section>
 
     <!-- ==========================================================================
-         TAB 4: STRUK PEMBELIAN & ACUAN HARGA (STITCH SCREEN 1)
+         TAB 4: STRUK PEMBELIAN
          ========================================================================== -->
     <section id="tabHistory" class="tab-pane flex-col w-full gap-space-md hidden">
-      <!-- Sub Tab Switcher: Struk vs Acuan Harga -->
-      <div class="flex bg-[#11131c] p-1 rounded-full mb-space-xs border border-[#1e2338] gap-1">
-        <button
-          class="flex-1 py-1.5 px-3 rounded-full bg-emerald-600 text-white font-mono text-xs font-black shadow-md transition-all active cursor-pointer"
-          id="btnSubHistory">
-          <span>Struk Pembelian</span>
-        </button>
-        <button
-          class="flex-1 py-1.5 px-3 rounded-full text-stone-400 font-mono text-xs font-bold hover:text-white transition-all cursor-pointer"
-          id="btnSubMaster">
-          <span>Daftar Acuan Harga</span>
-        </button>
-      </div>
-
       <!-- Sub View 1: Struk Pembelian Selesai -->
       <div id="subViewHistory" class="space-y-space-sm">
         <div class="flex items-center justify-between mb-2 px-1">
@@ -726,30 +710,6 @@
         </div>
         <div id="historyListContainer" class="space-y-space-sm">
           <!-- Rendered by JavaScript -->
-        </div>
-      </div>
-
-      <!-- Sub View 2: Acuan Harga Toko Bulan Lalu -->
-      <div id="subViewMaster" class="space-y-space-sm hidden">
-        <div class="flex items-center justify-between mb-1 px-1">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-bold uppercase tracking-wider">Harga
-            Acuan Bulan Lalu (Database Rian)</span>
-        </div>
-        <div class="flex items-center gap-2 mb-space-sm">
-          <div class="flex-1 relative">
-            <span
-              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline-variant text-[16px]">search</span>
-            <input type="text" id="searchMasterInput" placeholder="Cari acuan harga..."
-              class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-surface-container-lowest text-on-surface font-body-sm text-body-sm border border-outline-variant/30">
-          </div>
-          <button id="btnAddMasterItem"
-            class="px-3 py-1.5 rounded-xl bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold flex items-center gap-1 cursor-pointer">
-            <span class="material-symbols-outlined text-[15px]">add</span>
-            <span>Tambah</span>
-          </button>
-        </div>
-        <div id="masterItemsList" class="space-y-1.5">
-          <!-- Rendered dynamically -->
         </div>
       </div>
 
@@ -987,12 +947,6 @@
       <form id="formShelfPriceModal" class="space-y-4">
         <input type="hidden" id="shelfModalPlannerId">
 
-        <div class="p-3 bg-surface-container-low rounded-xl flex items-center justify-between">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">Harga Acuan Bulan Lalu:</span>
-          <strong class="font-numeric-md text-numeric-md text-primary font-bold" id="shelfModalLastPriceText">Rp
-            0</strong>
-        </div>
-
         <div>
           <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN DI RAK
             TOKO (RP) *</label>
@@ -1000,18 +954,6 @@
             <span class="absolute left-3 top-1/2 -translate-y-1/2 font-numeric-md text-outline">Rp</span>
             <input type="number" id="inputShelfPrice" placeholder="Contoh: 38000" required inputmode="numeric"
               class="w-full pl-10 pr-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-lg text-numeric-lg font-bold border border-outline-variant/30 focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
-          </div>
-        </div>
-
-        <!-- Fluktuasi Harga Badge Seketika -->
-        <div id="shelfModalFluctuationBox" class="p-2.5 rounded-xl bg-surface-container flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-secondary"
-            id="shelfFluctuationIcon">query_stats</span>
-          <div class="flex-1 min-w-0">
-            <span class="font-label-sm text-label-sm font-bold block" id="shelfFluctuationText">Ketik harga rak untuk
-              melihat fluktuasi</span>
-            <span class="font-body-sm text-[11px] text-on-surface-variant" id="shelfFluctuationSub">Dibandingkan dengan
-              catatan belanja bulan lalu</span>
           </div>
         </div>
 
@@ -1118,29 +1060,11 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN (RP)
-              *</label>
-            <input type="number" id="inputItemPrice" placeholder="18000" required inputmode="numeric"
-              class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md font-bold focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
-          </div>
-          <div>
-            <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA BULAN LALU
-              (RP)</label>
-            <input type="number" id="inputItemLastMonthPrice" placeholder="Otomatis" inputmode="numeric"
-              class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
-          </div>
-        </div>
-
-        <!-- Fluktuasi Badge -->
-        <div id="modalPriceComparisonBox">
-          <div
-            class="px-3 py-1.5 rounded-xl bg-surface-container-low text-secondary font-label-sm text-label-sm font-semibold flex items-center gap-1"
-            id="modalComparePill">
-            <span class="material-symbols-outlined text-[15px]">info</span>
-            <span id="modalCompareText">Masukkan harga untuk cek fluktuasi</span>
-          </div>
+        <div>
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN (RP)
+            *</label>
+          <input type="number" id="inputItemPrice" placeholder="18000" required inputmode="numeric"
+            class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md font-bold focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
         </div>
 
         <!-- Pilihan & Input Diskon Fleksibel -->
