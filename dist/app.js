@@ -2311,15 +2311,6 @@
       });
     }
 
-    // Sample Data
-    document.getElementById('btnLoadSampleData').addEventListener('click', () => {
-      appState.cart = JSON.parse(JSON.stringify(DEFAULT_SAMPLE_CART));
-      saveCart();
-      renderCart();
-      AudioEngine.playSuccess();
-      showToast('Data kebutuhan Rian dimuat', 'success');
-    });
-
     // Header Utility Buttons
     const btnCompareHeader = document.getElementById('btnQuickCompareHeader');
     if (btnCompareHeader) {
