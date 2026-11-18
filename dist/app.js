@@ -1312,7 +1312,6 @@
   // ==========================================================================
   function renderCart() {
     const container = document.getElementById('cartItemsList');
-    const emptyState = document.getElementById('emptyCartState');
     const summaryBottom = document.getElementById('cartSummaryBottom');
     const headerCount = document.getElementById('cartHeaderPillCount');
     if (headerCount) headerCount.textContent = `${appState.cart.length} LOT`;
@@ -1325,13 +1324,11 @@
 
     if (appState.cart.length === 0) {
       container.innerHTML = '';
-      emptyState.classList.remove('hidden');
       summaryBottom.classList.add('hidden');
       updateBudgetHud();
       return;
     }
 
-    emptyState.classList.add('hidden');
     summaryBottom.classList.toggle('hidden', !document.getElementById('tabCart')?.classList.contains('active'));
 
     if (filteredItems.length === 0) {
@@ -1861,7 +1858,6 @@
     }
 
     document.getElementById('btnOpenAddModal').addEventListener('click', () => openItemModal());
-    document.getElementById('btnEmptyAdd').addEventListener('click', () => openItemModal());
     document.getElementById('btnCloseItemModal').addEventListener('click', closeItemModal);
     document.getElementById('btnCancelModalItem').addEventListener('click', closeItemModal);
 
