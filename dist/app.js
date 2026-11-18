@@ -272,16 +272,6 @@
     realtimeChannel: null
   };
 
-  let astroCheckoutState = {
-    voucherCode: 'NONE',
-    voucherDiscount: 0,
-    selectedMethod: 'qris',
-    selectedVaBank: 'BCA',
-    cashPaid: 0,
-    qrisTimerInterval: null,
-    qrisSecondsRemaining: 900
-  };
-
   // Sound effects are disabled throughout Cartly.
   const AudioEngine = {
     init() {},
@@ -3193,7 +3183,7 @@
     if (receiptSystem) receiptSystem.textContent = `Sistem Mandiri ${storeName}`;
 
     const receiptFooter = document.getElementById('receiptFooterNote');
-    if (receiptFooter) receiptFooter.textContent = `Terima kasih telah berbelanja cerdas di ${storeName}! Simpan struk ini sebagai bukti pembayaran sah.`;
+    if (receiptFooter) receiptFooter.textContent = `Catatan belanja Cartly di ${storeName}. Struk ini bukan bukti pembayaran.`;
 
     // 6. Update selection in store modal
     renderStoreButtonsList();
@@ -3683,463 +3673,46 @@
   // ASTRO INTERACTIVE CASHIER CHECKOUT & RECEIPT ENGINE
   // Fitur pembayaran menarik dengan animasi mesin kasir & struk thermal
   // ==========================================================================
-  let currentProcessingTimer = null;
-  let qrisInterval = null;
-
+  // Shopping receipt flow: finalize the cart directly without payment steps.
   function initAstroCheckoutModule() {
-    // Finish Shopping button opens the interactive checkout modal
-    const btnFinish = document.getElementById('btnFinishShopping');
-    if (btnFinish) {
-      btnFinish.addEventListener('click', openAstroCheckoutModal);
-    }
-
-    const btnSticky = document.getElementById('btnCheckoutCashierSticky');
-    if (btnSticky) {
-      btnSticky.addEventListener('click', openAstroCheckoutModal);
-    }
-
-    // Close button
-    const btnClose = document.getElementById('btnCloseAstroCheckout');
-    if (btnClose) {
-      btnClose.addEventListener('click', closeAstroCheckoutModal);
-    }
-
-    const btnCloseReceipt = document.getElementById('btnCloseReceiptView');
-    if (btnCloseReceipt) {
-      btnCloseReceipt.addEventListener('click', closeAstroCheckoutModal);
-    }
-
-    // Voucher selection with Minimum Spend Validation
-    const voucherButtons = document.querySelectorAll('.checkout-voucher-btn');
-    voucherButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const code = btn.getAttribute('data-code');
-        const disc = parseInt(btn.getAttribute('data-discount'), 10) || 0;
-        const minSpend = parseInt(btn.getAttribute('data-min-spend') || '0', 10);
-        const subtotal = calculateCurrentSubtotal();
-
-        if (code !== 'NONE' && subtotal < minSpend) {
-          showToast(`Voucher ${code} butuh min. belanja Rp ${formatNumber(minSpend)} (kurang Rp ${formatNumber(minSpend - subtotal)})`, 'warning');
-          return;
-        }
-
-        voucherButtons.forEach(b => {
-          b.classList.remove('active', 'border-emerald-500', 'bg-emerald-50');
-          b.classList.add('border-gray-200', 'bg-white');
-        });
-        btn.classList.add('active', 'border-emerald-500', 'bg-emerald-50');
-        btn.classList.remove('border-gray-200', 'bg-white');
-
-        astroCheckoutState.voucherCode = code;
-        astroCheckoutState.voucherDiscount = disc;
-        AudioEngine.playTap();
-        refreshCheckoutTotals();
-        showToast(code === 'NONE' ? 'Belanja tanpa voucher promo' : `Voucher ${code} berhasil dipasang!`, 'success');
-      });
+    document.getElementById('btnFinishShopping')?.addEventListener('click', openAstroCheckoutModal);
+    document.getElementById('btnCheckoutCashierSticky')?.addEventListener('click', openAstroCheckoutModal);
+    document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
+    document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
+    document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
+      closeAstroCheckoutModal();
+      document.getElementById('navBtnCart')?.click();
     });
-
-    // Payment method tabs
-    const methodTabs = document.querySelectorAll('.checkout-method-tab');
-    methodTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const method = tab.getAttribute('data-method');
-        selectPaymentMethod(method);
-      });
+    document.getElementById('btnViewHistoryFromReceipt')?.addEventListener('click', () => {
+      closeAstroCheckoutModal();
+      document.getElementById('navBtnHistory')?.click();
     });
-
-    // VA Bank Selection
-    const vaButtons = document.querySelectorAll('.btn-select-va-bank');
-    vaButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        vaButtons.forEach(b => {
-          b.classList.remove('active', 'border-primary', 'bg-primary', 'text-secondary-fixed');
-          b.classList.add('border-outline-variant/30', 'bg-white', 'text-gray-700');
-        });
-        btn.classList.add('active', 'border-primary', 'bg-primary', 'text-secondary-fixed');
-        btn.classList.remove('border-outline-variant/30', 'bg-white', 'text-gray-700');
-
-        const bank = btn.getAttribute('data-bank');
-        astroCheckoutState.selectedVaBank = bank;
-        updateVaNumber(bank);
-        AudioEngine.playTap();
-      });
-    });
-
-    // Copy VA button
-    const btnCopyVa = document.getElementById('btnCopyVaNumber');
-    if (btnCopyVa) {
-      btnCopyVa.addEventListener('click', () => {
-        const vaNum = document.getElementById('vaNumberDisplay')?.textContent || '';
-        navigator.clipboard?.writeText(vaNum);
-        AudioEngine.playTap();
-        showToast(`Nomor VA ${astroCheckoutState.selectedVaBank} berhasil disalin!`, 'success');
-      });
-    }
-
-    // Quick Cash buttons
-    const cashButtons = document.querySelectorAll('.btn-quick-cash');
-    cashButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const amountType = btn.getAttribute('data-amount');
-        const inputCash = document.getElementById('inputCashPaid');
-        const currentGrandTotal = calculateCurrentGrandTotal();
-
-        if (amountType === 'pas') {
-          astroCheckoutState.cashPaid = currentGrandTotal;
-          if (inputCash) inputCash.value = currentGrandTotal;
-        } else {
-          const val = parseInt(amountType, 10) || 0;
-          astroCheckoutState.cashPaid = val;
-          if (inputCash) inputCash.value = val;
-        }
-        AudioEngine.playTap();
-        refreshCashChangeDisplay();
-      });
-    });
-
-    // Cash input live change
-    const inputCash = document.getElementById('inputCashPaid');
-    if (inputCash) {
-      inputCash.addEventListener('input', () => {
-        astroCheckoutState.cashPaid = parseFloat(inputCash.value) || 0;
-        refreshCashChangeDisplay();
-      });
-    }
-
-    // Confirm Pay button
-    const btnConfirmPay = document.getElementById('btnConfirmAstroPay');
-    if (btnConfirmPay) {
-      btnConfirmPay.addEventListener('click', handleAstroPaymentExecution);
-    }
-
-    // Copy receipt text
-    const btnCopyReceipt = document.getElementById('btnCopyReceiptText');
-    if (btnCopyReceipt) {
-      btnCopyReceipt.addEventListener('click', copyThermalReceiptSummary);
-    }
-
-    // Done shopping / new trolley
-    const btnDone = document.getElementById('btnDoneAstroCheckout');
-    if (btnDone) {
-      btnDone.addEventListener('click', () => {
-        closeAstroCheckoutModal();
-        const navCart = document.getElementById('navBtnCart');
-        if (navCart) navCart.click();
-      });
-    }
-
-    // View history from receipt
-    const btnViewHist = document.getElementById('btnViewHistoryFromReceipt');
-    if (btnViewHist) {
-      btnViewHist.addEventListener('click', () => {
-        closeAstroCheckoutModal();
-        const navHistory = document.getElementById('navBtnHistory');
-        if (navHistory) navHistory.click();
-      });
-    }
   }
-
-  function selectPaymentMethod(method) {
-    astroCheckoutState.selectedMethod = method;
-
-    const methodTabs = document.querySelectorAll('.checkout-method-tab');
-    methodTabs.forEach(t => {
-      const match = t.getAttribute('data-method') === method;
-      t.classList.toggle('active', match);
-      t.classList.toggle('border-secondary', match);
-      t.classList.toggle('bg-secondary/10', match);
-      t.classList.toggle('border-outline-variant/30', !match);
-      t.classList.toggle('bg-surface-container-low', !match);
-    });
-
-    const panelQris = document.getElementById('methodPanelQris');
-    const panelAstroPay = document.getElementById('methodPanelAstroPay');
-    const panelVa = document.getElementById('methodPanelVa');
-    const panelCash = document.getElementById('methodPanelCash');
-
-    if (panelQris) panelQris.classList.toggle('hidden', method !== 'qris');
-    if (panelAstroPay) panelAstroPay.classList.toggle('hidden', method !== 'astropay');
-    if (panelVa) panelVa.classList.toggle('hidden', method !== 'va');
-    if (panelCash) panelCash.classList.toggle('hidden', method !== 'cash');
-
-    AudioEngine.playTap();
-    refreshCheckoutTotals();
-  }
-
-  function updateVaNumber(bank) {
-    const label = document.getElementById('vaBankNameLabel');
-    const numDisplay = document.getElementById('vaNumberDisplay');
-    const numbers = {
-      'BCA': '8801 2948 1029 3847',
-      'Mandiri': '8932 7481 0293 8472',
-      'BRI': '8029 4810 2938 4721',
-      'BNI': '8271 0294 8102 9384'
-    };
-    if (label) label.textContent = `NOMOR VIRTUAL ACCOUNT ${bank}`;
-    if (numDisplay) numDisplay.textContent = numbers[bank] || '8801 2948 1029 3847';
-  }
-
-  function calculateCurrentSubtotal() {
-    let subtotal = 0;
-    appState.cart.forEach(item => {
-      const disc = calculateDiscount(item.price, item.discountRaw);
-      subtotal += disc.finalUnitPrice * item.qty;
-    });
-    return subtotal;
-  }
-
-  function calculateCurrentGrandTotal() {
-    const subtotal = calculateCurrentSubtotal();
-    const rawDiscount = astroCheckoutState.voucherDiscount || 0;
-    const effectiveDiscount = Math.min(rawDiscount, subtotal);
-    const serviceFee = astroCheckoutState.voucherCode === 'ONGKIRGRATIS' ? 0 : 1000;
-    return Math.max(0, (subtotal - effectiveDiscount) + serviceFee);
-  }
-
-  function refreshCheckoutTotals() {
-    const subtotal = calculateCurrentSubtotal();
-    const rawDiscount = astroCheckoutState.voucherDiscount || 0;
-    const effectiveDiscount = Math.min(rawDiscount, subtotal);
-    const serviceFee = astroCheckoutState.voucherCode === 'ONGKIRGRATIS' ? 0 : 1000;
-    const grandTotal = Math.max(0, (subtotal - effectiveDiscount) + serviceFee);
-
-    const elSub = document.getElementById('checkoutSubtotal');
-    const elDisc = document.getElementById('checkoutDiscountAmount');
-    const elVouchLabel = document.getElementById('checkoutVoucherLabel');
-    const elService = document.getElementById('checkoutServiceFee');
-    const elGrand = document.getElementById('checkoutGrandTotal');
-    const elConfirmBtnText = document.getElementById('btnConfirmPayText');
-    const elRemaining = document.getElementById('checkoutBudgetRemaining');
-
-    if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
-    if (elDisc) elDisc.textContent = effectiveDiscount > 0 ? `-Rp ${formatNumber(effectiveDiscount)}` : 'Rp 0';
-    if (elVouchLabel) elVouchLabel.textContent = astroCheckoutState.voucherCode === 'NONE' ? 'Tanpa Voucher' : astroCheckoutState.voucherCode;
-    if (elService) elService.textContent = serviceFee > 0 ? `Rp ${formatNumber(serviceFee)}` : 'GRATIS (Voucher)';
-    if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
-    if (elConfirmBtnText) elConfirmBtnText.textContent = `Bayar Sekarang (Rp ${formatNumber(grandTotal)})`;
-
-    // Budget comparison
-    const remainingWallet = appState.budgetLimit - grandTotal;
-    if (elRemaining) {
-      if (remainingWallet >= 0) {
-        elRemaining.className = 'font-bold text-emerald-700';
-        elRemaining.textContent = `Rp ${formatNumber(remainingWallet)} (Aman ✅)`;
-      } else {
-        elRemaining.className = 'font-bold text-red-600';
-        elRemaining.textContent = `Defisit Rp ${formatNumber(Math.abs(remainingWallet))} (Melebihi Limit ⚠️)`;
-      }
-    }
-
-    refreshCashChangeDisplay();
-  }
-
-  function refreshCashChangeDisplay() {
-    const elChange = document.getElementById('cashChangeDisplay');
-    if (!elChange) return;
-
-    const grandTotal = calculateCurrentGrandTotal();
-    const paid = astroCheckoutState.cashPaid || 0;
-    const change = paid - grandTotal;
-
-    if (paid <= 0) {
-      elChange.textContent = 'Rp 0';
-      elChange.className = 'text-sm font-bold text-gray-500';
-    } else if (change >= 0) {
-      elChange.textContent = `Rp ${formatNumber(change)} (Kembalian Pas)`;
-      elChange.className = 'text-sm font-bold text-secondary';
-    } else {
-      elChange.textContent = `Kurang Rp ${formatNumber(Math.abs(change))}`;
-      elChange.className = 'text-sm font-bold text-red-600';
-    }
-  }
-
-  function startQrisCountdown() {
-    clearInterval(qrisInterval);
-    astroCheckoutState.qrisSecondsRemaining = 900; // 15:00
-    const timerEl = document.getElementById('qrisCountdownTimer');
-
-    function updateDisplay() {
-      const sec = astroCheckoutState.qrisSecondsRemaining;
-      const m = Math.floor(sec / 60);
-      const s = sec % 60;
-      if (timerEl) {
-        timerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-      }
-      if (sec <= 0) {
-        clearInterval(qrisInterval);
-      }
-      astroCheckoutState.qrisSecondsRemaining--;
-    }
-
-    updateDisplay();
-    qrisInterval = setInterval(updateDisplay, 1000);
-  }
-
   function openAstroCheckoutModal() {
     if (appState.cart.length === 0) {
-      showToast('Keranjang belanja masih kosong! Pilih barang di Katalog Lotte Mart Puri Indah.', 'warning');
-      const catalogSection = document.getElementById('sectionAstroCatalog');
-      if (catalogSection) {
-        catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      showToast('Keranjang belanja masih kosong. Tambahkan produk terlebih dahulu.', 'warning');
       return;
     }
-
     const modal = document.getElementById('modalAstroCheckout');
-    const stageReview = document.getElementById('checkoutStageReview');
-    const stageProcessing = document.getElementById('checkoutStageProcessing');
     const stageReceipt = document.getElementById('checkoutStageReceipt');
-
-    if (!modal) return;
-
-    // Reset stages
-    stageReview.classList.remove('hidden');
-    stageProcessing.classList.add('hidden');
-    stageReceipt.classList.add('hidden');
-
-    // Populate user
-    const avatarEl = document.getElementById('checkoutUserAvatar');
-    const nameEl = document.getElementById('checkoutUserName');
-    if (avatarEl) avatarEl.textContent = (appState.currentUser?.avatarText || 'R');
-    if (nameEl) nameEl.textContent = (appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama');
-
-    // Render items list
-    const itemsContainer = document.getElementById('checkoutItemsList');
-    const countBadge = document.getElementById('checkoutItemCountBadge');
-    if (countBadge) countBadge.textContent = `${appState.cart.length} Produk`;
-
-    if (itemsContainer) {
-      itemsContainer.innerHTML = appState.cart.map(item => {
-        const disc = calculateDiscount(item.price, item.discountRaw);
-        const lineTotal = disc.finalUnitPrice * item.qty;
-        return `
-          <div class="flex items-center justify-between text-xs py-1.5 border-b border-[#222638] last:border-b-0">
-            <div class="flex-1 min-w-0 pr-2">
-              <span class="font-bold text-white truncate block">${escapeHtml(item.name)}</span>
-              <span class="text-[10px] text-white/90 font-medium">${item.qty} ${escapeHtml(item.unit)} x Rp ${formatNumber(disc.finalUnitPrice)}</span>
-            </div>
-            <strong class="font-mono text-white font-bold shrink-0">Rp ${formatNumber(lineTotal)}</strong>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Validate voucher eligibility against current subtotal
-    const subtotal = calculateCurrentSubtotal();
-    const activeBtn = document.querySelector(`.checkout-voucher-btn[data-code="${astroCheckoutState.voucherCode}"]`);
-    const minSpend = activeBtn ? parseInt(activeBtn.getAttribute('data-min-spend') || '0', 10) : 0;
-    if (subtotal < minSpend) {
-      astroCheckoutState.voucherCode = 'NONE';
-      astroCheckoutState.voucherDiscount = 0;
-    }
-
-    // Update voucher buttons UI (highlight selected, dim ineligible)
-    document.querySelectorAll('.checkout-voucher-btn').forEach(b => {
-      const bCode = b.getAttribute('data-code');
-      const bMin = parseInt(b.getAttribute('data-min-spend') || '0', 10);
-      const isEligible = subtotal >= bMin || bCode === 'NONE';
-      const isSelected = bCode === astroCheckoutState.voucherCode;
-
-      b.classList.toggle('active', isSelected);
-      b.classList.toggle('border-emerald-500', isSelected);
-      b.classList.toggle('bg-emerald-50', isSelected);
-      b.classList.toggle('border-gray-200', !isSelected);
-      b.classList.toggle('bg-white', !isSelected);
-      b.classList.toggle('opacity-50', !isEligible);
-      b.classList.toggle('grayscale', !isEligible);
-    });
-
-    // Reset default payment method & refresh totals
-    selectPaymentMethod('qris');
-    startQrisCountdown();
-    refreshCheckoutTotals();
-
+    if (!modal || !stageReceipt) return;
+    stageReceipt.classList.remove('hidden');
     modal.classList.remove('hidden');
-    AudioEngine.playTap();
+    completeCheckoutAndDisplayReceipt();
   }
-
   function closeAstroCheckoutModal() {
     const modal = document.getElementById('modalAstroCheckout');
     if (modal) modal.classList.add('hidden');
-    clearInterval(qrisInterval);
-    if (currentProcessingTimer) clearTimeout(currentProcessingTimer);
-  }
-
-  // Multi-Phase Interactive Cashier Machine Sequence
-  function handleAstroPaymentExecution() {
-    const grandTotal = calculateCurrentGrandTotal();
-
-    // If Cash method, check if paid is sufficient
-    if (astroCheckoutState.selectedMethod === 'cash') {
-      const paid = astroCheckoutState.cashPaid || 0;
-      if (paid < grandTotal && paid > 0) {
-        showToast('Nomor uang tunai kurang dari total belanjaan!', 'danger');
-        return;
-      }
-      if (paid <= 0) {
-        // Assume uang pas
-        astroCheckoutState.cashPaid = grandTotal;
-      }
-    }
-
-    const stageReview = document.getElementById('checkoutStageReview');
-    const stageProcessing = document.getElementById('checkoutStageProcessing');
-    const stageReceipt = document.getElementById('checkoutStageReceipt');
-
-    stageReview.classList.add('hidden');
-    stageProcessing.classList.remove('hidden');
-    stageReceipt.classList.add('hidden');
-
-    const stepBadge = document.getElementById('posStepBadge');
-    const stepTitle = document.getElementById('posStepTitle');
-    const stepDesc = document.getElementById('posStepDesc');
-    const progressBar = document.getElementById('posProgressBar');
-
-    // Phase 1 (0ms - 1200ms): Connect to Gateway
-    if (stepBadge) stepBadge.textContent = 'FASE 1 / 3';
-    if (stepTitle) stepTitle.textContent = `📡 Menghubungkan ke ${appState.activeStore} Payment Gateway...`;
-    if (stepDesc) stepDesc.textContent = 'Mengunci pesanan dan memvalidasi saluran pembayaran terenkripsi.';
-    if (progressBar) progressBar.style.width = '35%';
-    AudioEngine.playBeep();
-
-    // Phase 2 (1200ms - 2400ms): Verify balance / auth
-    currentProcessingTimer = setTimeout(() => {
-      if (stepBadge) stepBadge.textContent = 'FASE 2 / 3';
-      if (stepTitle) stepTitle.textContent = '🔐 Memverifikasi Saldo & Mengunci Stok Bahan...';
-      if (stepDesc) stepDesc.textContent = 'Sistem kasir mengonfirmasi transaksi disetujui tanpa kendala.';
-      if (progressBar) progressBar.style.width = '75%';
-      AudioEngine.playTap();
-
-      // Phase 3 (2400ms - 3400ms): Printing Thermal Receipt
-      currentProcessingTimer = setTimeout(() => {
-        if (stepBadge) stepBadge.textContent = 'FASE 3 / 3';
-        if (stepTitle) stepTitle.textContent = '🖨️ Mencetak Struk Kasir Thermal Digital...';
-        if (stepDesc) stepDesc.textContent = `Mengesahkan struk bukti transaksi resmi ${appState.activeStore}.`;
-        if (progressBar) progressBar.style.width = '100%';
-        AudioEngine.playPrinter();
-
-        // Phase 4 (3500ms): Success Celebration & Rollout Receipt
-        currentProcessingTimer = setTimeout(() => {
-          completeCheckoutAndDisplayReceipt();
-        }, 1100);
-
-      }, 1200);
-
-    }, 1200);
   }
 
   function completeCheckoutAndDisplayReceipt() {
-    clearInterval(qrisInterval);
-    const stageProcessing = document.getElementById('checkoutStageProcessing');
     const stageReceipt = document.getElementById('checkoutStageReceipt');
 
-    stageProcessing.classList.add('hidden');
-    stageReceipt.classList.remove('hidden');
+    stageReceipt?.classList.remove('hidden');
 
     const subtotal = calculateCurrentSubtotal();
-    const discount = astroCheckoutState.voucherDiscount || 0;
-    const serviceFee = astroCheckoutState.voucherCode === 'ONGKIRGRATIS' ? 0 : 1000;
-    const grandTotal = Math.max(0, subtotal - discount + serviceFee);
+    const discount = 0;
+    const grandTotal = Math.max(0, subtotal - discount);
 
     const storePrefix = (appState.activeStore || 'CARTLY').split(/[\s-]+/)[0].toUpperCase();
     const trxId = `${storePrefix}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -4154,44 +3727,23 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const methodLabels = {
-      'qris': `QRIS ${appState.activeStore} Instant (LUNAS)`,
-      'astropay': `${storePrefix}Pay E-Wallet (LUNAS)`,
-      'va': `Virtual Account ${astroCheckoutState.selectedVaBank} (LUNAS)`,
-      'cash': 'Tunai di Kasir (LUNAS)'
-    };
-    const paymentMethodLabel = methodLabels[astroCheckoutState.selectedMethod] || `QRIS ${appState.activeStore} (LUNAS)`;
+    const receiptLabel = 'Catatan belanja (belum dibayar)';
 
     // Populate Thermal Receipt Elements
     const elTrx = document.getElementById('receiptTrxId');
     const elTime = document.getElementById('receiptTimestamp');
     const elCust = document.getElementById('receiptCustomerName');
-    const elMethod = document.getElementById('receiptPaymentMethodLabel');
     const elItemsBody = document.getElementById('receiptItemsBody');
     const elSub = document.getElementById('receiptSubtotal');
     const elVouch = document.getElementById('receiptVoucherDiscount');
-    const elService = document.getElementById('receiptServiceFee');
     const elGrand = document.getElementById('receiptGrandTotal');
-    const elCashDetail = document.getElementById('receiptCashDetailRow');
-    const elCashChange = document.getElementById('receiptCashChangeText');
 
     if (elTrx) elTrx.textContent = trxId;
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
-    if (elMethod) elMethod.textContent = paymentMethodLabel;
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
-    if (elService) elService.textContent = serviceFee > 0 ? `Rp ${formatNumber(serviceFee)}` : 'GRATIS';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
-
-    if (astroCheckoutState.selectedMethod === 'cash') {
-      const paid = astroCheckoutState.cashPaid || grandTotal;
-      const change = paid - grandTotal;
-      if (elCashDetail) elCashDetail.classList.remove('hidden');
-      if (elCashChange) elCashChange.textContent = `Bayar: Rp ${formatNumber(paid)} • Kembali: Rp ${formatNumber(Math.max(0, change))}`;
-    } else {
-      if (elCashDetail) elCashDetail.classList.add('hidden');
-    }
 
     // Render receipt items lines
     const receiptItems = appState.cart.map(item => {
@@ -4230,7 +3782,7 @@
       totalSaved: discount,
       itemCount: receiptItems.length,
       items: receiptItems,
-      paymentMethod: paymentMethodLabel
+      paymentMethod: receiptLabel
     };
 
     appState.history.unshift(newReceipt);
@@ -4270,16 +3822,15 @@
       });
     }
 
-    showToast('Pembayaran berhasil! Struk digital dicetak.', 'success');
+    showToast('Struk belanja siap.', 'success');
   }
 
   function copyThermalReceiptSummary() {
     const elTrx = document.getElementById('receiptTrxId')?.textContent || '';
     const elCust = document.getElementById('receiptCustomerName')?.textContent || '';
-    const elMethod = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
-    const text = `🧾 STRUK PEMBAYARAN ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. TRX: ${elTrx}\nPelanggan: ${elCust}\nMetode: ${elMethod}\nTOTAL: ${elGrand}\nStatus: LUNAS\nTerima kasih telah berbelanja di ${appState.activeStore}!`;
+    const text = `🧾 CATATAN BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Catatan: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nStatus: Belum dibayar\nCatatan ini bukan bukti pembayaran.`;
 
     navigator.clipboard?.writeText(text);
     AudioEngine.playTap();
