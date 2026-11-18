@@ -1172,8 +1172,12 @@
   // ==========================================================================
   // F-05: PENGENDALI ANGGARAN (NEO-BENTO SAFETY CAP) CALCULATION & UI
   // ==========================================================================
+  function getPurchasedCartItems() {
+    return appState.cart.filter(item => item.inPhysicalCart === true);
+  }
+
   function calculateCurrentSubtotal() {
-    return appState.cart.reduce((total, item) => {
+    return getPurchasedCartItems().reduce((total, item) => {
       const discount = calculateDiscount(item.price, item.discountRaw);
       return total + discount.finalUnitPrice * (Number(item.qty) || 0);
     }, 0);
@@ -1184,7 +1188,8 @@
     let totalSaved = 0;
     let totalQty = 0;
 
-    appState.cart.forEach(item => {
+    const purchasedItems = getPurchasedCartItems();
+    purchasedItems.forEach(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
       const lineTotal = disc.finalUnitPrice * item.qty;
       totalSpent += lineTotal;
@@ -1199,12 +1204,12 @@
     const checkoutButton = document.getElementById('btnFinishShopping');
     if (checkoutButton) {
       const overBudget = totalSpent > limit;
-      const allowed = appState.cart.length > 0 && !overBudget;
+      const allowed = purchasedItems.length > 0 && !overBudget;
       checkoutButton.disabled = !allowed;
       checkoutButton.setAttribute('aria-disabled', String(!allowed));
       checkoutButton.title = overBudget
         ? `Kurangi belanja Rp ${formatNumber(totalSpent - limit)} agar sesuai batas anggaran.`
-        : allowed ? 'Lanjut ke pembayaran' : 'Tambahkan barang sebelum membayar';
+        : allowed ? 'Lanjut ke pembayaran' : 'Centang barang yang sudah dibeli';
       const checkoutLabel = document.getElementById('checkoutButtonLabel');
       const checkoutHint = document.getElementById('checkoutButtonHint');
       if (checkoutLabel) checkoutLabel.textContent = overBudget ? 'Anggaran Terlampaui' : 'Bayar Sekarang';
@@ -1227,7 +1232,7 @@
     const hudSubtickLimit = document.getElementById('hudSubtickLimit');
     if (hudSubtickLimit) hudSubtickLimit.textContent = `Rp ${formatNumber(limit)}`;
 
-    document.getElementById('summaryTotalItems').textContent = `${appState.cart.length} Jenis (${totalQty} Qty)`;
+    document.getElementById('summaryTotalItems').textContent = `${purchasedItems.length} Jenis (${totalQty} Qty)`;
     document.getElementById('summaryTotalSaved').textContent = `Hemat Rp ${formatNumber(totalSaved)}`;
 
     // DOM Elements
@@ -1378,7 +1383,7 @@
           <!-- Top Row: Checkbox, Category, Barcode Strip & Quick Actions -->
           <div class="flex items-center justify-between border-b border-stone-200/80 pb-2">
             <div class="flex items-center gap-2">
-              <button type="button" class="cart-check-btn ${isChecked ? 'checked' : ''}" onclick="window.toggleItemInCart('${item.id}')" title="Centang jika sudah di rak troli">
+              <button type="button" class="cart-check-btn ${isChecked ? 'checked' : ''}" aria-pressed="${isChecked}" onclick="window.toggleItemInCart('${item.id}')" title="${isChecked ? 'Barang masuk total dan transaksi' : 'Centang barang yang sudah dibeli'}">
                 <i data-lucide="check"></i>
               </button>
               <div class="flex items-center gap-1.5">
@@ -1459,8 +1464,9 @@
             </div>
 
             <div class="text-right">
-              <div class="font-mono text-[9px] text-stone-400 font-bold uppercase tracking-wider">SUBTOTAL (${item.qty} ${item.unit})</div>
-              <div class="font-headline-md text-[18px] font-black text-emerald-400 tracking-tight">Rp ${formatNumber(lineTotal)}</div>
+              <div class="font-mono text-[9px] ${isChecked ? 'text-stone-500' : 'text-slate-500'} font-bold uppercase tracking-wider">${isChecked ? `Subtotal (${item.qty} ${escapeHtml(item.unit)})` : 'Belum dibeli'}</div>
+              <div class="font-headline-md text-[18px] font-black ${isChecked ? 'text-emerald-700' : 'text-slate-400 line-through'} tracking-tight">Rp ${formatNumber(lineTotal)}</div>
+              ${isChecked ? '' : '<div class="text-[9px] text-slate-500">Tidak masuk total</div>'}
             </div>
           </div>
         </div>
@@ -2665,7 +2671,7 @@
 
     // Wallet Impact
     let currentTotalSpent = 0;
-    appState.cart.forEach(item => {
+    getPurchasedCartItems().forEach(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
       currentTotalSpent += disc.finalUnitPrice * item.qty;
     });
@@ -2762,7 +2768,7 @@
       if (nameEl) nameEl.textContent = data.name;
       if (formulaEl) formulaEl.textContent = `${data.discount_result.formula_text} = Rp ${formatNumber(data.discount_result.final_price)}`;
 
-      const totalCart = appState.cart.reduce((s, it) => s + (it.price * it.qty), 0);
+      const totalCart = getPurchasedCartItems().reduce((s, it) => s + (it.price * it.qty), 0);
       const remaining = appState.budgetLimit - (totalCart + data.discount_result.final_price);
       if (capEl) {
         if (remaining < 0) {
@@ -3105,7 +3111,7 @@
       // If offline/preview, calculate with matching TypeScript logic
       if (!insightData) {
         let totalSpent = 0;
-        appState.cart.forEach(item => {
+        getPurchasedCartItems().forEach(item => {
           const disc = calculateDiscount(item.price, item.discountRaw);
           totalSpent += disc.finalUnitPrice * item.qty;
         });
@@ -3476,8 +3482,9 @@
     });
   }
   function openAstroCheckoutModal() {
-    if (appState.cart.length === 0) {
-      showToast('Keranjang belanja masih kosong. Tambahkan produk terlebih dahulu.', 'warning');
+    const purchasedItems = getPurchasedCartItems();
+    if (purchasedItems.length === 0) {
+      showToast('Centang barang yang sudah dibeli sebelum melanjutkan pembayaran.', 'warning');
       return;
     }
     const total = calculateCurrentSubtotal();
@@ -3497,7 +3504,7 @@
     if (storeLabel) storeLabel.textContent = appState.activeStore || 'Belanja Cartly';
     const itemsContainer = document.getElementById('checkoutPaymentItems');
     if (itemsContainer) {
-      itemsContainer.innerHTML = appState.cart.map(item => {
+      itemsContainer.innerHTML = purchasedItems.map(item => {
         const finalUnitPrice = calculateDiscount(item.price, item.discountRaw).finalUnitPrice;
         return `<div class="flex justify-between gap-3 text-xs text-white"><span class="min-w-0">${escapeHtml(item.name)} × ${item.qty}</span><strong class="shrink-0">Rp ${formatNumber(finalUnitPrice * item.qty)}</strong></div>`;
       }).join('');
@@ -3554,7 +3561,8 @@
     const total = calculateCurrentSubtotal();
     const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
     const overBudget = total > appState.budgetLimit;
-    const canSubmit = !overBudget && (checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed);
+    const canSubmit = getPurchasedCartItems().length > 0 && !overBudget &&
+      (checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed);
     button.disabled = checkoutPaymentSubmitted || !canSubmit;
     button.textContent = overBudget
       ? 'Anggaran terlampaui'
@@ -3567,7 +3575,12 @@
   }
 
   function completeCheckoutAndDisplayReceipt() {
-    if (checkoutPaymentSubmitted || appState.cart.length === 0) return;
+    const purchasedItems = getPurchasedCartItems();
+    if (checkoutPaymentSubmitted) return;
+    if (purchasedItems.length === 0) {
+      showToast('Centang barang yang sudah dibeli sebelum menyelesaikan transaksi.', 'warning');
+      return;
+    }
     const total = calculateCurrentSubtotal();
     if (total > appState.budgetLimit) {
       updateCheckoutPaymentButton();
@@ -3585,7 +3598,7 @@
       return;
     }
 
-    const receiptItems = appState.cart.map(item => {
+    const receiptItems = purchasedItems.map(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
       const lineTotal = disc.finalUnitPrice * item.qty;
       updateMasterDatabaseItem(item.name, item.category, item.unit, item.price);
@@ -3683,7 +3696,8 @@
     appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
     saveHistory();
     renderHistoryList();
-    appState.cart = [];
+    const purchasedIds = new Set(purchasedItems.map(item => item.id));
+    appState.cart = appState.cart.filter(item => !purchasedIds.has(item.id));
 
     saveCart();
     saveMaster();
@@ -3900,7 +3914,7 @@
     const catTotals = {};
     let grandTotal = 0;
 
-    appState.cart.forEach(item => {
+    getPurchasedCartItems().forEach(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
       const line = disc.finalUnitPrice * item.qty;
       catTotals[item.category] = (catTotals[item.category] || 0) + line;
