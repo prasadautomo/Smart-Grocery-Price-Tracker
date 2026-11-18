@@ -1,7 +1,7 @@
 {
-  "name": "Smart Grocery Pro",
-  "short_name": "SmartGrocery",
-  "description": "Smart Grocery & Budget Safety Tracker untuk Belanja Supermarket Cerdas Rian",
+  "name": "Cartly - Smart Grocery & Budget Tracker",
+  "short_name": "Cartly",
+  "description": "Cartly - Smart Grocery & Budget Safety Tracker",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",

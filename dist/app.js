@@ -3328,7 +3328,7 @@
             ${recomHtml}
           </div>
           <div class="text-[10px] text-gray-500 text-right pt-1">
-            💡 Dianalisis oleh Smart Grocery Node.js Engine
+            💡 Dianalisis oleh Cartly Engine
           </div>
         </div>
       `;
@@ -5300,7 +5300,7 @@
         hideLoginAlert();
         loginAsUser(userObj, true);
         AudioEngine.playSuccess();
-        showToast(`Akun ${rawUsername} berhasil dibuat! Selamat datang di KeranjangPintar.`, 'success');
+        showToast(`Akun ${rawUsername} berhasil dibuat! Selamat datang di Cartly.`, 'success');
       });
     }
 
