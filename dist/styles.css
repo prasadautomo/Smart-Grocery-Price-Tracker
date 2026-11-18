@@ -1712,6 +1712,17 @@ nav.fixed.bottom-0 {
   padding: 0 !important;
 }
 
+#sessionDatePicker {
+  background: transparent !important;
+  color: #263852 !important;
+  border: 0 !important;
+  color-scheme: light;
+}
+
+#sessionDatePicker::-webkit-calendar-picker-indicator {
+  opacity: 0.72;
+}
+
 #btnEditBudgetTrigger span,
 #activeStoreName {
   color: #263852 !important;
