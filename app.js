@@ -286,6 +286,12 @@
   };
   // --- INITIALIZATION ---
   document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', event => {
+      const checkoutTrigger = event.target?.closest?.('#btnFinishShopping, #btnCheckoutCashierSticky');
+      if (!checkoutTrigger) return;
+      event.preventDefault();
+      openAstroCheckoutModal();
+    }, true);
     initApp();
   });
 
@@ -3654,8 +3660,6 @@
   let checkoutPaymentSubmitted = false;
 
   function initAstroCheckoutModule() {
-    document.getElementById('btnFinishShopping')?.addEventListener('click', openAstroCheckoutModal);
-    document.getElementById('btnCheckoutCashierSticky')?.addEventListener('click', openAstroCheckoutModal);
     document.getElementById('btnClosePaymentView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
