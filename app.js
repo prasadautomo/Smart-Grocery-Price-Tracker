@@ -1165,6 +1165,13 @@
   // ==========================================================================
   // F-05: PENGENDALI ANGGARAN (NEO-BENTO SAFETY CAP) CALCULATION & UI
   // ==========================================================================
+  function calculateCurrentSubtotal() {
+    return appState.cart.reduce((total, item) => {
+      const discount = calculateDiscount(item.price, item.discountRaw);
+      return total + discount.finalUnitPrice * (Number(item.qty) || 0);
+    }, 0);
+  }
+
   function updateBudgetHud() {
     let totalSpent = 0;
     let totalSaved = 0;
@@ -1182,6 +1189,20 @@
     const remaining = limit - totalSpent;
     const percentage = limit > 0 ? (totalSpent / limit) * 100 : 0;
     const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+    const checkoutButton = document.getElementById('btnFinishShopping');
+    if (checkoutButton) {
+      const overBudget = totalSpent > limit;
+      const allowed = appState.cart.length > 0 && !overBudget;
+      checkoutButton.disabled = !allowed;
+      checkoutButton.setAttribute('aria-disabled', String(!allowed));
+      checkoutButton.title = overBudget
+        ? `Kurangi belanja Rp ${formatNumber(totalSpent - limit)} agar sesuai batas anggaran.`
+        : allowed ? 'Lanjut ke pembayaran' : 'Tambahkan barang sebelum membayar';
+      const checkoutLabel = document.getElementById('checkoutButtonLabel');
+      const checkoutHint = document.getElementById('checkoutButtonHint');
+      if (checkoutLabel) checkoutLabel.textContent = overBudget ? 'Anggaran Terlampaui' : 'Bayar Sekarang';
+      if (checkoutHint) checkoutHint.textContent = overBudget ? 'Kurangi barang untuk lanjut' : 'Lanjut ke pembayaran';
+    }
 
     // Text Elements
     document.getElementById('hudTotalSpending').textContent = formatNumber(totalSpent);
@@ -3512,6 +3533,11 @@
       showToast('Keranjang belanja masih kosong. Tambahkan produk terlebih dahulu.', 'warning');
       return;
     }
+    const total = calculateCurrentSubtotal();
+    if (total > appState.budgetLimit) {
+      showToast(`Total belanja melebihi batas Rp ${formatNumber(appState.budgetLimit)}. Kurangi barang sebelum membayar.`, 'warning');
+      return;
+    }
     const modal = document.getElementById('modalAstroCheckout');
     const stagePayment = document.getElementById('checkoutStagePayment');
     const stageReceipt = document.getElementById('checkoutStageReceipt');
@@ -3529,7 +3555,6 @@
         return `<div class="flex justify-between gap-3 text-xs text-white"><span class="min-w-0">${escapeHtml(item.name)} × ${item.qty}</span><strong class="shrink-0">Rp ${formatNumber(finalUnitPrice * item.qty)}</strong></div>`;
       }).join('');
     }
-    const total = calculateCurrentSubtotal();
     const subtotalEl = document.getElementById('checkoutPaymentSubtotal');
     const totalEl = document.getElementById('checkoutPaymentTotal');
     const cashInput = document.getElementById('checkoutCashAmount');
@@ -3581,9 +3606,12 @@
     const paid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
     const total = calculateCurrentSubtotal();
     const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    const canSubmit = checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed;
+    const overBudget = total > appState.budgetLimit;
+    const canSubmit = !overBudget && (checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed);
     button.disabled = checkoutPaymentSubmitted || !canSubmit;
-    button.textContent = checkoutPaymentMethod === 'cash' ? 'Konfirmasi pembayaran tunai' : 'Catat pembayaran selesai';
+    button.textContent = overBudget
+      ? 'Anggaran terlampaui'
+      : checkoutPaymentMethod === 'cash' ? 'Konfirmasi pembayaran tunai' : 'Catat pembayaran selesai';
   }
 
   function closeAstroCheckoutModal() {
@@ -3594,6 +3622,11 @@
   function completeCheckoutAndDisplayReceipt() {
     if (checkoutPaymentSubmitted || appState.cart.length === 0) return;
     const total = calculateCurrentSubtotal();
+    if (total > appState.budgetLimit) {
+      updateCheckoutPaymentButton();
+      showToast(`Transaksi tidak dapat dilanjutkan. Kurangi belanja Rp ${formatNumber(total - appState.budgetLimit)} agar sesuai anggaran.`, 'warning');
+      return;
+    }
     const cashPaid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
     const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
     if (checkoutPaymentMethod === 'cash' && cashPaid < total) {
