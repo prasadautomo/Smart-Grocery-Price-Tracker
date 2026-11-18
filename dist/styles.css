@@ -1058,13 +1058,25 @@ body {
   border-color: #3b4668 !important;
 }
 
-.astro-cat-chip.active,
-.neo-cat-chip.active {
+.astro-cat-chip.active {
   background-color: #0d2319 !important;
   color: #10b981 !important;
   border-color: #10b981 !important;
   font-weight: 800 !important;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
+}
+
+.neo-cat-chip.active {
+  background-color: #00b88a !important;
+  color: #06251d !important;
+  border-color: #00b88a !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 8px rgba(0, 184, 138, 0.3) !important;
+}
+
+.neo-cat-chip.active #countAll {
+  background-color: rgba(6, 37, 29, 0.18) !important;
+  color: #06251d !important;
 }
 
 /* Thermal Paper Roll with jagged edges */
