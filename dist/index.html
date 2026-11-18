@@ -281,42 +281,31 @@
   <header
     class="fixed top-0 left-0 right-0 max-w-[480px] mx-auto w-full z-50 bg-[#07080b] pt-safe border-b border-[#1c1f2e] shadow-sm"
     style="background-color: #f4f7fb !important; opacity: 1 !important;">
-    <div class="px-3 py-2 flex items-center justify-between gap-2">
-      <!-- Left: Big Squircle Bag Icon & Stacked 3-Line Info -->
-      <div class="flex items-center gap-2 min-w-0 flex-1">
-        <!-- Squircle Bag Icon -->
-        <div class="w-11 h-11 rounded-2xl bg-[#181512] flex items-center justify-center text-citrus shadow-sm shrink-0 border border-stone-800">
-          <span class="material-symbols-outlined text-[22px] text-emerald-400" style="font-variation-settings: 'FILL' 1;">shopping_bag</span>
+    <div class="px-3 py-2 flex items-center justify-between gap-3">
+      <!-- Store, app name, and active date -->
+      <div class="flex flex-col min-w-0 flex-1">
+        <div class="flex items-center leading-none">
+          <span class="font-headline-sm text-[15px] font-black text-primary tracking-tight whitespace-nowrap">Cartly</span>
         </div>
 
-        <!-- 3 Lines Stacked Info -->
-        <div class="flex flex-col min-w-0">
-          <!-- Line 1: Title & PRO Badge -->
-          <div class="flex items-center gap-1.5 leading-none">
-            <span class="font-headline-sm text-[15px] font-black text-white tracking-tight whitespace-nowrap">Cartly</span>
-            <span class="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[9px] font-black border border-emerald-500/30">PRO</span>
-          </div>
+        <!-- Line 2: Store Selector with Dropdown Arrow -->
+        <div class="flex items-center gap-1 mt-0.5">
+          <button
+            class="flex items-center gap-1 text-primary transition-colors text-left cursor-pointer truncate max-w-[190px]"
+            id="btnStoreSelector" title="Pilih Lokasi Toko Belanja">
+            <span class="material-symbols-outlined text-[14px] text-emerald-700 shrink-0">storefront</span>
+            <span class="font-label-sm text-[11px] font-bold text-primary truncate" id="activeStoreName">Lotte Mart Grocery - Puri Indah</span>
+            <span class="material-symbols-outlined text-[14px] text-primary shrink-0">expand_more</span>
+          </button>
+        </div>
 
-          <!-- Line 2: Store Selector with Dropdown Arrow -->
-          <div class="flex items-center gap-1 mt-0.5">
-            <button
-              class="flex items-center gap-1 text-white hover:text-emerald-300 transition-colors text-left cursor-pointer truncate max-w-[125px] sm:max-w-[155px]"
-              id="btnStoreSelector" title="Pilih Lokasi Toko Belanja">
-              <span class="material-symbols-outlined text-[13px] text-emerald-400 shrink-0">storefront</span>
-              <span class="font-label-sm text-[11px] font-bold text-white truncate" id="activeStoreName">Lotte Mart Grocery - Puri Indah</span>
-              <span class="material-symbols-outlined text-[13px] text-white shrink-0">expand_more</span>
-            </button>
-          </div>
-
-          <!-- Line 3: Compact Date Picker -->
-          <div class="flex items-center gap-1 mt-0.5">
-            <div class="flex items-center gap-0.5 text-[10.5px] font-bold text-white bg-[#11131c] px-1.5 py-0.5 rounded-md border border-[#222638] shadow-2xs shrink-0" title="Selector Tanggal Belanja Aktif (SRS F-01)">
-              <span class="material-symbols-outlined text-[12px] text-white">calendar_month</span>
-              <input type="date" id="sessionDatePicker" class="bg-transparent border-0 p-0 text-[10px] font-mono font-bold text-white cursor-pointer focus:outline-none" value="2026-10-26" />
-            </div>
+        <!-- Line 3: Compact Date Picker -->
+        <div class="flex items-center gap-1 mt-0.5">
+          <div class="flex items-center gap-1 text-[10.5px] font-bold text-primary bg-white px-2 py-1 rounded-md border border-slate-200 shadow-2xs shrink-0" title="Tanggal belanja aktif">
+            <span class="material-symbols-outlined text-[13px] text-slate-500">calendar_month</span>
+            <input type="date" id="sessionDatePicker" class="max-w-[145px] bg-transparent border-0 p-0 text-[11px] font-mono font-bold text-primary cursor-pointer focus:outline-none" value="2026-10-26" />
           </div>
         </div>
-      </div>
 
       <!-- Right: Action Pills -->
       <div class="flex items-center gap-1.5 shrink-0">

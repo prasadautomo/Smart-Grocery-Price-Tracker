@@ -1706,6 +1706,12 @@ nav.fixed.bottom-0 {
   color: #263852 !important;
 }
 
+#btnStoreSelector {
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
 #btnEditBudgetTrigger span,
 #activeStoreName {
   color: #263852 !important;
