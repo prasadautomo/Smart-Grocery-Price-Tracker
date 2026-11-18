@@ -6025,7 +6025,7 @@
           showToast('Membuka Google Sign-In...', 'info');
 
           try {
-            const currentRedirect = window.location.origin + window.location.pathname;
+            const currentRedirect = 'https://cartlybyprasada.vercel.app/';
             const { data, error } = await appState.supabaseClient.auth.signInWithOAuth({
               provider: 'google',
               options: {
