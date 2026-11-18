@@ -24,8 +24,11 @@ CREATE TABLE IF NOT EXISTS public.receipts (
     total_saved NUMERIC NOT NULL DEFAULT 0,
     item_count INTEGER NOT NULL DEFAULT 0,
     items JSONB NOT NULL DEFAULT '[]'::jsonb,
+    payment_method TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+ALTER TABLE public.receipts ADD COLUMN IF NOT EXISTS payment_method TEXT NOT NULL DEFAULT '';
 
 -- 3. TABEL PENGATURAN ANGGARAN USER (F-05)
 CREATE TABLE IF NOT EXISTS public.user_settings (

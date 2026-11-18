@@ -900,6 +900,7 @@
             total_saved: rcp.totalSaved,
             item_count: rcp.itemCount,
             items: rcp.items,
+            payment_method: rcp.paymentMethod || '',
             created_at: new Date().toISOString()
           }));
         if (receiptsPayload.length > 0) {
@@ -989,7 +990,9 @@
           grandTotal: Number(r.grand_total) || 0,
           totalSaved: Number(r.total_saved) || 0,
           itemCount: Number(r.item_count) || 0,
-          items: Array.isArray(r.items) ? r.items : []
+          items: Array.isArray(r.items) ? r.items : [],
+          paymentMethod: r.payment_method || '',
+          paymentStatus: r.payment_method && !/belum dibayar|catatan belanja/i.test(r.payment_method) ? 'paid' : 'unpaid'
         }));
         saveHistory();
 
@@ -2071,9 +2074,6 @@
       renderCart();
     });
 
-    // Finish Shopping / Checkout
-    document.getElementById('btnFinishShopping').addEventListener('click', handleCheckout);
-
     // Clear Cart with Safety Confirmation Modal (Skenario 8)
     const modalClearCart = document.getElementById('modalConfirmClearCart');
     const btnOpenClearCart = document.getElementById('btnOpenClearCartModal');
@@ -2146,11 +2146,6 @@
         const navBudget = document.getElementById('navBtnBudget');
         if (navBudget) navBudget.click();
       });
-    }
-
-    const btnCheckoutSticky = document.getElementById('btnCheckoutCashierSticky');
-    if (btnCheckoutSticky) {
-      btnCheckoutSticky.addEventListener('click', handleCheckout);
     }
 
     const btnStore = document.getElementById('btnStoreSelector');
@@ -3653,15 +3648,28 @@
   }
 
   // ==========================================================================
-  // ASTRO INTERACTIVE CASHIER CHECKOUT & RECEIPT ENGINE
-  // Fitur pembayaran menarik dengan animasi mesin kasir & struk thermal
+  // CARTLY CHECKOUT & PAYMENT RECORDING
   // ==========================================================================
-  // Shopping receipt flow: finalize the cart directly without payment steps.
+  let checkoutPaymentMethod = 'cash';
+  let checkoutPaymentSubmitted = false;
+
   function initAstroCheckoutModule() {
     document.getElementById('btnFinishShopping')?.addEventListener('click', openAstroCheckoutModal);
     document.getElementById('btnCheckoutCashierSticky')?.addEventListener('click', openAstroCheckoutModal);
+    document.getElementById('btnClosePaymentView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
+    document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', completeCheckoutAndDisplayReceipt);
+    document.querySelectorAll('.checkout-payment-method').forEach(button => {
+      button.addEventListener('click', () => selectCheckoutPaymentMethod(button.dataset.method));
+    });
+    document.getElementById('checkoutExactCash')?.addEventListener('click', () => {
+      const amountInput = document.getElementById('checkoutCashAmount');
+      if (amountInput) amountInput.value = String(calculateCurrentSubtotal());
+      updateCheckoutCashChange();
+    });
+    document.getElementById('checkoutCashAmount')?.addEventListener('input', updateCheckoutCashChange);
+    document.getElementById('checkoutDigitalPaidConfirm')?.addEventListener('change', updateCheckoutPaymentButton);
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
       closeAstroCheckoutModal();
       document.getElementById('navBtnCart')?.click();
@@ -3677,25 +3685,107 @@
       return;
     }
     const modal = document.getElementById('modalAstroCheckout');
+    const stagePayment = document.getElementById('checkoutStagePayment');
     const stageReceipt = document.getElementById('checkoutStageReceipt');
-    if (!modal || !stageReceipt) return;
-    stageReceipt.classList.remove('hidden');
+    if (!modal || !stagePayment || !stageReceipt) return;
+    checkoutPaymentSubmitted = false;
+    checkoutPaymentMethod = 'cash';
+    stagePayment.classList.remove('hidden');
+    stageReceipt.classList.add('hidden');
+    const storeLabel = document.getElementById('checkoutStoreLabel');
+    if (storeLabel) storeLabel.textContent = appState.activeStore || 'Belanja Cartly';
+    const itemsContainer = document.getElementById('checkoutPaymentItems');
+    if (itemsContainer) {
+      itemsContainer.innerHTML = appState.cart.map(item => {
+        const finalUnitPrice = calculateDiscount(item.price, item.discountRaw).finalUnitPrice;
+        return `<div class="flex justify-between gap-3 text-xs text-white"><span class="min-w-0">${escapeHtml(item.name)} × ${item.qty}</span><strong class="shrink-0">Rp ${formatNumber(finalUnitPrice * item.qty)}</strong></div>`;
+      }).join('');
+    }
+    const total = calculateCurrentSubtotal();
+    const subtotalEl = document.getElementById('checkoutPaymentSubtotal');
+    const totalEl = document.getElementById('checkoutPaymentTotal');
+    const cashInput = document.getElementById('checkoutCashAmount');
+    const digitalCheck = document.getElementById('checkoutDigitalPaidConfirm');
+    if (subtotalEl) subtotalEl.textContent = `Rp ${formatNumber(total)}`;
+    if (totalEl) totalEl.textContent = `Rp ${formatNumber(total)}`;
+    if (cashInput) cashInput.value = String(total);
+    if (digitalCheck) digitalCheck.checked = false;
+    selectCheckoutPaymentMethod('cash');
     modal.classList.remove('hidden');
-    completeCheckoutAndDisplayReceipt();
   }
+
+  function selectCheckoutPaymentMethod(method) {
+    const allowedMethods = ['cash', 'qris', 'ewallet', 'transfer'];
+    checkoutPaymentMethod = allowedMethods.includes(method) ? method : 'cash';
+    document.querySelectorAll('.checkout-payment-method').forEach(button => {
+      const selected = button.dataset.method === checkoutPaymentMethod;
+      button.setAttribute('aria-pressed', String(selected));
+      button.classList.toggle('border-emerald-500', selected);
+      button.classList.toggle('bg-emerald-950/40', selected);
+      button.classList.toggle('border-[#30384b]', !selected);
+      button.classList.toggle('bg-[#151a24]', !selected);
+    });
+    document.getElementById('checkoutCashPanel')?.classList.toggle('hidden', checkoutPaymentMethod !== 'cash');
+    document.getElementById('checkoutDigitalPanel')?.classList.toggle('hidden', checkoutPaymentMethod === 'cash');
+    updateCheckoutCashChange();
+    updateCheckoutPaymentButton();
+  }
+
+  function updateCheckoutCashChange() {
+    const total = calculateCurrentSubtotal();
+    const paid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
+    const changeEl = document.getElementById('checkoutCashChange');
+    if (changeEl) {
+      if (paid < total) {
+        changeEl.textContent = `Uang kurang: Rp ${formatNumber(total - paid)}`;
+        changeEl.className = 'text-xs font-semibold text-rose-300';
+      } else {
+        changeEl.textContent = `Kembalian: Rp ${formatNumber(paid - total)}`;
+        changeEl.className = 'text-xs font-semibold text-emerald-300';
+      }
+    }
+    updateCheckoutPaymentButton();
+  }
+
+  function updateCheckoutPaymentButton() {
+    const button = document.getElementById('btnConfirmCheckoutPayment');
+    if (!button) return;
+    const paid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
+    const total = calculateCurrentSubtotal();
+    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
+    const canSubmit = checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed;
+    button.disabled = checkoutPaymentSubmitted || !canSubmit;
+    button.textContent = checkoutPaymentMethod === 'cash' ? 'Konfirmasi pembayaran tunai' : 'Catat pembayaran selesai';
+  }
+
   function closeAstroCheckoutModal() {
     const modal = document.getElementById('modalAstroCheckout');
     if (modal) modal.classList.add('hidden');
   }
 
   function completeCheckoutAndDisplayReceipt() {
-    const stageReceipt = document.getElementById('checkoutStageReceipt');
+    if (checkoutPaymentSubmitted || appState.cart.length === 0) return;
+    const total = calculateCurrentSubtotal();
+    const cashPaid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
+    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
+    if (checkoutPaymentMethod === 'cash' && cashPaid < total) {
+      showToast(`Uang yang diterima kurang Rp ${formatNumber(total - cashPaid)}.`, 'warning');
+      return;
+    }
+    if (checkoutPaymentMethod !== 'cash' && !digitalConfirmed) {
+      showToast('Konfirmasi pembayaran digital terlebih dahulu.', 'warning');
+      return;
+    }
+    checkoutPaymentSubmitted = true;
+    updateCheckoutPaymentButton();
 
+    document.getElementById('checkoutStagePayment')?.classList.add('hidden');
+    const stageReceipt = document.getElementById('checkoutStageReceipt');
     stageReceipt?.classList.remove('hidden');
 
-    const subtotal = calculateCurrentSubtotal();
+    const subtotal = total;
     const discount = 0;
-    const grandTotal = Math.max(0, subtotal - discount);
+    const grandTotal = subtotal;
 
     const storePrefix = (appState.activeStore || 'CARTLY').split(/[\s-]+/)[0].toUpperCase();
     const trxId = `${storePrefix}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -3710,12 +3800,15 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const receiptLabel = 'Catatan belanja (belum dibayar)';
+    const paymentLabels = { cash: 'Tunai', qris: 'QRIS (konfirmasi manual)', ewallet: 'E-Wallet (konfirmasi manual)', transfer: 'Transfer (konfirmasi manual)' };
+    const receiptLabel = paymentLabels[checkoutPaymentMethod];
 
     // Populate Thermal Receipt Elements
     const elTrx = document.getElementById('receiptTrxId');
     const elTime = document.getElementById('receiptTimestamp');
     const elCust = document.getElementById('receiptCustomerName');
+    const elMethod = document.getElementById('receiptPaymentMethodLabel');
+    const elStatus = document.getElementById('receiptPaymentStatus');
     const elItemsBody = document.getElementById('receiptItemsBody');
     const elSub = document.getElementById('receiptSubtotal');
     const elVouch = document.getElementById('receiptVoucherDiscount');
@@ -3724,6 +3817,8 @@
     if (elTrx) elTrx.textContent = trxId;
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
+    if (elMethod) elMethod.textContent = receiptLabel;
+    if (elStatus) elStatus.textContent = 'Lunas';
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
@@ -3765,7 +3860,10 @@
       totalSaved: discount,
       itemCount: receiptItems.length,
       items: receiptItems,
-      paymentMethod: receiptLabel
+      paymentMethod: receiptLabel,
+      paymentStatus: 'paid',
+      cashReceived: checkoutPaymentMethod === 'cash' ? cashPaid : null,
+      cashChange: checkoutPaymentMethod === 'cash' ? cashPaid - grandTotal : null
     };
 
     appState.history.unshift(newReceipt);
@@ -3789,12 +3887,18 @@
         total_saved: newReceipt.totalSaved,
         item_count: newReceipt.itemCount,
         items: newReceipt.items,
+        payment_method: newReceipt.paymentMethod,
         created_at: new Date().toISOString()
-      }).then(() => { });
+      }).then(({ error }) => {
+        if (error) {
+          console.error('Receipt sync failed:', error);
+          showToast('Pembayaran tercatat di perangkat. Sinkronisasi cloud gagal; jalankan pembaruan skema Supabase.', 'warning');
+        }
+      }).catch(error => {
+        console.error('Receipt sync failed:', error);
+        showToast('Pembayaran tercatat di perangkat, tetapi koneksi cloud gagal.', 'warning');
+      });
     }
-
-    AudioEngine.playCashier();
-    AudioEngine.playSuccess();
 
     if (window.confetti) {
       confetti({
@@ -3805,7 +3909,7 @@
       });
     }
 
-    showToast('Struk belanja siap.', 'success');
+    showToast('Pembayaran dicatat dan struk berhasil dibuat.', 'success');
   }
 
   function copyThermalReceiptSummary() {
@@ -3813,16 +3917,12 @@
     const elCust = document.getElementById('receiptCustomerName')?.textContent || '';
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
-    const text = `🧾 CATATAN BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Catatan: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nStatus: Belum dibayar\nCatatan ini bukan bukti pembayaran.`;
+    const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
+    const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: Lunas (dicatat di Cartly)`;
 
     navigator.clipboard?.writeText(text);
     AudioEngine.playTap();
     showToast('Teks struk berhasil disalin ke clipboard!', 'success');
-  }
-
-  // Alias for backward compatibility
-  function handleCheckout() {
-    openAstroCheckoutModal();
   }
 
   function formatReceiptDate(rawDate) {
@@ -3947,6 +4047,7 @@
           <div class="receipt-market-name">SUPERMARKET GROSIR</div>
           <small>Struk Belanja Mandiri • Cartly</small>
           <div class="receipt-meta-row font-mono text-[11px]">${escapeHtml(displayDate)}</div>
+          <div class="receipt-meta-row text-[11px]">Metode: ${escapeHtml(rcp.paymentMethod || 'Belum dicatat')} • ${rcp.paymentStatus === 'paid' || (rcp.paymentMethod && !/belum dibayar|catatan belanja/i.test(rcp.paymentMethod)) ? 'Lunas' : 'Belum dibayar'}</div>
         </div>
         <div class="receipt-lines-list max-h-60 overflow-y-auto my-2 pr-1">
           ${itemsHtml}

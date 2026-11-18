@@ -18,9 +18,12 @@ create table if not exists public.receipts (
   total_saved numeric not null default 0,
   item_count integer not null default 0,
   items jsonb not null default '[]'::jsonb,
+  payment_method text not null default '',
   created_at timestamptz not null default now(),
   primary key (owner_id, id)
 );
+
+alter table public.receipts add column if not exists payment_method text not null default '';
 
 create table if not exists public.master_products (
   id uuid primary key default gen_random_uuid(),
