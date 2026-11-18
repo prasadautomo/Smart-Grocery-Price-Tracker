@@ -1654,6 +1654,9 @@
     const hudSubtickMax = document.getElementById('hudSubtickMax');
     if (hudSubtickMax) hudSubtickMax.textContent = `Max ${formatNumber(Math.round(limit / 1000))}k`;
 
+    const hudSubtickLimit = document.getElementById('hudSubtickLimit');
+    if (hudSubtickLimit) hudSubtickLimit.textContent = `Rp ${formatNumber(limit)}`;
+
     document.getElementById('summaryTotalItems').textContent = `${appState.cart.length} Jenis (${totalQty} Qty)`;
     document.getElementById('summaryTotalSaved').textContent = `Hemat Rp ${formatNumber(totalSaved)}`;
 
@@ -1692,32 +1695,38 @@
 
     if (percentage < 90) {
       if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-black tracking-widest';
+        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-black uppercase tracking-wider';
+        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span id="hudStatusText">STATUS: AMAN</span>';
       }
-      if (statusText) statusText.textContent = '';
-      if (statusIcon) statusIcon.innerHTML = '';
-      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-stone-700/80"><span class="text-stone-400 text-[10px]">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      if (remainingText) {
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#222638]"><span class="text-stone-400 text-[10.5px] font-semibold">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      }
+      if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-emerald-400 font-black tracking-tight';
       if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
     } else if (percentage >= 90 && percentage <= 100) {
       if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-mono text-[10px] font-black tracking-widest';
+        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-black uppercase tracking-wider';
+        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="hudStatusText">STATUS: WASPADA</span>';
       }
-      if (statusText) statusText.textContent = '';
-      if (statusIcon) statusIcon.innerHTML = '';
-      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-800/80 border border-yellow-500/40"><span class="text-stone-400 text-[10px]">Sisa Kritis:</span><strong class="text-yellow-300 font-black text-[12px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      if (remainingText) {
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-amber-500/40"><span class="text-amber-300/80 text-[10.5px] font-semibold">Sisa Kritis:</span><strong class="text-amber-300 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
+      }
+      if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-amber-400 font-black tracking-tight';
       if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
-      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
-      if (progressBar) progressBar.className = 'h-full bg-yellow-400 rounded-full transition-all duration-300';
+      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-amber-400 absolute -top-0.5 -right-1';
+      if (progressBar) progressBar.className = 'h-full bg-amber-400 rounded-full transition-all duration-300';
     } else {
       if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-rose-500/25 text-rose-300 border border-rose-500/50 font-mono text-[10px] font-black tracking-widest animate-pulse';
+        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/25 border border-rose-500/50 text-rose-300 font-mono text-[10px] font-black uppercase tracking-wider animate-pulse';
+        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span><span id="hudStatusText">OVER BUDGET</span>';
       }
-      if (statusText) statusText.textContent = '';
-      if (statusIcon) statusIcon.innerHTML = '';
       const overAmount = Math.abs(remaining);
-      if (remainingText) remainingText.innerHTML = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-rose-950/80 border border-rose-600/60"><span class="text-rose-300 text-[10px]">Defisit:</span><strong class="text-rose-400 font-black text-[12px]">Rp ${formatNumber(overAmount)}</strong></span>`;
+      if (remainingText) {
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-600/60"><span class="text-rose-300 text-[10.5px] font-semibold">Defisit:</span><strong class="text-rose-400 font-black text-[12.5px]">Rp ${formatNumber(overAmount)}</strong></span>`;
+      }
+      if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-rose-400 font-black tracking-tight animate-pulse';
       if (overBudgetBanner) {
         overBudgetBanner.classList.remove('hidden');
         overBudgetBanner.className = 'neo-alert-overbudget bg-red-600 text-white border-2 border-red-800 rounded-2xl p-3.5 mb-space-md shadow-lg animate-shake';
