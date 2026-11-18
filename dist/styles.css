@@ -1587,33 +1587,17 @@ button.bg-emerald-500 {
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
-#budgetHudCard .segment-meter-grid {
-  background: #08090e !important;
-  border: 1.5px solid #1f2537 !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+#budgetProgressTrack {
+  background: #202838 !important;
+  border: 1px solid #475569 !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.65) !important;
 }
 
-#budgetHudCard .segment-block {
-  background: #181d2a !important;
-  border: 1px solid #22293d !important;
-}
-
-#budgetHudCard .segment-block.active-safe {
-  background: #10b981 !important;
-  border-color: #34d399 !important;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.85) !important;
-}
-
-#budgetHudCard .segment-block.active-warn {
-  background: #eab308 !important;
-  border-color: #facc15 !important;
-  box-shadow: 0 0 10px rgba(234, 179, 8, 0.75) !important;
-}
-
-#budgetHudCard .segment-block.active-danger {
-  background: #ef4444 !important;
-  border-color: #f87171 !important;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.95) !important;
+#budgetProgressBar {
+  min-width: 0;
+  border-radius: 9999px;
+  transition: width 280ms ease, background-color 180ms ease;
+  box-shadow: 0 0 8px currentColor;
 }
 
 /* ==========================================================================

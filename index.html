@@ -384,8 +384,8 @@
           <!-- Main Numbers Group -->
           <div class="relative z-10 flex flex-col mb-3.5">
             <div class="flex items-center justify-between mb-1">
-              <span class="font-mono text-[10.5px] tracking-wider text-stone-400 uppercase font-bold">Total Belanja Berjalan</span>
-              <span class="font-mono text-[10px] text-stone-400 uppercase font-bold">Pemakaian Saldo</span>
+              <span class="font-mono text-[11px] tracking-wide text-slate-300 uppercase font-bold">Total Belanja Berjalan</span>
+              <span class="font-mono text-[11px] text-slate-300 uppercase font-bold">Pemakaian Anggaran</span>
             </div>
             <div class="flex items-baseline justify-between gap-space-xs">
               <div class="flex items-baseline gap-1.5">
@@ -394,7 +394,7 @@
                   id="hudTotalSpending">0</span>
               </div>
               <div class="text-right">
-                <span class="font-mono text-sm sm:text-base text-emerald-400 font-black tracking-tight" id="budgetPercentLabel">0% CAP</span>
+                <span class="font-mono text-sm sm:text-base text-emerald-300 font-black tracking-tight" id="budgetPercentLabel">0%</span>
               </div>
             </div>
           </div>
@@ -408,33 +408,18 @@
                   <strong class="text-emerald-400 font-black text-[12.5px]">Rp 350.000</strong>
                 </span>
               </div>
-              <div class="text-[10.5px] font-mono text-stone-400">
-                Limit: <span class="text-white font-bold" id="hudSubtickLimit">Rp 350.000</span>
+              <div class="text-[11px] font-mono text-slate-300 font-semibold">
+                Batas: <span class="text-white font-bold" id="hudSubtickLimit">Rp 350.000</span>
               </div>
             </div>
 
-            <!-- Segmented Gauge Display (Stitch Screen 2: 10-Segment Discrete LED blocks) -->
-            <div class="segment-meter-grid" id="budgetSegmentMeter">
-              <div class="segment-block" data-seg="0"></div>
-              <div class="segment-block" data-seg="1"></div>
-              <div class="segment-block" data-seg="2"></div>
-              <div class="segment-block" data-seg="3"></div>
-              <div class="segment-block" data-seg="4"></div>
-              <div class="segment-block" data-seg="5"></div>
-              <div class="segment-block" data-seg="6"></div>
-              <div class="segment-block" data-seg="7"></div>
-              <div class="segment-block" data-seg="8"></div>
-              <div class="segment-block" data-seg="9"></div>
+            <div id="budgetProgressTrack" class="w-full h-2.5 rounded-full bg-[#202838] border border-[#39445b] overflow-hidden" role="progressbar" aria-label="Pemakaian anggaran" aria-valuemin="0" aria-valuemax="100">
+              <div id="budgetProgressBar" class="h-full w-0 rounded-full bg-emerald-400 transition-all duration-300" style="width: 0%;"></div>
             </div>
-            <!-- Hidden smooth bar for compatibility with existing JS animations -->
-            <div class="hidden" id="budgetProgressBar" style="width: 0%;"></div>
 
-            <!-- Gauge Sub-ticks -->
-            <div class="flex justify-between px-1 text-[9.5px] font-mono text-stone-400 font-bold">
+            <div class="flex justify-between px-1 text-[10px] font-mono text-slate-300 font-bold">
               <span>Rp 0</span>
-              <span>50%</span>
-              <span class="text-amber-400 font-black">80% Waspada</span>
-              <span id="hudSubtickMax">Max 350k</span>
+              <span id="hudSubtickMax">100% Limit</span>
             </div>
           </div>
         </div>

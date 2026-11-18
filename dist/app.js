@@ -1221,13 +1221,13 @@
     const shortLimit = limit >= 1000000 ? `${(limit / 1000000).toFixed(1)}jt` : `${Math.round(limit / 1000)}k`;
     document.getElementById('hudBudgetLimit').textContent = `Rp ${shortLimit}`;
     const hudPercentEl = document.getElementById('budgetPercentLabel');
-    if (hudPercentEl) hudPercentEl.textContent = `${percentage.toFixed(0)}% CAP`;
+    if (hudPercentEl) hudPercentEl.textContent = `${percentage.toFixed(0)}%`;
 
     const hudSavingsEl = document.getElementById('hudTotalSavingsText');
     if (hudSavingsEl) hudSavingsEl.textContent = `Hemat Rp ${formatNumber(totalSaved)}`;
 
     const hudSubtickMax = document.getElementById('hudSubtickMax');
-    if (hudSubtickMax) hudSubtickMax.textContent = `Max ${formatNumber(Math.round(limit / 1000))}k`;
+    if (hudSubtickMax) hudSubtickMax.textContent = '100% Limit';
 
     const hudSubtickLimit = document.getElementById('hudSubtickLimit');
     if (hudSubtickLimit) hudSubtickLimit.textContent = `Rp ${formatNumber(limit)}`;
@@ -1245,24 +1245,7 @@
 
     if (progressBar) {
       progressBar.style.width = `${clampedPercentage}%`;
-    }
-
-    // Stitch Screen 2: 10-Segment Discrete Gauge Blocks
-    const segmentBlocks = document.querySelectorAll('#budgetSegmentMeter .segment-block');
-    if (segmentBlocks.length === 10) {
-      const activeCount = Math.min(10, Math.ceil((percentage / 100) * 10));
-      segmentBlocks.forEach((blk, idx) => {
-        blk.className = 'segment-block';
-        if (percentage > 0 && idx < activeCount) {
-          if (percentage < 80) {
-            blk.classList.add('active-safe');
-          } else if (percentage < 100) {
-            blk.classList.add('active-warn');
-          } else {
-            blk.classList.add('active-danger');
-          }
-        }
-      });
+      progressBar.setAttribute('aria-valuenow', String(Math.round(clampedPercentage)));
     }
 
     const navBudgetDot = document.getElementById('navBudgetDot');
@@ -1273,14 +1256,14 @@
 
     if (percentage < 90) {
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#222638]"><span class="text-stone-400 text-[10.5px] font-semibold">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#334155]"><span class="text-slate-200 text-[11px] font-semibold">Sisa anggaran:</span><strong class="text-emerald-300 font-black text-[13px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-emerald-400 font-black tracking-tight';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
     } else if (percentage >= 90 && percentage <= 100) {
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-yellow-500/40"><span class="text-yellow-300/80 text-[10.5px] font-semibold">Sisa Kritis:</span><strong class="text-yellow-300 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-yellow-400/50"><span class="text-yellow-100 text-[11px] font-semibold">Sisa anggaran:</span><strong class="text-yellow-300 font-black text-[13px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-yellow-400 font-black tracking-tight';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
@@ -1288,7 +1271,7 @@
     } else {
       const overAmount = Math.abs(remaining);
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-600/60"><span class="text-rose-300 text-[10.5px] font-semibold">Defisit:</span><strong class="text-rose-400 font-black text-[12.5px]">Rp ${formatNumber(overAmount)}</strong></span>`;
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-500/70"><span class="text-rose-100 text-[11px] font-semibold">Melebihi batas:</span><strong class="text-rose-300 font-black text-[13px]">Rp ${formatNumber(overAmount)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-rose-400 font-black tracking-tight animate-pulse';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-1';
