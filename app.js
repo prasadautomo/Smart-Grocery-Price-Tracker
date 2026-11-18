@@ -1863,13 +1863,14 @@
       btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-val') || '';
         const cur = inputItemDiscount.value.trim();
-        if (!cur) {
-          inputItemDiscount.value = val.startsWith('+') ? val.substring(1).trim() : val;
-        } else if (val.startsWith('+')) {
-          inputItemDiscount.value = `${cur} + ${val.substring(1).trim()}`;
-        } else {
-          inputItemDiscount.value = val;
-        }
+        const isPercent = /^\d+(?:[.,]\d+)?%$/.test(val.trim());
+        const currentIsPercentFormula = cur.includes('%') && !/\brp\b/i.test(cur);
+
+        // Repeated percentage taps add another discount layer (e.g. 10% + 10%).
+        // The fixed rupiah shortcut remains a standalone discount value.
+        inputItemDiscount.value = isPercent && currentIsPercentFormula
+          ? `${cur} + ${val.trim()}`
+          : val.trim();
         AudioEngine.playTap();
         updateModalLiveCalculations();
       });
