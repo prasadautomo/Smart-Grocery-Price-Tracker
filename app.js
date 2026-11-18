@@ -3577,6 +3577,26 @@
       showToast('Konfirmasi pembayaran digital terlebih dahulu.', 'warning');
       return;
     }
+
+    const receiptItems = appState.cart.map(item => {
+      const disc = calculateDiscount(item.price, item.discountRaw);
+      const lineTotal = disc.finalUnitPrice * item.qty;
+      updateMasterDatabaseItem(item.name, item.category, item.unit, item.price);
+      return {
+        name: item.name,
+        category: item.category,
+        unit: item.unit,
+        qty: item.qty,
+        originalPrice: item.price,
+        finalUnitPrice: disc.finalUnitPrice,
+        lineTotal
+      };
+    });
+    if (receiptItems.length === 0) {
+      showToast('Struk tidak dapat dibuat karena daftar barang kosong.', 'warning');
+      return;
+    }
+
     checkoutPaymentSubmitted = true;
     updateCheckoutPaymentButton();
 
@@ -3624,22 +3644,7 @@
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
 
-    // Render receipt items lines
-    const receiptItems = appState.cart.map(item => {
-      const disc = calculateDiscount(item.price, item.discountRaw);
-      const lineTotal = disc.finalUnitPrice * item.qty;
-      updateMasterDatabaseItem(item.name, item.category, item.unit, item.price);
-      return {
-        name: item.name,
-        category: item.category,
-        unit: item.unit,
-        qty: item.qty,
-        originalPrice: item.price,
-        finalUnitPrice: disc.finalUnitPrice,
-        lineTotal
-      };
-    });
-
+    // Render item lines after confirming the receipt has transaction items.
     if (elItemsBody) {
       elItemsBody.innerHTML = receiptItems.map(item => `
         <div class="flex justify-between items-start text-[11px] leading-tight py-1 border-b border-[#222638] last:border-b-0">

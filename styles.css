@@ -1958,6 +1958,21 @@ nav.fixed.bottom-0 {
   color: #263852 !important;
 }
 
+#checkoutStageReceipt .thermal-receipt-roll {
+  background: #ffffff !important;
+  color: #263852 !important;
+}
+
+#checkoutStageReceipt .thermal-receipt-roll * {
+  background-color: transparent !important;
+  color: #263852 !important;
+}
+
+#checkoutStageReceipt .thermal-receipt-roll #receiptGrandTotal,
+#checkoutStageReceipt .thermal-receipt-roll #receiptPaymentStatus {
+  color: #087b5c !important;
+}
+
 input,
 select,
 textarea {
