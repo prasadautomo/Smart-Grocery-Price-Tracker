@@ -9,8 +9,8 @@
 
   // --- SUPABASE EMBEDDED CONFIG ---
   const SUPABASE_CONFIG = {
-    URL: 'https://szhtgpjvudguknevurfh.supabase.co',
-    KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6aHRncGp2dWRndWtuZXZ1cmZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5OTcwNDcsImV4cCI6MjEwNjU3MzA0N30.qtqxVbdfU3RBz4cH2jr20w8JHiyhMs3NcppzIPGc1GA'
+    URL: 'https://wkrspzoixbkbpanoelvp.supabase.co',
+    KEY: 'sb_publishable_1FHBAEbLjAx-FI9RrBxY5A_71gqi_dG'
   };
 
   // --- STORAGE KEYS ---
