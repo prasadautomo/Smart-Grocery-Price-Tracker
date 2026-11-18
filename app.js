@@ -2972,9 +2972,6 @@
     const catalogSub = document.getElementById('catalogStoreSubtitle');
     if (catalogSub) catalogSub.innerHTML = `Daftar rak ${escapeHtml(storeName)} • Klik <strong class="text-emerald-400">+ Keranjang</strong> untuk belanja langsung`;
 
-    const bundleTitle = document.getElementById('bundleStoreTitle');
-    if (bundleTitle) bundleTitle.textContent = `Paket Sembako Komplit ${storeName}`;
-
     const searchInput = document.getElementById('inputAstroSearch');
     if (searchInput) searchInput.placeholder = `Cari barang di ${storeName} (Beras, Minyak, Telur, Mie)...`;
 
@@ -3317,12 +3314,6 @@
       });
     }
 
-    // 3. 1-Klik Paket Hemat Anak Kos Astro
-    const btnLoadKos = document.getElementById('btnLoadAstroKosPack');
-    if (btnLoadKos) {
-      btnLoadKos.addEventListener('click', loadAstroKosStarterPack);
-    }
-
     renderAstroCatalog();
   }
 
@@ -3446,57 +3437,6 @@
     renderCart();
     renderAstroCatalog();
   };
-
-  // 1-Click Paket Hemat Anak Kos Astro (Beras, Minyak, Telur, Indomie, Susu, Rinso)
-  function loadAstroKosStarterPack() {
-    const kosPicks = [
-      'lotte-beras-5kg',
-      'lotte-telur-1kg',
-      'lotte-garam-500g',
-      'astro-minyak-sunco-2l',
-      'astro-indomie-goreng-5',
-      'astro-ultra-fullcream-1l'
-    ];
-
-    kosPicks.forEach(id => {
-      const prod = ASTRO_OFFICIAL_CATALOG.find(p => p.id === id);
-      if (!prod) return;
-
-      const existing = appState.cart.find(c => c.astroId === prod.id || c.name.toLowerCase() === prod.name.toLowerCase());
-      if (!existing) {
-        appState.cart.push({
-          id: 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-          astroId: prod.id,
-          name: prod.name,
-          category: prod.category,
-          unit: prod.unit,
-          qty: 1,
-          price: prod.price,
-          lastMonthPrice: prod.originalPrice || prod.price,
-          discountRaw: prod.discountRaw || '',
-          isPlanned: true,
-          inPhysicalCart: true,
-          createdAt: Date.now()
-        });
-      }
-    });
-
-    saveCart();
-    renderCart();
-    renderAstroCatalog();
-    AudioEngine.playSuccess();
-
-    if (window.confetti) {
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#006e2f', '#6bff8f', '#ffffff']
-      });
-    }
-
-    showToast('✨ 6 Produk Paket Sembako Lotte Mart Puri Indah masuk ke troli!', 'success');
-  }
 
   // ==========================================================================
   // CARTLY CHECKOUT & PAYMENT RECORDING
