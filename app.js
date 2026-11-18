@@ -4328,11 +4328,7 @@
 
     if (fullContainer) {
       if (appState.planner.length === 0) {
-        fullContainer.innerHTML = `
-          <div class="p-4 bg-surface-container-low rounded-xl text-center text-on-surface-variant font-body-sm text-body-sm">
-            Belum ada rencana kebutuhan. Gunakan form di atas untuk mencatat barang sebelum ke supermarket.
-          </div>
-        `;
+        fullContainer.innerHTML = '';
       } else {
         let html = '';
         appState.planner.forEach(item => {
