@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SMART GROCERY PRO - NEO-CYBER & SUPABASE CLOUD SYNC CORE
  * Menjawab seluruh kebutuhan SRS F-01 s/d F-06 & Cerita Belanja Rian
  * Terintegrasi Cloud Supabase Hybrid (LocalStorage + Cloud Sync)
@@ -65,57 +65,21 @@
   ];
 
   // ==========================================================================
-  // LOTTE MART GROCERY - PURI INDAH CATALOG (32 PRODUK RESMI LOTTE MART)
+  // LOTTE MART GROCERY - PURI INDAH CATALOG (8 PRODUK KEBUTUHAN POKOK)
   // Harga real-time Lotte Mart Puri Indah, tidak perlu ketik manual!
   // ==========================================================================
   const ASTRO_OFFICIAL_CATALOG = [
     {
       id: 'lotte-beras-5kg',
-      name: 'Beras 5kg',
+      name: 'Beras Premium Setra Ramos 5kg',
       category: 'Bahan Pokok',
-      unit: 'pack',
-      price: 74000,
-      originalPrice: 68000,
-      discountRaw: '',
-      badge: 'Lotte Mart • Naik',
-      emoji: '🌾',
-      description: 'Beras 5kg Lotte Mart Puri Indah (Bulan lalu Rp 68.000 -> Naik ke Rp 74.000)'
-    },
-    {
-      id: 'lotte-telur-1kg',
-      name: 'Telur 1kg',
-      category: 'Bahan Pokok',
-      unit: 'kg',
-      price: 28000,
-      originalPrice: 32000,
-      discountRaw: '',
-      badge: 'Lotte Mart • Turun',
-      emoji: '🥚',
-      description: 'Telur 1kg Lotte Mart Puri Indah (Bulan lalu Rp 32.000 -> Turun ke Rp 28.000)'
-    },
-    {
-      id: 'lotte-garam-500g',
-      name: 'Garam 500g',
-      category: 'Dapur & Bumbu',
-      unit: 'pack',
-      price: 5000,
-      originalPrice: 5000,
-      discountRaw: '',
-      badge: 'Lotte Mart • Stabil',
-      emoji: '🧂',
-      description: 'Garam 500g Lotte Mart Puri Indah (Harga stabil Rp 5.000)'
-    },
-    {
-      id: 'astro-beras-5kg',
-      name: 'Beras Setra Ramos BMW 5kg',
-      category: 'Bahan Pokok',
-      unit: '5 kg',
+      unit: 'Karung 5kg',
       price: 69900,
       originalPrice: 74500,
       discountRaw: '-Rp 4.600',
-      badge: 'Lotte Mart • Diskon',
+      badge: 'Promo Sembako',
       emoji: '🌾',
-      description: 'Beras putih pulen super quality'
+      description: 'Beras putih pulen super quality Lotte Mart'
     },
     {
       id: 'astro-minyak-sunco-2l',
@@ -127,71 +91,23 @@
       discountRaw: '7%',
       badge: 'Best Seller',
       emoji: '🍳',
-      description: 'Minyak goreng bening tidak mudah beku'
+      description: 'Minyak goreng bening kelapa sawit pilihan'
     },
     {
-      id: 'astro-minyak-sania-2l',
-      name: 'Minyak Goreng Sania Pouch 2L',
+      id: 'lotte-telur-1kg',
+      name: 'Telur Ayam Negeri Fresh 1kg',
       category: 'Bahan Pokok',
-      unit: 'Pouch 2L',
-      price: 37500,
-      originalPrice: 39500,
-      discountRaw: '5%',
-      badge: 'Hemat',
-      emoji: '🍳',
-      description: 'Kelapa sawit pilihan bermutu tinggi'
-    },
-    {
-      id: 'astro-telur-negeri-10',
-      name: 'Telur Ayam Negeri Fresh (10 Butir)',
-      category: 'Bahan Pokok',
-      unit: 'Pack 10 btr',
-      price: 29500,
+      unit: 'Pack 1kg (16 btr)',
+      price: 28000,
       originalPrice: 32000,
       discountRaw: '',
-      badge: 'Lotte Fresh',
+      badge: 'Harga Turun',
       emoji: '🥚',
-      description: 'Telur bersih bebas bakteri salmonella'
-    },
-    {
-      id: 'astro-telur-omega-10',
-      name: 'Telur Ayam Omega 3 Lotte Mart (10 Butir)',
-      category: 'Bahan Pokok',
-      unit: 'Pack 10 btr',
-      price: 35000,
-      originalPrice: 38500,
-      discountRaw: '10%',
-      badge: 'Super Premium',
-      emoji: '🥚',
-      description: 'Kaya DHA & nutrisi tinggi untuk keluarga'
-    },
-    {
-      id: 'astro-indomie-goreng-5',
-      name: 'Indomie Goreng Spesial (Pack 5 Pcs)',
-      category: 'Bahan Pokok',
-      unit: 'Pack 5 pcs',
-      price: 15500,
-      originalPrice: 16500,
-      discountRaw: '',
-      badge: 'Favorit Kos',
-      emoji: '🍜',
-      description: 'Mie instan goreng rasa legendaris'
-    },
-    {
-      id: 'astro-indomie-soto-5',
-      name: 'Indomie Kuah Rasa Soto Mie (Pack 5 Pcs)',
-      category: 'Bahan Pokok',
-      unit: 'Pack 5 pcs',
-      price: 15000,
-      originalPrice: 16000,
-      discountRaw: '',
-      badge: 'Kuah Hangat',
-      emoji: '🍜',
-      description: 'Gurih hangat kuah soto mie khas'
+      description: 'Telur ayam negeri segar kualitas pilihan'
     },
     {
       id: 'astro-gulaku-1kg',
-      name: 'Gula Pasir Gulaku Tebu Kuning 1kg',
+      name: 'Gula Pasir Gulaku Tebu Murni 1kg',
       category: 'Bahan Pokok',
       unit: 'Pack 1kg',
       price: 18500,
@@ -199,7 +115,7 @@
       discountRaw: '',
       badge: 'Gula Murni',
       emoji: '🍬',
-      description: 'Gula tebu murni manis alami'
+      description: 'Gula tebu kristal putih higienis'
     },
     {
       id: 'astro-tepung-segitiga-1kg',
@@ -211,283 +127,43 @@
       discountRaw: '',
       badge: 'Serbaguna',
       emoji: '🌾',
-      description: 'Tepung terigu protein sedang aneka masakan'
+      description: 'Tepung terigu protein sedang aneka olahan'
+    },
+    {
+      id: 'astro-indomie-goreng-5',
+      name: 'Indomie Goreng Spesial (Pack 5 Pcs)',
+      category: 'Bahan Pokok',
+      unit: 'Pack 5 pcs',
+      price: 15500,
+      originalPrice: 16500,
+      discountRaw: '',
+      badge: 'Favorit Hemat',
+      emoji: '🍜',
+      description: 'Mie goreng instan rasa spesial legendaris'
+    },
+    {
+      id: 'lotte-garam-500g',
+      name: 'Garam Dapur Beryodium 500g',
+      category: 'Bahan Pokok',
+      unit: 'Pack 500g',
+      price: 5000,
+      originalPrice: 5000,
+      discountRaw: '',
+      badge: 'Beryodium',
+      emoji: '🧂',
+      description: 'Garam halus beryodium untuk memasak'
     },
     {
       id: 'astro-ultra-fullcream-1l',
       name: 'Ultra Milk Full Cream UHT 1000ml',
-      category: 'Susu & Minuman',
+      category: 'Bahan Pokok',
       unit: 'Kotak 1L',
       price: 21000,
       originalPrice: 22500,
       discountRaw: '',
-      badge: 'Lotte Choice',
+      badge: 'Nutrisi Harian',
       emoji: '🥛',
-      description: 'Susu sapi segar murni kaya kalsium'
-    },
-    {
-      id: 'astro-ultra-cokelat-1l',
-      name: 'Ultra Milk Cokelat UHT 1000ml',
-      category: 'Susu & Minuman',
-      unit: 'Kotak 1L',
-      price: 21500,
-      originalPrice: 23000,
-      discountRaw: '',
-      badge: 'Manis Gurih',
-      emoji: '🍫',
-      description: 'Cokelat asli nikmat kaya nutrisi'
-    },
-    {
-      id: 'astro-greenfields-pasteur-1l',
-      name: 'Greenfields Fresh Milk Pasteurisasi 1L',
-      category: 'Susu & Minuman',
-      unit: 'Botol 1L',
-      price: 32500,
-      originalPrice: 35000,
-      discountRaw: '',
-      badge: 'Fresh Chilled',
-      emoji: '🥛',
-      description: 'Susu segar pasteurisasi dingin dari peternakan'
-    },
-    {
-      id: 'astro-yakult-5',
-      name: 'Yakult Minuman Probiotik (5 Botol)',
-      category: 'Susu & Minuman',
-      unit: 'Pack 5 btl',
-      price: 11500,
-      originalPrice: 12500,
-      discountRaw: '',
-      badge: 'Pencernaan Sehat',
-      emoji: '🧃',
-      description: 'Bakteri baik L. casei Shirota strain'
-    },
-    {
-      id: 'astro-aqua-600-pack6',
-      name: 'Aqua Air Mineral 600ml (Pack 6 Botol)',
-      category: 'Susu & Minuman',
-      unit: 'Pack 6 btl',
-      price: 21000,
-      originalPrice: 24000,
-      discountRaw: '',
-      badge: 'Air Murni',
-      emoji: '💧',
-      description: 'Kemurnian air pegunungan alami'
-    },
-    {
-      id: 'astro-tehbotol-250-pack3',
-      name: 'Teh Botol Sosro Kotak 250ml (Pack 3)',
-      category: 'Susu & Minuman',
-      unit: 'Pack 3 pcs',
-      price: 11000,
-      originalPrice: 12500,
-      discountRaw: '',
-      badge: 'Teh Asli',
-      emoji: '🧃',
-      description: 'Aroma melati teh asli Indonesia'
-    },
-    {
-      id: 'astro-kopi-kapal-api-mix',
-      name: 'Kopi Kapal Api Spesial Mix (10x24g)',
-      category: 'Susu & Minuman',
-      unit: 'Renceng 10 sct',
-      price: 16500,
-      originalPrice: 18000,
-      discountRaw: '',
-      badge: 'Kopi Mantap',
-      emoji: '☕',
-      description: 'Paduan biji kopi pilihan & gula harum'
-    },
-    {
-      id: 'astro-ayam-fillet-500g',
-      name: 'Ayam Fillet Dada Boneless Lotte Fresh 500g',
-      category: 'Segar & Daging',
-      unit: 'Tray 500g',
-      price: 39900,
-      originalPrice: 44000,
-      discountRaw: '',
-      badge: 'Lotte Fresh',
-      emoji: '🍗',
-      description: 'Daging dada ayam tanpa tulang segar'
-    },
-    {
-      id: 'astro-daging-slice-300g',
-      name: 'Daging Sapi Slice Sukiyaki Shabu 300g',
-      category: 'Segar & Daging',
-      unit: 'Tray 300g',
-      price: 49500,
-      originalPrice: 55000,
-      discountRaw: '10%',
-      badge: 'Daging Impor',
-      emoji: '🥩',
-      description: 'Irisan daging sapi impor empuk gurih'
-    },
-    {
-      id: 'astro-pisang-cavendish',
-      name: 'Pisang Cavendish Sunpride (1 Sisir)',
-      category: 'Segar & Daging',
-      unit: '1 Sisir (±1.2kg)',
-      price: 26500,
-      originalPrice: 29000,
-      discountRaw: '',
-      badge: 'Buah Segar',
-      emoji: '🍌',
-      description: 'Pisang manis kulit bersih mulus bernutrisi'
-    },
-    {
-      id: 'astro-apel-fuji-1kg',
-      name: 'Apel Fuji Wang Shan Fresh 1kg',
-      category: 'Segar & Daging',
-      unit: 'Pack 1kg',
-      price: 38000,
-      originalPrice: 42000,
-      discountRaw: '',
-      badge: 'Manis Renyah',
-      emoji: '🍎',
-      description: 'Apel fuji renyah manis kaya vitamin C'
-    },
-    {
-      id: 'astro-kecap-bango-520',
-      name: 'Kecap Manis Bango Refill 520ml',
-      category: 'Dapur & Bumbu',
-      unit: 'Pouch 520ml',
-      price: 24800,
-      originalPrice: 27000,
-      discountRaw: '',
-      badge: 'Kedelai Hitam',
-      emoji: '🥫',
-      description: 'Kecap manis kedelai hitam Mallika legendaris'
-    },
-    {
-      id: 'astro-saus-abc-380',
-      name: 'Saus Sambal ABC Asli Pouch 380ml',
-      category: 'Dapur & Bumbu',
-      unit: 'Pouch 380ml',
-      price: 15500,
-      originalPrice: 17000,
-      discountRaw: '',
-      badge: 'Pedas Mantap',
-      emoji: '🌶️',
-      description: 'Cabai segar pilihan rasa pedas khas'
-    },
-    {
-      id: 'astro-royco-ayam-230',
-      name: 'Royco Kaldu Ayam Rasa Mantap 230g',
-      category: 'Dapur & Bumbu',
-      unit: 'Pouch 230g',
-      price: 11500,
-      originalPrice: 12500,
-      discountRaw: '',
-      badge: 'Penyedap Rasa',
-      emoji: '🧂',
-      description: 'Ekstrak daging ayam asli lezat masakan gurih'
-    },
-    {
-      id: 'astro-bawang-merah-250',
-      name: 'Bawang Merah Brebes Pilihan 250g',
-      category: 'Dapur & Bumbu',
-      unit: 'Pack 250g',
-      price: 18500,
-      originalPrice: 20000,
-      discountRaw: '',
-      badge: 'Bumbu Segar',
-      emoji: '🧅',
-      description: 'Bawang merah Brebes wangi sedap masakan'
-    },
-    {
-      id: 'astro-cabe-rawit-150',
-      name: 'Cabe Rawit Merah Super Segar 150g',
-      category: 'Dapur & Bumbu',
-      unit: 'Pack 150g',
-      price: 19500,
-      originalPrice: 22000,
-      discountRaw: '',
-      badge: 'Pedas Nendang',
-      emoji: '🌶️',
-      description: 'Rawit merah segar petik baru super pedas'
-    },
-    {
-      id: 'astro-rinso-molto-750',
-      name: 'Rinso Molto Cair Japanese Peach 750ml',
-      category: 'Kebersihan',
-      unit: 'Pouch 750ml',
-      price: 22900,
-      originalPrice: 25500,
-      discountRaw: '',
-      badge: 'Wangi Segar',
-      emoji: '🧺',
-      description: 'Deterjen cair konsentrat lembut wangi peach'
-    },
-    {
-      id: 'astro-sunlight-jeruk-700',
-      name: 'Sunlight Pencuci Piring Jeruk Nipis 700ml',
-      category: 'Kebersihan',
-      unit: 'Pouch 700ml',
-      price: 14500,
-      originalPrice: 16500,
-      discountRaw: '',
-      badge: 'Hilangkan Lemak',
-      emoji: '🍋',
-      description: 'Bersih kesat ekstrak jeruk nipis 100 asli'
-    },
-    {
-      id: 'astro-lifebuoy-450',
-      name: 'Sabun Mandi Lifebuoy Cair Total 10 450ml',
-      category: 'Kebersihan',
-      unit: 'Pouch 450ml',
-      price: 26500,
-      originalPrice: 29500,
-      discountRaw: '',
-      badge: 'Antibakteri',
-      emoji: '🧼',
-      description: 'Perlindungan kuman 10x lebih kuat'
-    },
-    {
-      id: 'astro-pepsodent-190',
-      name: 'Pasta Gigi Pepsodent Economy 190g',
-      category: 'Kebersihan',
-      unit: 'Tube 190g',
-      price: 14200,
-      originalPrice: 16000,
-      discountRaw: '',
-      badge: 'Gigi Sehat',
-      emoji: '🪥',
-      description: 'Perlindungan gigi berlubang aktif kalsium'
-    },
-    {
-      id: 'astro-sari-roti-kupas',
-      name: 'Roti Tawar Sari Roti Spesial Kupas',
-      category: 'Camilan & Roti',
-      unit: 'Pack 200g',
-      price: 16500,
-      originalPrice: 17500,
-      discountRaw: '',
-      badge: 'Roti Lembut',
-      emoji: '🍞',
-      description: 'Roti tawar tanpa kulit empuk bergizi'
-    },
-    {
-      id: 'astro-chitato-sapi-68',
-      name: 'Chitato Sapi Panggang 68g',
-      category: 'Camilan & Roti',
-      unit: 'Bungkus 68g',
-      price: 11500,
-      originalPrice: 12500,
-      discountRaw: '',
-      badge: 'Renyah Asik',
-      emoji: '🥔',
-      description: 'Keripik kentang bergelombang rasa sapi panggang'
-    },
-    {
-      id: 'astro-pocky-cokelat',
-      name: 'Pocky Chocolate Glico 47g',
-      category: 'Camilan & Roti',
-      unit: 'Box 47g',
-      price: 8900,
-      originalPrice: 9900,
-      discountRaw: '',
-      badge: 'Camilan Manis',
-      emoji: '🍫',
-      description: 'Biskuit stik renyah salut krim cokelat tebal'
+      description: 'Susu sapi segar UHT murni kaya kalsium'
     }
   ];
 
