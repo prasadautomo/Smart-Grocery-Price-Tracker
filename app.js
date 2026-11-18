@@ -689,13 +689,14 @@
   function pushActiveCartToCloud() {
     clearTimeout(syncCartTimer);
     syncCartTimer = setTimeout(async () => {
-      if (!appState.supabaseClient) return;
+      if (!appState.supabaseClient || !appState.currentUser?.id) return;
       try {
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
         const cartSyncId = 'active_cart_' + userSyncId;
         appState.lastCartPushTimestamp = Date.now();
         await appState.supabaseClient.from('receipts').upsert({
           id: cartSyncId,
+          owner_id: appState.currentUser.id,
           date_label: 'ACTIVE_CART',
           budget_limit: Number(appState.budgetLimit) || 350000,
           grand_total: appState.cart.reduce((sum, it) => sum + (Number(it.finalPrice) || 0), 0),
@@ -703,7 +704,7 @@
           item_count: appState.cart.length,
           items: appState.cart,
           created_at: new Date().toISOString()
-        }, { onConflict: 'id' });
+        }, { onConflict: 'owner_id,id' });
       } catch (e) {
         console.warn('Realtime cart push error:', e);
       }
@@ -714,13 +715,14 @@
   function pushActivePlannerToCloud() {
     clearTimeout(syncPlannerTimer);
     syncPlannerTimer = setTimeout(async () => {
-      if (!appState.supabaseClient) return;
+      if (!appState.supabaseClient || !appState.currentUser?.id) return;
       try {
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
         const plannerSyncId = 'active_planner_' + userSyncId;
         appState.lastPlannerPushTimestamp = Date.now();
         await appState.supabaseClient.from('receipts').upsert({
           id: plannerSyncId,
+          owner_id: appState.currentUser.id,
           date_label: 'ACTIVE_PLANNER',
           budget_limit: Number(appState.budgetLimit) || 350000,
           grand_total: 0,
@@ -728,7 +730,7 @@
           item_count: appState.planner.length,
           items: appState.planner,
           created_at: new Date().toISOString()
-        }, { onConflict: 'id' });
+        }, { onConflict: 'owner_id,id' });
       } catch (e) {
         console.warn('Realtime planner push error:', e);
       }
@@ -739,11 +741,12 @@
   function pushUserSettingsToCloud() {
     clearTimeout(syncSettingsTimer);
     syncSettingsTimer = setTimeout(async () => {
-      if (!appState.supabaseClient) return;
+      if (!appState.supabaseClient || !appState.currentUser?.id) return;
       try {
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
         await appState.supabaseClient.from('user_settings').upsert({
           id: userSyncId,
+          owner_id: appState.currentUser.id,
           budget_limit: Number(appState.budgetLimit) || 350000,
           sound_enabled: appState.soundEnabled,
           updated_at: new Date().toISOString()
@@ -803,6 +806,7 @@
   // SUPABASE CLOUD INTEGRATION MODULE (REALTIME HYBRID)
   // ==========================================================================
   function initSupabaseClient() {
+    if (appState.supabaseClient) return;
     if (appState.supabaseUrl && appState.supabaseKey && window.supabase) {
       try {
         appState.supabaseClient = window.supabase.createClient(appState.supabaseUrl, appState.supabaseKey);
@@ -811,38 +815,48 @@
         subscribeToRealtimeChanges();
         startRealtimeHeartbeat();
 
-        // Listen to official Supabase Auth state changes (Google OAuth callback)
         appState.supabaseClient.auth.onAuthStateChange((event, session) => {
-          if (event === 'SIGNED_OUT' || localStorage.getItem('sg_explicit_logout') === 'true') {
+          if (!session?.user || localStorage.getItem('sg_explicit_logout') === 'true') return;
+          if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN' && event !== 'PASSWORD_RECOVERY') return;
+
+          const authUser = session.user;
+          const meta = authUser.user_metadata || {};
+          const email = authUser.email || '';
+          const username = meta.username || email.split('@')[0] || 'cartly_user';
+          const displayName = meta.display_name || meta.full_name || meta.name || username;
+          const userObj = {
+            id: authUser.id,
+            slug: getUserSlug(authUser.id),
+            username,
+            displayName,
+            provider: authUser.app_metadata?.provider || 'email',
+            email,
+            avatarUrl: meta.avatar_url || meta.picture || '',
+            avatarText: (displayName[0] || 'U').toUpperCase(),
+            loginAt: Date.now()
+          };
+
+          if (event === 'PASSWORD_RECOVERY') {
+            appState.authRecoveryUser = userObj;
+            const recoveryModal = document.getElementById('modalForgotPasswordBackdrop');
+            document.getElementById('formForgotStep1Email')?.classList.add('hidden');
+            document.getElementById('formForgotStep2Reset')?.classList.remove('hidden');
+            document.getElementById('forgotModalDesc').textContent = 'Masukkan password baru untuk akun Anda.';
+            document.getElementById('inputForgotOtp')?.removeAttribute('required');
+            document.getElementById('inputForgotOtp')?.closest('div')?.classList.add('hidden');
+            document.getElementById('forgotTargetEmailDisplay').textContent = email;
+            recoveryModal?.classList.remove('hidden');
             return;
           }
 
-          if (event === 'SIGNED_IN' && session && session.user) {
-            const u = session.user;
-            const meta = u.user_metadata || {};
-            const email = u.email || meta.email || '';
-            const name = meta.full_name || meta.name || (email ? email.split('@')[0] : 'User Google');
-            const username = email ? email.split('@')[0] : 'google_user';
-            const avatarUrl = meta.avatar_url || meta.picture || '';
-
-            const userObj = {
-              slug: 'g_' + getUserSlug(username),
-              username: username,
-              displayName: name,
-              provider: 'google',
-              email: email,
-              avatarUrl: avatarUrl,
-              avatarText: (name[0] || 'G').toUpperCase(),
-              loginAt: Date.now()
-            };
-
-            loginAsUser(userObj, true);
-          }
+          if (appState.currentUser?.id !== authUser.id) loginAsUser(userObj, event === 'SIGNED_IN');
         });
 
-        pullDataFromSupabase(true).then(() => {
-          appState.hasInitialCloudPulled = true;
-        });
+        if (appState.currentUser) {
+          pullDataFromSupabase(true).then(() => {
+            appState.hasInitialCloudPulled = true;
+          });
+        }
       } catch (e) {
         console.error('Supabase init error:', e);
         appState.isCloudConnected = false;
@@ -958,7 +972,7 @@
   }
 
   async function pushDataToSupabase(silent = false) {
-    if (!appState.supabaseClient) {
+    if (!appState.supabaseClient || !appState.currentUser?.id) {
       if (!silent) showToast('Koneksi sinkronisasi belum aktif!', 'warning');
       return;
     }
@@ -970,6 +984,7 @@
       const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
       await appState.supabaseClient.from('user_settings').upsert({
         id: userSyncId,
+        owner_id: appState.currentUser.id,
         budget_limit: appState.budgetLimit,
         sound_enabled: appState.soundEnabled,
         updated_at: new Date().toISOString()
@@ -978,13 +993,14 @@
       // 2. Sync Master Items
       if (appState.masterItems.length > 0) {
         const masterPayload = appState.masterItems.map(item => ({
+          owner_id: appState.currentUser.id,
           name: item.name,
           category: item.category,
           unit: item.unit,
           last_price: item.lastPrice,
           updated_at: new Date().toISOString()
         }));
-        await appState.supabaseClient.from('master_products').upsert(masterPayload, { onConflict: 'name' });
+        await appState.supabaseClient.from('master_products').upsert(masterPayload, { onConflict: 'owner_id,name' });
       }
 
       // 3. Sync Receipts (excluding active carts/planners)
@@ -993,6 +1009,7 @@
           .filter(rcp => !rcp.id.startsWith('active_cart_') && !rcp.id.startsWith('active_planner_'))
           .map(rcp => ({
             id: rcp.id,
+            owner_id: appState.currentUser.id,
             date_label: rcp.date,
             budget_limit: rcp.budgetLimit,
             grand_total: rcp.grandTotal,
@@ -1002,7 +1019,7 @@
             created_at: new Date().toISOString()
           }));
         if (receiptsPayload.length > 0) {
-          await appState.supabaseClient.from('receipts').upsert(receiptsPayload, { onConflict: 'id' });
+          await appState.supabaseClient.from('receipts').upsert(receiptsPayload, { onConflict: 'owner_id,id' });
         }
       }
 
@@ -1011,6 +1028,7 @@
       appState.lastCartPushTimestamp = Date.now();
       await appState.supabaseClient.from('receipts').upsert({
         id: cartSyncId,
+        owner_id: appState.currentUser.id,
         date_label: 'ACTIVE_CART',
         budget_limit: Number(appState.budgetLimit) || 350000,
         grand_total: appState.cart.reduce((sum, it) => sum + (Number(it.finalPrice) || 0), 0),
@@ -1018,13 +1036,14 @@
         item_count: appState.cart.length,
         items: appState.cart,
         created_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      }, { onConflict: 'owner_id,id' });
 
       // 5. Sync Active Planner in Cloud
       const plannerSyncId = 'active_planner_' + userSyncId;
       appState.lastPlannerPushTimestamp = Date.now();
       await appState.supabaseClient.from('receipts').upsert({
         id: plannerSyncId,
+        owner_id: appState.currentUser.id,
         date_label: 'ACTIVE_PLANNER',
         budget_limit: Number(appState.budgetLimit) || 350000,
         grand_total: 0,
@@ -1032,7 +1051,7 @@
         item_count: appState.planner.length,
         items: appState.planner,
         created_at: new Date().toISOString()
-      }, { onConflict: 'id' });
+      }, { onConflict: 'owner_id,id' });
 
       if (!silent) {
         AudioEngine.playSuccess();
@@ -1045,7 +1064,7 @@
   }
 
   async function pullDataFromSupabase(silent = false) {
-    if (!appState.supabaseClient) {
+    if (!appState.supabaseClient || !appState.currentUser?.id) {
       if (!silent) showToast('Koneksi sinkronisasi belum aktif!', 'warning');
       return;
     }
@@ -1056,7 +1075,8 @@
       // 1. Fetch Master Products
       const { data: masterData, error: masterErr } = await appState.supabaseClient
         .from('master_products')
-        .select('*');
+        .select('*')
+        .eq('owner_id', appState.currentUser.id);
 
       if (!masterErr && masterData && masterData.length > 0) {
         appState.masterItems = masterData.map(m => ({
@@ -1072,6 +1092,7 @@
       const { data: receiptsData, error: rcpErr } = await appState.supabaseClient
         .from('receipts')
         .select('*')
+        .eq('owner_id', appState.currentUser.id)
         .order('created_at', { ascending: false });
 
       if (!rcpErr && receiptsData && receiptsData.length > 0) {
@@ -1125,6 +1146,7 @@
         .from('user_settings')
         .select('*')
         .eq('id', userSyncId)
+        .eq('owner_id', appState.currentUser.id)
         .single();
 
       if (settingsData) {
@@ -1911,9 +1933,10 @@
 
     // Auto-sync single item to Supabase if connected
     if (appState.supabaseClient) {
-      appState.supabaseClient.from('master_products').upsert({
+      if (appState.currentUser?.id) appState.supabaseClient.from('master_products').upsert({
+        owner_id: appState.currentUser?.id,
         name, category, unit, last_price: price, updated_at: new Date().toISOString()
-      }, { onConflict: 'name' }).then(() => { });
+      }, { onConflict: 'owner_id,name' }).then(() => { });
     }
   }
 
@@ -4361,8 +4384,9 @@
 
     // Auto push receipt to Supabase if connected
     if (appState.supabaseClient) {
-      appState.supabaseClient.from('receipts').insert({
+      if (appState.currentUser?.id) appState.supabaseClient.from('receipts').insert({
         id: newReceipt.id,
+        owner_id: appState.currentUser?.id,
         date_label: newReceipt.date,
         budget_limit: newReceipt.budgetLimit,
         grand_total: newReceipt.grandTotal,
@@ -4472,7 +4496,7 @@
 
     if (appState.supabaseClient) {
       try {
-        await appState.supabaseClient.from('receipts').delete().eq('id', receiptId);
+        await appState.supabaseClient.from('receipts').delete().eq('id', receiptId).eq('owner_id', appState.currentUser?.id);
       } catch (err) {
         console.warn('Failed to delete receipt from Supabase:', err);
       }
@@ -4495,7 +4519,7 @@
 
     if (appState.supabaseClient && idsToDelete.length > 0) {
       try {
-        await appState.supabaseClient.from('receipts').delete().in('id', idsToDelete);
+        await appState.supabaseClient.from('receipts').delete().in('id', idsToDelete).eq('owner_id', appState.currentUser?.id);
       } catch (err) {
         console.warn('Failed to clear receipts in Supabase:', err);
       }
@@ -5164,9 +5188,7 @@
   // ==========================================================================
   // AUTHENTICATION & MULTI-USER DATA ISOLATION MODULE
   // ==========================================================================
-  // AUTHENTICATION & MULTI-USER SYSTEM (USERNAME & PASSWORD / GOOGLE)
-  // ==========================================================================
-  const USERS_CREDENTIALS_KEY = 'smart_grocery_user_credentials';
+  // Supabase is the single source of truth for account credentials.
 
   function initAuthModule() {
     const loginScreen = document.getElementById('loginScreen');
@@ -5260,46 +5282,16 @@
       });
     }
 
-    // Helper: Get stored user credentials
-    function getStoredCredentials() {
-      try {
-        const raw = localStorage.getItem(USERS_CREDENTIALS_KEY);
-        return raw ? JSON.parse(raw) : {};
-      } catch (e) {
-        return {};
-      }
-    }
-
-    function saveCredentials(creds) {
-      try {
-        localStorage.setItem(USERS_CREDENTIALS_KEY, JSON.stringify(creds));
-      } catch (e) {}
-    }
-
-    // 1. Check existing session
-    let savedUser = null;
+    // Clear legacy browser-stored passwords and cached identities.
     try {
-      const rawUser = localStorage.getItem(AUTH_STORAGE_KEYS.CURRENT_USER);
-      if (rawUser) {
-        savedUser = JSON.parse(rawUser);
-      }
-    } catch (e) {
-      console.warn('Error reading saved user session:', e);
-    }
-
-    if (savedUser && savedUser.username) {
-      appState.currentUser = savedUser;
-      if (loginScreen) loginScreen.classList.add('hidden');
-      loadDataFromStorage();
-      updateHeaderUserUI();
-    } else {
-      // First time or logged out -> Show clean login screen
-      appState.currentUser = null;
-      loadDataFromStorage();
-      if (loginScreen) loginScreen.classList.remove('hidden');
-      renderSavedAccountsList();
-      updateHeaderUserUI();
-    }
+      localStorage.removeItem('smart_grocery_user_credentials');
+      localStorage.removeItem(AUTH_STORAGE_KEYS.CURRENT_USER);
+      localStorage.removeItem(AUTH_STORAGE_KEYS.KNOWN_USERS);
+    } catch (e) {}
+    appState.currentUser = null;
+    loadDataFromStorage();
+    if (loginScreen) loginScreen.classList.remove('hidden');
+    updateHeaderUserUI();
 
     // Inline Alert Helper on Login Card
     const alertEl = document.getElementById('loginFeedbackAlert');
@@ -5354,85 +5346,36 @@
       });
     }
 
-    // 2. Handle Login Submit
+    // Sign in with a Supabase Auth email/password account.
     if (formLogin) {
-      formLogin.addEventListener('submit', (e) => {
+      formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
         e.stopPropagation();
         hideLoginAlert();
-        const rawUsername = inputUsername ? inputUsername.value.trim() : '';
+        const rawEmail = inputUsername ? inputUsername.value.trim().toLowerCase() : '';
         const rawPassword = inputPassword ? inputPassword.value : '';
 
-        if (!rawUsername) {
-          AudioEngine.playLimitAlert();
-          showLoginAlert('Silakan masukkan username kamu!', 'warning');
-          showToast('Silakan masukkan username kamu!', 'warning');
-          if (inputUsername) {
-            inputUsername.style.borderColor = '#ef4444';
-            inputUsername.focus();
-          }
+        if (!appState.supabaseClient) initSupabaseClient();
+        if (!rawEmail || !rawEmail.includes('@') || !rawPassword) {
+          showLoginAlert('Masukkan email dan password yang valid.', 'warning');
+          return;
+        }
+        if (!appState.supabaseClient) {
+          showLoginAlert('Layanan autentikasi belum siap. Coba muat ulang halaman.', 'danger');
           return;
         }
 
-        if (!rawPassword) {
-          AudioEngine.playLimitAlert();
-          showLoginAlert('Silakan masukkan password akun kamu!', 'warning');
-          showToast('Silakan masukkan password akun kamu!', 'warning');
-          if (inputPassword) {
-            inputPassword.style.borderColor = '#ef4444';
-            inputPassword.focus();
-          }
+        localStorage.removeItem('sg_explicit_logout');
+        const { error } = await appState.supabaseClient.auth.signInWithPassword({ email: rawEmail, password: rawPassword });
+        if (error) {
+          showLoginAlert(error.message || 'Email atau password tidak cocok.', 'danger');
           return;
         }
-
-        const slug = getUserSlug(rawUsername);
-        const creds = getStoredCredentials();
-
-        // Akun harus terdaftar terlebih dahulu lewat Sign Up (Daftar Akun)
-        if (!creds[slug]) {
-          AudioEngine.playLimitAlert();
-          const notRegMsg = `Akun "${rawUsername}" belum terdaftar! Silakan klik tab "Daftar Akun" di atas untuk mendaftar.`;
-          showLoginAlert(notRegMsg, 'danger');
-          showToast(notRegMsg, 'danger');
-          if (inputUsername) {
-            inputUsername.style.borderColor = '#ef4444';
-            inputUsername.focus();
-          }
-          return;
-        }
-
-        // Verifikasi password akun terdaftar
-        if (creds[slug].password !== rawPassword) {
-          AudioEngine.playLimitAlert();
-          const wrongPwdMsg = 'Password salah! Cek kembali password akun kamu.';
-          showLoginAlert(wrongPwdMsg, 'danger');
-          showToast(wrongPwdMsg, 'danger');
-          if (inputPassword) {
-            inputPassword.value = '';
-            inputPassword.style.borderColor = '#ef4444';
-            inputPassword.focus();
-          }
-          return;
-        }
-
-        const userObj = {
-          slug: slug,
-          username: creds[slug].username || rawUsername,
-          displayName: creds[slug].displayName || creds[slug].username || rawUsername,
-          provider: 'username',
-          email: '',
-          avatarText: (rawUsername[0] || 'U').toUpperCase(),
-          loginAt: Date.now()
-        };
-
         hideLoginAlert();
-        loginAsUser(userObj, true);
-        if (inputUsername) inputUsername.value = '';
-        if (inputPassword) inputPassword.value = '';
       });
     }
 
-    // 3. Handle Register Submit (Instant Register & Login - Tanpa batasan kuota OTP email)
+    // Create the Auth account in Supabase; passwords never enter app storage.
     if (formRegister) {
       formRegister.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -5453,715 +5396,113 @@
           return;
         }
 
-        if (!rawPassword || rawPassword.length < 4) {
-          showToast('Password minimal 4 karakter!', 'warning');
+        if (!rawPassword || rawPassword.length < 8) {
+          showToast('Password minimal 8 karakter.', 'warning');
           if (inputRegPassword) inputRegPassword.focus();
           return;
         }
 
-        const slug = getUserSlug(rawUsername);
-        const creds = getStoredCredentials();
-
-        if (creds[slug]) {
-          showToast('Username sudah terdaftar! Silakan login di tab Masuk.', 'warning');
-          if (tabLoginBtn) tabLoginBtn.click();
-          if (inputUsername) inputUsername.value = rawUsername;
-          if (inputPassword) inputPassword.focus();
+        if (!appState.supabaseClient) initSupabaseClient();
+        if (!appState.supabaseClient) {
+          showToast('Layanan autentikasi belum siap. Coba muat ulang halaman.', 'danger');
           return;
         }
-
-        // Check if email is already registered locally
-        const isEmailRegistered = Object.values(creds).some(c => c.email && c.email.toLowerCase() === rawEmail.toLowerCase());
-        if (isEmailRegistered) {
-          showToast('Email ini sudah terdaftar! Silakan login atau gunakan email lain.', 'warning');
-          if (inputRegEmail) inputRegEmail.focus();
-          return;
-        }
-
-        // Simpan akun baru secara permanen
-        creds[slug] = {
-          username: rawUsername,
-          email: rawEmail,
+        localStorage.removeItem('sg_explicit_logout');
+        const { data, error } = await appState.supabaseClient.auth.signUp({
+          email: rawEmail.toLowerCase(),
           password: rawPassword,
-          verified: true,
-          createdAt: Date.now()
-        };
-        saveCredentials(creds);
-
-        // Daftarkan ke Supabase di background jika terhubung
-        if (appState.supabaseClient) {
-          appState.supabaseClient.auth.signUp({
-            email: rawEmail,
-            password: rawPassword,
-            options: {
-              data: {
-                username: rawUsername,
-                display_name: rawUsername
-              }
-            }
-          }).catch(err => console.warn('Supabase background signup:', err));
+          options: {
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+            data: { username: rawUsername, display_name: rawUsername }
+          }
+        });
+        if (error) {
+          showToast(error.message || 'Pendaftaran gagal.', 'danger');
+          return;
         }
-
-        const userObj = {
-          slug: slug,
-          username: rawUsername,
-          displayName: rawUsername,
-          provider: 'username',
-          email: rawEmail,
-          avatarText: (rawUsername[0] || 'U').toUpperCase(),
-          loginAt: Date.now()
-        };
 
         if (inputRegUsername) inputRegUsername.value = '';
         if (inputRegEmail) inputRegEmail.value = '';
         if (inputRegPassword) inputRegPassword.value = '';
 
         hideLoginAlert();
-        loginAsUser(userObj, true);
-        AudioEngine.playSuccess();
-        showToast(`Akun ${rawUsername} berhasil dibuat! Selamat datang di Cartly.`, 'success');
+        if (data.session) {
+          showToast(`Akun ${rawUsername} berhasil dibuat.`, 'success');
+        } else {
+          showToast('Akun berhasil dibuat. Periksa email untuk mengonfirmasi pendaftaran.', 'success');
+        }
       });
     }
 
     // ==========================================================================
-    // FORGOT PASSWORD MODULE (Kirim kode verifikasi ke Gmail & Reset Password)
-    // ==========================================================================
+    // Supabase-managed password recovery.
     const btnForgotTrigger = document.getElementById('btnForgotPasswordTrigger');
     const modalForgot = document.getElementById('modalForgotPasswordBackdrop');
     const btnCancelForgot = document.getElementById('btnCancelForgotModal');
     const formForgotStep1 = document.getElementById('formForgotStep1Email');
     const inputForgotEmail = document.getElementById('inputForgotEmail');
     const formForgotStep2 = document.getElementById('formForgotStep2Reset');
-    const forgotTargetEmailDisplay = document.getElementById('forgotTargetEmailDisplay');
-    const inputForgotOtp = document.getElementById('inputForgotOtp');
     const inputForgotNewPassword = document.getElementById('inputForgotNewPassword');
-    const btnToggleForgotPwd = document.getElementById('btnToggleForgotPwd');
-    const forgotModalDesc = document.getElementById('forgotModalDesc');
-
-    let forgotState = null;
-
-    if (btnToggleForgotPwd && inputForgotNewPassword) {
-      btnToggleForgotPwd.addEventListener('click', () => {
-        const isPwd = inputForgotNewPassword.type === 'password';
-        inputForgotNewPassword.type = isPwd ? 'text' : 'password';
-        const icon = btnToggleForgotPwd.querySelector('.material-symbols-outlined');
-        if (icon) icon.textContent = isPwd ? 'visibility_off' : 'visibility';
-      });
-    }
-
-    if (btnForgotTrigger && modalForgot) {
-      btnForgotTrigger.addEventListener('click', () => {
-        AudioEngine.playTap();
-        forgotState = null;
-        if (formForgotStep1) formForgotStep1.classList.remove('hidden');
-        if (formForgotStep2) formForgotStep2.classList.add('hidden');
-        if (forgotModalDesc) forgotModalDesc.textContent = 'Masukkan email akun kamu untuk menerima 6-digit kode verifikasi';
-        if (inputForgotEmail) {
-          inputForgotEmail.value = inputUsername && inputUsername.value.includes('@') ? inputUsername.value : '';
-          inputForgotEmail.style.borderColor = '';
-        }
-        modalForgot.classList.remove('hidden');
-        setTimeout(() => {
-          if (inputForgotEmail) inputForgotEmail.focus();
-        }, 150);
-      });
-    }
-
-    if (btnCancelForgot && modalForgot) {
-      btnCancelForgot.addEventListener('click', () => {
-        modalForgot.classList.add('hidden');
-      });
-    }
-
-    // Step 1: Submit Email Lupa Password
-    if (formForgotStep1) {
-      formForgotStep1.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const rawEmail = inputForgotEmail ? inputForgotEmail.value.trim().toLowerCase() : '';
-        if (!rawEmail || !rawEmail.includes('@')) {
-          showToast('Masukkan alamat email yang valid!', 'warning');
-          if (inputForgotEmail) inputForgotEmail.focus();
-          return;
-        }
-
-        const creds = getStoredCredentials();
-        // Cari user berdasarkan email
-        const targetSlug = Object.keys(creds).find(s => creds[s].email && creds[s].email.toLowerCase() === rawEmail);
-
-        if (!targetSlug) {
-          AudioEngine.playLimitAlert();
-          showToast('Email ini belum terdaftar di aplikasi!', 'danger');
-          if (inputForgotEmail) {
-            inputForgotEmail.style.borderColor = '#ef4444';
-            inputForgotEmail.focus();
-          }
-          return;
-        }
-
-        showToast('Mengirim kode verifikasi ke Gmail...', 'info');
-
-        // Panggil Supabase reset password jika terhubung
-        if (appState.supabaseClient) {
-          try {
-            await appState.supabaseClient.auth.resetPasswordForEmail(rawEmail);
-          } catch (err) {
-            console.warn('Supabase resetPassword error:', err);
-          }
-        }
-
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        forgotState = {
-          email: rawEmail,
-          slug: targetSlug,
-          otp: otpCode,
-          createdAt: Date.now()
-        };
-
-        if (forgotTargetEmailDisplay) forgotTargetEmailDisplay.textContent = rawEmail;
-        if (formForgotStep1) formForgotStep1.classList.add('hidden');
-        if (formForgotStep2) formForgotStep2.classList.remove('hidden');
-        if (forgotModalDesc) forgotModalDesc.textContent = 'Masukkan kode verifikasi dari email dan password baru kamu';
-
-        if (inputForgotOtp) {
-          inputForgotOtp.value = '';
-          inputForgotOtp.focus();
-        }
-
-        AudioEngine.playSuccess();
-        showToast(`Kode verifikasi dikirim ke ${rawEmail}`, 'success');
-      });
-    }
-
-    // Step 2: Submit OTP & Password Baru
     if (formForgotStep2) {
-      formForgotStep2.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const enteredOtp = inputForgotOtp ? inputForgotOtp.value.trim() : '';
-        const newPassword = inputForgotNewPassword ? inputForgotNewPassword.value : '';
-
-        if (!forgotState) {
-          showToast('Sesi lupa password telah kadaluarsa. Silakan ulangi.', 'warning');
-          if (formForgotStep1) formForgotStep1.classList.remove('hidden');
-          if (formForgotStep2) formForgotStep2.classList.add('hidden');
-          return;
-        }
-
-        if (!enteredOtp || enteredOtp.length < 6) {
-          AudioEngine.playLimitAlert();
-          showToast('Masukkan 6 digit kode verifikasi!', 'warning');
-          if (inputForgotOtp) inputForgotOtp.focus();
-          return;
-        }
-
-        if (!newPassword || newPassword.length < 4) {
-          showToast('Password baru minimal 4 karakter!', 'warning');
-          if (inputForgotNewPassword) inputForgotNewPassword.focus();
-          return;
-        }
-
-        let isOtpValid = false;
-
-        // Coba verifikasi dengan Supabase recovery
-        if (appState.supabaseClient) {
-          try {
-            const { data, error } = await appState.supabaseClient.auth.verifyOtp({
-              email: forgotState.email,
-              token: enteredOtp,
-              type: 'recovery'
-            });
-            if (!error && data && data.user) {
-              isOtpValid = true;
-              // Update user password di Supabase
-              await appState.supabaseClient.auth.updateUser({ password: newPassword });
-            }
-          } catch (e) {
-            console.warn('Supabase verify recovery error:', e);
-          }
-        }
-
-        if (!isOtpValid && enteredOtp === forgotState.otp) {
-          isOtpValid = true;
-        }
-
-        if (!isOtpValid) {
-          AudioEngine.playLimitAlert();
-          showToast('Kode verifikasi salah! Cek kembali email Anda.', 'danger');
-          if (inputForgotOtp) {
-            inputForgotOtp.style.borderColor = '#ef4444';
-            inputForgotOtp.focus();
-          }
-          return;
-        }
-
-        // Simpan password baru ke kredensial
-        const creds = getStoredCredentials();
-        if (creds[forgotState.slug]) {
-          creds[forgotState.slug].password = newPassword;
-          saveCredentials(creds);
-        }
-
-        if (modalForgot) modalForgot.classList.add('hidden');
-        AudioEngine.playSuccess();
-        showToast('Password berhasil diubah! Silakan masuk dengan password baru.', 'success');
-
-        // Beralih ke form login & isi otomatis username
-        if (tabLoginBtn) tabLoginBtn.click();
-        if (inputUsername) inputUsername.value = creds[forgotState.slug]?.username || forgotState.email;
-        if (inputPassword) {
-          inputPassword.value = '';
-          inputPassword.focus();
-        }
-
-        forgotState = null;
+      formForgotStep2.classList.add('hidden');
+      formForgotStep2.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = inputForgotNewPassword?.value || '';
+        if (password.length < 8) return showToast('Password minimal 8 karakter.', 'warning');
+        const { data, error } = await appState.supabaseClient.auth.updateUser({ password });
+        if (error) return showToast(error.message, 'danger');
+        modalForgot?.classList.add('hidden');
+        if (data.user && appState.authRecoveryUser) loginAsUser(appState.authRecoveryUser, false);
+        showToast('Password berhasil diperbarui.', 'success');
+        inputForgotNewPassword.value = '';
+        appState.authRecoveryUser = null;
       });
     }
-
-    // 4. Handle Official Supabase Google OAuth Flow
-    // Helper mem-parse payload JWT tanpa dependency eksternal
-    function parseJwtPayload(token) {
-      if (!token || typeof token !== 'string') return null;
-      try {
-        const parts = token.split('.');
-        if (parts.length < 2) return null;
-        const base64Url = parts[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    // Helper memproses user Supabase ke appState dan langsung tutup form login
-    function handleSupabaseUserSession(u) {
-      if (!u) return;
-      const meta = u.user_metadata || {};
-      const email = u.email || meta.email || '';
-      const name = meta.full_name || meta.name || (email ? email.split('@')[0] : 'User Google');
-      const username = email ? email.split('@')[0] : 'google_user';
-      const avatarUrl = meta.avatar_url || meta.picture || '';
-
-      const userObj = {
-        slug: 'g_' + getUserSlug(username),
-        username: username,
-        displayName: name,
-        provider: 'google',
-        email: email,
-        avatarUrl: avatarUrl,
-        avatarText: (name[0] || 'G').toUpperCase(),
-        loginAt: Date.now()
-      };
-
-      loginAsUser(userObj, true);
-      const ls = document.getElementById('loginScreen');
-      if (ls) {
-        ls.classList.add('hidden');
-        ls.style.display = 'none';
-      }
-    }
-
-    // Pemroses token/code OAuth incoming dari berbagai channel (postMessage, direct redirect, dll.)
-    async function processOAuthIncoming(payload) {
-      if (!payload) return false;
-      const { hash = '', search = '', user = null } = payload;
-
-      // 1. Jika objek user sudah disiapkan langsung
-      if (user && (user.email || user.user_metadata)) {
-        handleSupabaseUserSession(user);
-        return true;
-      }
-
-      // 2. PKCE Authorization Code flow (search parameter ?code=...)
-      if (search.includes('code=')) {
-        const searchParams = new URLSearchParams(search.replace(/^\?/, ''));
-        const code = searchParams.get('code');
-        if (code && appState.supabaseClient) {
-          showToast('Menyelesaikan login Google...', 'info');
-          try {
-            const { data, error } = await appState.supabaseClient.auth.exchangeCodeForSession(code);
-            if (data && data.user) {
-              handleSupabaseUserSession(data.user);
-              return true;
-            } else if (data && data.session && data.session.user) {
-              handleSupabaseUserSession(data.session.user);
-              return true;
-            }
-          } catch (err) {
-            console.warn('exchangeCodeForSession error:', err);
-          }
-        }
-      }
-
-      // 3. Implicit token flow (hash fragment #access_token=...)
-      if (hash.includes('access_token')) {
-        const params = new URLSearchParams(hash.replace(/^#/, ''));
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        const providerToken = params.get('provider_token');
-
-        if (accessToken) {
-          showToast('Menghubungkan akun Google...', 'info');
-
-          // A. Supabase setSession
-          if (appState.supabaseClient) {
-            try {
-              const { data } = await appState.supabaseClient.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken || ''
-              });
-              if (data && data.user) {
-                handleSupabaseUserSession(data.user);
-                return true;
-              }
-            } catch (e) {}
-          }
-
-          // B. Decode Supabase JWT secara langsung jika setSession asynchronous
-          const jwt = parseJwtPayload(accessToken);
-          if (jwt && (jwt.email || jwt.user_metadata)) {
-            handleSupabaseUserSession({
-              email: jwt.email,
-              user_metadata: jwt.user_metadata || {}
-            });
-            return true;
-          }
-
-          // C. Coba fetch Google UserInfo jika ada provider_token asli dari Google
-          if (providerToken) {
-            try {
-              const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                headers: { 'Authorization': `Bearer ${providerToken}` }
-              });
-              if (res.ok) {
-                const profile = await res.json();
-                handleSupabaseUserSession({
-                  email: profile.email,
-                  user_metadata: {
-                    full_name: profile.name,
-                    avatar_url: profile.picture
-                  }
-                });
-                return true;
-              }
-            } catch (e) {}
-          }
-        }
-      }
-
-      return false;
-    }
-
-    // Deteksi jika jendela ini adalah POPUP CALLBACK OAuth dari Supabase/Google
-    const isLikelyOAuthPopup = (window.opener && window.opener !== window) || window.name === 'GoogleSignInPopup';
-    const currentHash = window.location.hash || '';
-    const currentSearch = window.location.search || '';
-
-    // Tangani jika callback menghasilkan error dari Supabase (misal server_error / scopes)
-    if (currentSearch.includes('error=')) {
-      const sp = new URLSearchParams(currentSearch.replace(/^\?/, ''));
-      const errCode = sp.get('error_code') || sp.get('error') || 'unknown';
-      const errDesc = sp.get('error_description') || errCode;
-
-      try {
-        localStorage.setItem('sg_oauth_error', JSON.stringify({ error: errCode, description: errDesc, time: Date.now() }));
-      } catch (e) {}
-
-      if (window.opener && !window.opener.closed) {
-        try {
-          window.opener.postMessage({
-            type: 'SUPABASE_OAUTH_ERROR',
-            error: errCode,
-            description: errDesc
-          }, '*');
-        } catch (e) {}
-      }
-
-      // Jika ini di dalam popup, tutup jendela seketika agar tidak membuka halaman kembar
-      if (isLikelyOAuthPopup) {
-        setTimeout(() => {
-          try { window.close(); } catch (e) {}
-        }, 150);
-      } else {
-        window.history.replaceState(null, '', window.location.pathname);
-      }
-    }
-
-    if (currentHash.includes('access_token') || currentSearch.includes('code=')) {
-      (async function resolveAnyOAuthCallback() {
-        if (!appState.supabaseClient) {
-          initSupabaseClient();
-        }
-
-        let resolvedUser = null;
-
-        // 1. Tangani code atau access_token
-        if (currentSearch.includes('code=') && appState.supabaseClient) {
-          try {
-            const code = new URLSearchParams(currentSearch.replace(/^\?/, '')).get('code');
-            if (code) {
-              const { data } = await appState.supabaseClient.auth.exchangeCodeForSession(code);
-              if (data && data.user) resolvedUser = data.user;
-            }
-          } catch (e) {}
-        } else if (currentHash.includes('access_token')) {
-          try {
-            const params = new URLSearchParams(currentHash.replace(/^#/, ''));
-            const at = params.get('access_token');
-            const rt = params.get('refresh_token');
-            if (at && appState.supabaseClient) {
-              const { data } = await appState.supabaseClient.auth.setSession({
-                access_token: at,
-                refresh_token: rt || ''
-              });
-              if (data && data.user) resolvedUser = data.user;
-            }
-            if (!resolvedUser && at) {
-              const jwt = parseJwtPayload(at);
-              if (jwt && (jwt.email || jwt.user_metadata)) {
-                resolvedUser = { email: jwt.email, user_metadata: jwt.user_metadata || {} };
-              }
-            }
-          } catch (e) {}
-        }
-
-        // 2. Jika user berhasil didapat: simpan ke localStorage agar jendela utama mendeteksi seketika
-        if (resolvedUser) {
-          const meta = resolvedUser.user_metadata || {};
-          const email = resolvedUser.email || meta.email || '';
-          const name = meta.full_name || meta.name || (email ? email.split('@')[0] : 'User Google');
-          const username = email ? email.split('@')[0] : 'google_user';
-          const avatarUrl = meta.avatar_url || meta.picture || '';
-
-          const userObj = {
-            slug: 'g_' + getUserSlug(username),
-            username: username,
-            displayName: name,
-            provider: 'google',
-            email: email,
-            avatarUrl: avatarUrl,
-            avatarText: (name[0] || 'G').toUpperCase(),
-            loginAt: Date.now()
-          };
-
-          try {
-            localStorage.setItem('sg_oauth_sync_user', JSON.stringify(userObj));
-            localStorage.setItem(AUTH_STORAGE_KEYS.CURRENT_USER, JSON.stringify(userObj));
-          } catch (e) {}
-
-          // Kirim postMessage jika opener masih terhubung
-          if (window.opener && !window.opener.closed) {
-            try {
-              window.opener.postMessage({
-                type: 'SUPABASE_OAUTH_TOKEN_TRANSFER',
-                hash: currentHash,
-                search: currentSearch,
-                user: resolvedUser
-              }, '*');
-            } catch (e) {}
-          }
-
-          // Jika ini jendela popup, tutup otomatis
-          if (isLikelyOAuthPopup) {
-            setTimeout(() => {
-              try { window.close(); } catch (e) {}
-            }, 300);
-            return;
-          }
-
-          // Jika ini jendela utama (direct redirect), langsung masuk
-          loginAsUser(userObj, true);
-          const ls = document.getElementById('loginScreen');
-          if (ls) {
-            ls.classList.add('hidden');
-            ls.style.display = 'none';
-          }
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-      })();
-    }
-
-    // Parent window: Dengarkan token/user/error dari popup via postMessage
-    window.addEventListener('message', async (event) => {
-      if (event.data && event.data.type === 'SUPABASE_OAUTH_TOKEN_TRANSFER') {
-        await processOAuthIncoming(event.data);
-      } else if (event.data && event.data.type === 'SUPABASE_OAUTH_ERROR') {
-        showToast('Login Google: ' + (event.data.description || event.data.error), 'danger');
-      }
+    if (btnForgotTrigger && modalForgot) btnForgotTrigger.addEventListener('click', () => {
+      formForgotStep1?.classList.remove('hidden');
+      formForgotStep2?.classList.add('hidden');
+      document.getElementById('inputForgotOtp')?.closest('div')?.classList.remove('hidden');
+      document.getElementById('inputForgotOtp')?.setAttribute('required', 'required');
+      document.getElementById('forgotModalDesc').textContent = 'Masukkan email akun Anda untuk menerima tautan reset.';
+      if (inputForgotEmail) inputForgotEmail.value = inputUsername?.value.includes('@') ? inputUsername.value.trim() : '';
+      modalForgot.classList.remove('hidden');
     });
-
-    // Parent window: Dengarkan perubahan localStorage jika popup menulis auth token
-    window.addEventListener('storage', (e) => {
-      if (localStorage.getItem('sg_explicit_logout') === 'true') return;
-      if ((e.key === 'sg_oauth_sync_user' || e.key === AUTH_STORAGE_KEYS.CURRENT_USER || (e.key && e.key.includes('auth-token'))) && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          const u = parsed.user || (parsed.currentSession && parsed.currentSession.user) || parsed;
-          if (u && (u.email || u.username)) {
-            if (u.provider === 'google') {
-              loginAsUser(u, true);
-            } else {
-              handleSupabaseUserSession(u);
-            }
-          }
-        } catch (err) {}
-      }
-    });
-
-    // 4. Handle Official Supabase Google OAuth Flow (Popup Mengambang Tanpa Beralih Halaman)
-    if (btnGoogle) {
-      btnGoogle.addEventListener('click', async () => {
-        AudioEngine.playTap();
-        try {
-          localStorage.removeItem('sg_explicit_logout');
-        } catch (e) {}
-
-        if (!appState.supabaseClient) {
-          initSupabaseClient();
-        }
-
-        if (appState.supabaseClient) {
-          showToast('Membuka Google Sign-In...', 'info');
-
-          try {
-            const currentRedirect = 'https://cartlybyprasada.vercel.app/';
-            const { data, error } = await appState.supabaseClient.auth.signInWithOAuth({
-              provider: 'google',
-              options: {
-                skipBrowserRedirect: true, // Mencegah halaman utama beralih halaman
-                redirectTo: currentRedirect,
-                scopes: 'openid email profile',
-                queryParams: {
-                  prompt: 'select_account',
-                  access_type: 'offline'
-                }
-              }
-            });
-
-            if (error) {
-              console.warn('Supabase Google OAuth status:', error.message);
-              showToast('Login Google resmi belum tersedia. Periksa konfigurasi provider Google di Supabase.', 'danger');
-              return;
-            }
-
-            if (data && data.url) {
-              const width = 500;
-              const height = 650;
-              const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-              const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-
-              // Hapus flag sinkronisasi & error lama sebelum mulai
-              try {
-                localStorage.removeItem('sg_oauth_sync_user');
-                localStorage.removeItem('sg_oauth_error');
-              } catch (e) {}
-
-              // Buka di popup window terpisah agar halaman utama tidak beralih halaman
-              const popup = window.open(
-                data.url,
-                'GoogleSignInPopup',
-                `width=${width},height=${height},left=${left},top=${top},status=0,toolbar=0,menubar=0,location=1`
-              );
-
-              if (popup) {
-                // Pantau sinkronisasi aktif setiap 300ms dari localStorage dan session
-                const checkInterval = setInterval(async () => {
-                  try {
-                    // Cek jika ada error dari callback
-                    const errRaw = localStorage.getItem('sg_oauth_error');
-                    if (errRaw) {
-                      localStorage.removeItem('sg_oauth_error');
-                      clearInterval(checkInterval);
-                      try { popup.close(); } catch (e) {}
-                      const errObj = JSON.parse(errRaw);
-                      showToast('Google Login: ' + (errObj.description || errObj.error), 'danger');
-                      return;
-                    }
-
-                    // A. Cek sync user dari localStorage (paling cepat & aman dari pemutusan opener)
-                    const syncRaw = localStorage.getItem('sg_oauth_sync_user');
-                    if (syncRaw) {
-                      localStorage.removeItem('sg_oauth_sync_user');
-                      clearInterval(checkInterval);
-                      const u = JSON.parse(syncRaw);
-                      if (u) {
-                        loginAsUser(u, true);
-                        try { popup.close(); } catch (e) {}
-                        return;
-                      }
-                    }
-
-                    // B. Cek session aktif di Supabase Client
-                    if (appState.supabaseClient) {
-                      const { data: sData } = await appState.supabaseClient.auth.getSession();
-                      if (sData && sData.session && sData.session.user) {
-                        clearInterval(checkInterval);
-                        handleSupabaseUserSession(sData.session.user);
-                        try { popup.close(); } catch (e) {}
-                        return;
-                      }
-                    }
-
-                    // C. Cek current user di localStorage
-                    const curRaw = localStorage.getItem(AUTH_STORAGE_KEYS.CURRENT_USER);
-                    if (curRaw) {
-                      const cur = JSON.parse(curRaw);
-                      if (cur && cur.provider === 'google' && cur.loginAt > Date.now() - 30000) {
-                        clearInterval(checkInterval);
-                        loginAsUser(cur, true);
-                        try { popup.close(); } catch (e) {}
-                        return;
-                      }
-                    }
-
-                    // D. Jika popup sudah ditutup user
-                    if (popup.closed) {
-                      clearInterval(checkInterval);
-                      // Cek sekali lagi apakah login sudah tersimpan
-                      setTimeout(() => {
-                        const finalCheck = localStorage.getItem(AUTH_STORAGE_KEYS.CURRENT_USER);
-                        if (finalCheck) {
-                          const u = JSON.parse(finalCheck);
-                          if (u && u.provider === 'google') {
-                            loginAsUser(u, true);
-                          }
-                        }
-                      }, 400);
-                    }
-                  } catch (e) {}
-                }, 300);
-              } else {
-                showToast('Izinkan pop-up di browser Anda agar tidak beralih halaman.', 'warning');
-              }
-            }
-          } catch (err) {
-            console.error('Supabase OAuth error:', err);
-            showToast('Login Google gagal dimulai. Periksa konfigurasi OAuth Google di Supabase.', 'danger');
-          }
-        } else {
-          showToast('Layanan autentikasi belum siap. Muat ulang halaman lalu coba lagi.', 'danger');
-        }
+    if (btnCancelForgot && modalForgot) btnCancelForgot.addEventListener('click', () => modalForgot.classList.add('hidden'));
+    if (formForgotStep1) formForgotStep1.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = inputForgotEmail?.value.trim().toLowerCase() || '';
+      if (!email.includes('@')) return showToast('Masukkan alamat email yang valid.', 'warning');
+      if (!appState.supabaseClient) initSupabaseClient();
+      if (!appState.supabaseClient) return showToast('Layanan autentikasi belum siap.', 'danger');
+      const { error } = await appState.supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}${window.location.pathname}`
       });
-    }
-
-    function showSupabaseGoogleGuide() {
-      const guideText = 
-        'AKSES GOOGLE BELUM DIAKTIFKAN DI DASHBOARD SUPABASE!\n\n' +
-        'Langkah manual yang perlu Anda lakukan (hanya 2 menit):\n\n' +
-        '1. Buka Dashboard Supabase Anda:\n' +
-        '   https://supabase.com/dashboard/project/szhtgpjvudguknevurfh/auth/providers\n\n' +
-        '2. Klik provider "Google" dan aktifkan toggle "Enable Google provider".\n\n' +
-        '3. Buka Google Cloud Console (https://console.cloud.google.com/apis/credentials):\n' +
-        '   - Buat OAuth Client ID (Web Application)\n' +
-        '   - Masukkan Callback URL Supabase ini ke Authorized Redirect URIs:\n' +
-        '     https://szhtgpjvudguknevurfh.supabase.co/auth/v1/callback\n\n' +
-        '4. Salin Client ID & Client Secret dari Google ke kolom di Supabase tadi, lalu klik Save.\n\n' +
-        'Setelah itu, tombol Google ini akan 100% otomatis membuka akun Google asli Anda!';
-
-      alert(guideText);
-    }
-
+      if (error) return showToast(error.message, 'danger');
+      modalForgot?.classList.add('hidden');
+      showToast('Jika email terdaftar, tautan reset password akan dikirim.', 'success');
+    });
+    // Start the official Google OAuth flow using Supabase Auth.
+    if (btnGoogle) btnGoogle.addEventListener('click', async () => {
+      AudioEngine.playTap();
+      localStorage.removeItem('sg_explicit_logout');
+      if (!appState.supabaseClient) initSupabaseClient();
+      if (!appState.supabaseClient) {
+        showToast('Layanan autentikasi belum siap.', 'danger');
+        return;
+      }
+      try {
+        const { error } = await appState.supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: 'https://cartlybyprasada.vercel.app/',
+            queryParams: { prompt: 'select_account' }
+          }
+        });
+        if (error) showLoginAlert(error.message || 'Login Google gagal dimulai.', 'danger');
+      } catch (error) {
+        showLoginAlert(error.message || 'Koneksi login Google gagal.', 'danger');
+      }
+    });
     // 7. Profile Header Trigger
     if (btnProfileTrigger) {
       btnProfileTrigger.addEventListener('click', (e) => {
@@ -6248,19 +5589,7 @@
     try {
       localStorage.setItem(AUTH_STORAGE_KEYS.CURRENT_USER, JSON.stringify(userObj));
 
-      // Update Known Users List
-      let knownUsers = [];
-      const saved = localStorage.getItem(AUTH_STORAGE_KEYS.KNOWN_USERS);
-      if (saved) knownUsers = JSON.parse(saved);
-
-      const existingIdx = knownUsers.findIndex(u => u.slug === userObj.slug);
-      if (existingIdx >= 0) {
-        knownUsers[existingIdx] = userObj;
-      } else {
-        knownUsers.unshift(userObj);
-      }
-      knownUsers = knownUsers.slice(0, 8);
-      localStorage.setItem(AUTH_STORAGE_KEYS.KNOWN_USERS, JSON.stringify(knownUsers));
+      localStorage.removeItem(AUTH_STORAGE_KEYS.KNOWN_USERS);
     } catch (e) {
       console.warn('Error saving user session:', e);
     }
@@ -6416,7 +5745,7 @@
     }
     if (displayName) displayName.textContent = appState.currentUser.displayName || appState.currentUser.username;
     if (badge) {
-      badge.textContent = isGoogle ? 'Akun Google' : 'Username Mandiri';
+      badge.textContent = isGoogle ? 'Akun Google' : 'Email & Password';
       badge.className = isGoogle
         ? 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700'
         : 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-fixed/30 text-secondary';

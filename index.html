@@ -172,7 +172,7 @@
             <label class="font-mono text-[11px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">Username</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">person</span>
-              <input type="text" id="inputLoginUsername" placeholder="Username atau email kamu" required autocomplete="username"
+              <input type="email" id="inputLoginUsername" placeholder="Email kamu" required autocomplete="email"
                 class="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0b0c14] text-white font-body-md text-sm font-bold border-2 border-[#222638] focus:border-emerald-500 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-500">
             </div>
           </div>
@@ -226,7 +226,7 @@
             <label class="font-mono text-[11px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">Buat Password</label>
             <div class="relative">
               <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">lock</span>
-              <input type="password" id="inputRegPassword" placeholder="Minimal 4 karakter" required autocomplete="new-password"
+              <input type="password" id="inputRegPassword" placeholder="Minimal 8 karakter" minlength="8" required autocomplete="new-password"
                 class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#0b0c14] text-white font-body-md text-sm font-bold border-2 border-[#222638] focus:border-emerald-500 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-500">
               <button type="button" id="btnToggleRegPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]">visibility</span>
@@ -263,14 +263,6 @@
           </svg>
           <span>Lanjutkan dengan Google</span>
         </button>
-
-        <!-- Saved Accounts on this Device -->
-        <div id="sectionSavedAccounts" class="mt-4 pt-3 border-t border-stone-200 hidden">
-          <span class="text-[10px] font-mono font-bold text-stone-500 block mb-2 uppercase">Akun Tersimpan di Perangkat:</span>
-          <div class="flex flex-wrap gap-1.5" id="savedAccountsList">
-            <!-- Rendered dynamically by JS from real user logins -->
-          </div>
-        </div>
 
       </div>
 
@@ -2183,7 +2175,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=7.2.0"></script>
+  <script src="app.js?v=8.0.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {
@@ -2199,97 +2191,6 @@
       }
     }
 
-    // Direct In-App Safeguard for Login Validation
-    window.addEventListener('load', () => {
-      const btnLogin = document.getElementById('btnSubmitLogin');
-      const inputUser = document.getElementById('inputLoginUsername');
-      const inputPass = document.getElementById('inputLoginPassword');
-      const alertBox = document.getElementById('loginFeedbackAlert');
-      const alertTxt = document.getElementById('loginFeedbackText');
-      const alertIcon = document.getElementById('loginFeedbackIcon');
-
-      function showInAppAlert(msg, targetInput) {
-        if (alertBox && alertTxt) {
-          alertTxt.textContent = msg;
-          alertBox.style.display = 'flex';
-          alertBox.classList.remove('hidden', 'animate-shake');
-          void alertBox.offsetWidth; // restart shake
-          alertBox.className = 'mb-3.5 p-3.5 rounded-xl bg-red-100 border-2 border-red-500 text-red-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
-          if (alertIcon) alertIcon.textContent = 'error';
-        }
-        const toast = document.getElementById('neoToast');
-        const msgEl = document.getElementById('toastMessage');
-        const iconEl = document.getElementById('toastIcon');
-        if (toast && msgEl) {
-          msgEl.textContent = msg;
-          toast.className = 'neo-toast show danger';
-          if (iconEl) iconEl.textContent = 'error';
-          setTimeout(() => {
-            toast.classList.remove('show');
-          }, 3000);
-        }
-        if (targetInput) {
-          targetInput.style.borderColor = '#ef4444';
-          targetInput.focus();
-        }
-      }
-
-      if (inputUser) {
-        inputUser.addEventListener('input', () => {
-          inputUser.style.borderColor = '';
-          if (alertBox) alertBox.style.display = 'none';
-        });
-      }
-      if (inputPass) {
-        inputPass.addEventListener('input', () => {
-          inputPass.style.borderColor = '';
-          if (alertBox) alertBox.style.display = 'none';
-        });
-      }
-
-      if (btnLogin) {
-        btnLogin.addEventListener('click', (e) => {
-          const u = inputUser ? inputUser.value.trim() : '';
-          const p = inputPass ? inputPass.value : '';
-
-          if (!u) {
-            e.preventDefault();
-            e.stopPropagation();
-            showInAppAlert('Silakan masukkan username kamu!', inputUser);
-            return false;
-          }
-          if (!p) {
-            e.preventDefault();
-            e.stopPropagation();
-            showInAppAlert('Silakan masukkan password akun kamu!', inputPass);
-            return false;
-          }
-
-          let creds = {};
-          try {
-            const raw = localStorage.getItem('smart_grocery_user_credentials');
-            if (raw) creds = JSON.parse(raw);
-          } catch(err){}
-
-          const slug = u.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32) || 'user';
-
-          if (!creds[slug]) {
-            e.preventDefault();
-            e.stopPropagation();
-            showInAppAlert('Akun "' + u + '" belum terdaftar! Silakan klik tab "Daftar Akun" di atas untuk mendaftar.', inputUser);
-            return false;
-          }
-
-          if (creds[slug].password !== p) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (inputPass) inputPass.value = '';
-            showInAppAlert('Password salah! Cek kembali password akun kamu.', inputPass);
-            return false;
-          }
-        }, true);
-      }
-    });
   </script>
 </body>
 
