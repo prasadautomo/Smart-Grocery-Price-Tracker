@@ -126,7 +126,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.0.0">
+  <link rel="stylesheet" href="styles.css?v=7.1.0">
 </head>
 
 <body class="bg-[#07080b] font-body-md text-on-surface antialiased flex flex-col min-h-screen selection:bg-emerald-400 selection:text-stone-950">
@@ -852,14 +852,14 @@
          ========================================================================== -->
     <section id="tabHistory" class="tab-pane flex-col w-full gap-space-md hidden">
       <!-- Sub Tab Switcher: Struk vs Acuan Harga -->
-      <div class="flex bg-surface-container-highest p-1 rounded-full mb-space-xs shadow-inner gap-1">
+      <div class="flex bg-[#11131c] p-1 rounded-full mb-space-xs border border-[#1e2338] gap-1">
         <button
-          class="flex-1 py-1.5 px-3 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm shadow-md transition-all active"
+          class="flex-1 py-1.5 px-3 rounded-full bg-emerald-600 text-white font-mono text-xs font-black shadow-md transition-all active cursor-pointer"
           id="btnSubHistory">
           <span>Struk Pembelian</span>
         </button>
         <button
-          class="flex-1 py-1.5 px-3 rounded-full text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-all"
+          class="flex-1 py-1.5 px-3 rounded-full text-stone-400 font-mono text-xs font-bold hover:text-white transition-all cursor-pointer"
           id="btnSubMaster">
           <span>Daftar Acuan Harga</span>
         </button>
@@ -867,9 +867,12 @@
 
       <!-- Sub View 1: Struk Pembelian Selesai -->
       <div id="subViewHistory" class="space-y-space-sm">
-        <div class="flex items-center justify-between mb-1 px-1">
-          <span class="font-label-sm text-label-sm text-on-surface-variant font-bold uppercase tracking-wider">Riwayat
-            Belanja Selesai</span>
+        <div class="flex items-center justify-between mb-2 px-1">
+          <span class="font-mono text-xs text-stone-400 font-bold uppercase tracking-wider">Riwayat Belanja Selesai</span>
+          <button type="button" onclick="window.clearAllHistory ? window.clearAllHistory() : null" class="text-[11px] font-mono text-stone-400 hover:text-rose-400 flex items-center gap-1 transition-colors cursor-pointer" title="Bersihkan Seluruh Riwayat Struk">
+            <span class="material-symbols-outlined text-[15px]">delete_sweep</span>
+            <span>Hapus Semua</span>
+          </button>
         </div>
         <div id="historyListContainer" class="space-y-space-sm">
           <!-- Rendered by JavaScript -->
@@ -2182,7 +2185,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=7.0.0"></script>
+  <script src="app.js?v=7.1.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {

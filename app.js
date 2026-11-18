@@ -1086,12 +1086,12 @@
         const actualReceipts = receiptsData.filter(r => !r.id.startsWith('active_cart_') && !r.id.startsWith('active_planner_'));
         appState.history = actualReceipts.map(r => ({
           id: r.id,
-          date: r.date_label,
-          budgetLimit: Number(r.budget_limit),
-          grandTotal: Number(r.grand_total),
-          totalSaved: Number(r.total_saved),
-          itemCount: Number(r.item_count),
-          items: r.items
+          date: (r.date_label || '').replace(/[\r\n]+/g, ' ').replace(/(.)\1{8,}/g, '$1$1$1...').trim() || 'Struk Belanja',
+          budgetLimit: Number(r.budget_limit) || 0,
+          grandTotal: Number(r.grand_total) || 0,
+          totalSaved: Number(r.total_saved) || 0,
+          itemCount: Number(r.item_count) || 0,
+          items: Array.isArray(r.items) ? r.items : []
         }));
         saveHistory();
 
@@ -1999,10 +1999,10 @@
 
     if (subTabHistory && subTabMaster) {
       subTabHistory.addEventListener('click', () => {
-        subTabHistory.classList.add('active', 'bg-primary-container', 'text-on-primary');
-        subTabHistory.classList.remove('text-on-surface-variant');
-        subTabMaster.classList.remove('active', 'bg-primary-container', 'text-on-primary');
-        subTabMaster.classList.add('text-on-surface-variant');
+        subTabHistory.classList.add('active', 'bg-emerald-600', 'text-white');
+        subTabHistory.classList.remove('text-stone-400');
+        subTabMaster.classList.remove('active', 'bg-emerald-600', 'text-white');
+        subTabMaster.classList.add('text-stone-400');
         if (subViewHistory) subViewHistory.classList.remove('hidden');
         if (subViewMaster) subViewMaster.classList.add('hidden');
         AudioEngine.playTap();
@@ -2010,10 +2010,10 @@
       });
 
       subTabMaster.addEventListener('click', () => {
-        subTabMaster.classList.add('active', 'bg-primary-container', 'text-on-primary');
-        subTabMaster.classList.remove('text-on-surface-variant');
-        subTabHistory.classList.remove('active', 'bg-primary-container', 'text-on-primary');
-        subTabHistory.classList.add('text-on-surface-variant');
+        subTabMaster.classList.add('active', 'bg-emerald-600', 'text-white');
+        subTabMaster.classList.remove('text-stone-400');
+        subTabHistory.classList.remove('active', 'bg-emerald-600', 'text-white');
+        subTabHistory.classList.add('text-stone-400');
         if (subViewMaster) subViewMaster.classList.remove('hidden');
         if (subViewHistory) subViewHistory.classList.add('hidden');
         AudioEngine.playTap();
@@ -4259,6 +4259,16 @@
     openAstroCheckoutModal();
   }
 
+  function formatReceiptDate(rawDate) {
+    if (!rawDate) return 'Struk Transaksi';
+    // Remove consecutive repeated character spam (e.g. zzzzzzzzz)
+    let clean = String(rawDate).replace(/[\r\n]+/g, ' ').replace(/(.)\1{8,}/g, '$1$1$1...').trim();
+    if (clean.length > 32) {
+      clean = clean.substring(0, 29) + '...';
+    }
+    return clean || 'Struk Transaksi';
+  }
+
   function renderHistoryList() {
     const container = document.getElementById('historyListContainer');
     if (!container) return;
@@ -4276,16 +4286,23 @@
 
     let html = '';
     appState.history.forEach(rcp => {
+      const displayDate = formatReceiptDate(rcp.date);
       html += `
         <div class="neo-history-card">
           <div class="h-top">
-            <span class="h-date">
-              <i data-lucide="calendar"></i> ${escapeHtml(rcp.date)}
+            <span class="h-date" title="${escapeHtml(rcp.date)}">
+              <i data-lucide="calendar"></i>
+              <span class="truncate">${escapeHtml(displayDate)}</span>
             </span>
-            <span class="h-price">Rp ${formatNumber(rcp.grandTotal)}</span>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="h-price">Rp ${formatNumber(rcp.grandTotal)}</span>
+              <button class="btn-delete-receipt" onclick="window.deleteReceipt('${rcp.id}', event)" title="Hapus Struk Ini">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
           </div>
           <div class="h-sub">
-            ${rcp.itemCount} Jenis • Hemat Promo: Rp ${formatNumber(rcp.totalSaved)}
+            <span>${rcp.itemCount} Jenis • Hemat Promo: Rp ${formatNumber(rcp.totalSaved)}</span>
           </div>
           <button class="btn-neo-secondary full-w" onclick="window.showReceiptModal('${rcp.id}')">
             <i data-lucide="file-text"></i> BUKA STRUK DIGITAL
@@ -4298,6 +4315,48 @@
     if (window.lucide) lucide.createIcons();
   }
 
+  window.deleteReceipt = async function (receiptId, event) {
+    if (event) event.stopPropagation();
+    if (!confirm('Hapus struk transaksi ini dari riwayat?')) return;
+
+    appState.history = appState.history.filter(h => h.id !== receiptId);
+    saveHistory();
+    renderHistoryList();
+
+    if (appState.supabaseClient) {
+      try {
+        await appState.supabaseClient.from('receipts').delete().eq('id', receiptId);
+      } catch (err) {
+        console.warn('Failed to delete receipt from Supabase:', err);
+      }
+    }
+    AudioEngine.playTap();
+    showToast('Struk riwayat berhasil dihapus', 'info');
+  };
+
+  window.clearAllHistory = async function () {
+    if (appState.history.length === 0) {
+      showToast('Riwayat struk sudah kosong', 'info');
+      return;
+    }
+    if (!confirm('Apakah Anda yakin ingin menghapus SEMUA struk riwayat belanja?')) return;
+
+    const idsToDelete = appState.history.map(h => h.id);
+    appState.history = [];
+    saveHistory();
+    renderHistoryList();
+
+    if (appState.supabaseClient && idsToDelete.length > 0) {
+      try {
+        await appState.supabaseClient.from('receipts').delete().in('id', idsToDelete);
+      } catch (err) {
+        console.warn('Failed to clear receipts in Supabase:', err);
+      }
+    }
+    AudioEngine.playTap();
+    showToast('Semua riwayat struk telah dibersihkan', 'info');
+  };
+
   window.showReceiptModal = function (receiptId) {
     const rcp = appState.history.find(h => h.id === receiptId);
     if (!rcp) return;
@@ -4305,23 +4364,25 @@
     const body = document.getElementById('receiptModalBody');
     let itemsHtml = '';
 
-    rcp.items.forEach(item => {
+    (rcp.items || []).forEach(item => {
       itemsHtml += `
         <div class="receipt-line-split">
-          <span>${escapeHtml(item.name)} (${item.qty} ${escapeHtml(item.unit)})</span>
-          <span>Rp ${formatNumber(item.lineTotal)}</span>
+          <span class="break-words mr-2">${escapeHtml(item.name)} (${item.qty} ${escapeHtml(item.unit || 'pcs')})</span>
+          <span class="shrink-0">Rp ${formatNumber(item.lineTotal || 0)}</span>
         </div>
       `;
     });
+
+    const displayDate = formatReceiptDate(rcp.date);
 
     body.innerHTML = `
       <div class="receipt-paper-slip">
         <div class="receipt-slip-top">
           <div class="receipt-market-name">SUPERMARKET GROSIR</div>
-          <small>Struk Belanja Mandiri Kos Rian</small>
-          <div class="receipt-meta-row">${escapeHtml(rcp.date)}</div>
+          <small>Struk Belanja Mandiri • Cartly</small>
+          <div class="receipt-meta-row font-mono text-[11px]">${escapeHtml(displayDate)}</div>
         </div>
-        <div class="receipt-lines-list">
+        <div class="receipt-lines-list max-h-60 overflow-y-auto my-2 pr-1">
           ${itemsHtml}
         </div>
         <div class="receipt-slip-total">
