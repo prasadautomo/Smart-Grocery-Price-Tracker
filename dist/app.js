@@ -852,6 +852,37 @@
           if (appState.currentUser?.id !== authUser.id) loginAsUser(userObj, event === 'SIGNED_IN');
         });
 
+        // Read the persisted session as a second callback path, so a slow initial
+        // auth event cannot leave a successfully signed-in user on the login screen.
+        appState.supabaseClient.auth.getSession().then(({ data, error }) => {
+          if (error) {
+            console.warn('Supabase session restore error:', error.message);
+            return;
+          }
+          const authUser = data?.session?.user;
+          if (!authUser || localStorage.getItem('sg_explicit_logout') === 'true' || appState.currentUser?.id === authUser.id) return;
+          const meta = authUser.user_metadata || {};
+          const email = authUser.email || '';
+          const displayName = meta.display_name || meta.full_name || meta.name || email.split('@')[0] || 'Cartly';
+          loginAsUser({
+            id: authUser.id,
+            slug: getUserSlug(authUser.id),
+            username: meta.username || email.split('@')[0] || 'cartly_user',
+            displayName,
+            provider: authUser.app_metadata?.provider || 'email',
+            email,
+            avatarUrl: meta.avatar_url || meta.picture || '',
+            avatarText: (displayName[0] || 'U').toUpperCase(),
+            loginAt: Date.now()
+          }, false);
+        }).catch(error => console.warn('Supabase session restore error:', error));
+
+        const callbackError = new URLSearchParams(window.location.search).get('error_description');
+        if (callbackError) {
+          showToast(`Login gagal: ${callbackError}`, 'danger');
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+
         if (appState.currentUser) {
           pullDataFromSupabase(true).then(() => {
             appState.hasInitialCloudPulled = true;
