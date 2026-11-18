@@ -4239,7 +4239,8 @@
     const purchasedItems = appState.planner.filter(p => p.isPurchased);
 
     if (pill) {
-      pill.textContent = `${purchasedItems.length}/${appState.planner.length} Terbeli`;`r`n      pill.classList.toggle('hidden', appState.planner.length === 0);
+      pill.textContent = `${purchasedItems.length}/${appState.planner.length} Terbeli`;
+      pill.classList.toggle('hidden', appState.planner.length === 0);
     }
 
     const plannerBadge = document.getElementById('navPlannerBadge');
