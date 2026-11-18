@@ -680,12 +680,8 @@
   function flashRealtimeSyncIndicator() {
     const tag = document.getElementById('cloudStatusTag');
     if (tag) {
-      tag.classList.add('bg-emerald-300', 'text-emerald-950', 'ring-2', 'ring-emerald-400');
-      tag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-700 animate-ping"></span><span>SYNCED</span>`;
-      setTimeout(() => {
-        tag.classList.remove('bg-emerald-300', 'text-emerald-950', 'ring-2', 'ring-emerald-400');
-        tag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" id="cloudStatusDot"></span><span>ONLINE</span>`;
-      }, 1400);
+      tag.style.display = 'none';
+      tag.classList.add('hidden');
     }
   }
 
@@ -934,12 +930,16 @@
     const cloudTitle = document.getElementById('cloudStatusTitle');
     const cloudSub = document.getElementById('cloudStatusSubtitle');
 
+    if (tag) {
+      tag.style.display = 'none';
+      tag.classList.add('hidden');
+    }
+
     if (isConnected) {
       if (dot) {
         dot.classList.add('connected');
         dot.title = 'Status: Sinkronisasi Aktif (Tersinkron di Semua HP)';
       }
-      if (tag) tag.textContent = 'ONLINE';
       if (cloudIcon) cloudIcon.classList.add('connected');
       if (cloudTitle) cloudTitle.textContent = 'Data Belanja Tersinkron';
       if (cloudSub) cloudSub.textContent = 'Data belanja Anda otomatis tersimpan & sinkron di semua HP Anda.';
@@ -1361,12 +1361,12 @@
     }
 
     const navBudgetDot = document.getElementById('navBudgetDot');
+    if (statusBadge) {
+      statusBadge.style.display = 'none';
+      statusBadge.classList.add('hidden');
+    }
 
     if (percentage < 90) {
-      if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-black uppercase tracking-wider';
-        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span id="hudStatusText">STATUS: AMAN</span>';
-      }
       if (remainingText) {
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#222638]"><span class="text-stone-400 text-[10.5px] font-semibold">Sisa Aman:</span><strong class="text-emerald-400 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
@@ -1375,27 +1375,21 @@
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
     } else if (percentage >= 90 && percentage <= 100) {
-      if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[10px] font-black uppercase tracking-wider';
-        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="hudStatusText">STATUS: WASPADA</span>';
-      }
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-amber-500/40"><span class="text-amber-300/80 text-[10.5px] font-semibold">Sisa Kritis:</span><strong class="text-amber-300 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
+        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-yellow-500/40"><span class="text-yellow-300/80 text-[10.5px] font-semibold">Sisa Kritis:</span><strong class="text-yellow-300 font-black text-[12.5px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
-      if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-amber-400 font-black tracking-tight';
+      if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-yellow-400 font-black tracking-tight';
       if (overBudgetBanner) overBudgetBanner.classList.add('hidden');
-      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-amber-400 absolute -top-0.5 -right-1';
-      if (progressBar) progressBar.className = 'h-full bg-amber-400 rounded-full transition-all duration-300';
+      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
+      if (progressBar) progressBar.className = 'h-full bg-yellow-400 rounded-full transition-all duration-300';
     } else {
-      if (statusBadge) {
-        statusBadge.className = 'flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/25 border border-rose-500/50 text-rose-300 font-mono text-[10px] font-black uppercase tracking-wider animate-pulse';
-        statusBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span><span id="hudStatusText">OVER BUDGET</span>';
-      }
       const overAmount = Math.abs(remaining);
       if (remainingText) {
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-600/60"><span class="text-rose-300 text-[10.5px] font-semibold">Defisit:</span><strong class="text-rose-400 font-black text-[12.5px]">Rp ${formatNumber(overAmount)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-rose-400 font-black tracking-tight animate-pulse';
+      if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-1';
+      if (progressBar) progressBar.className = 'h-full bg-rose-500 rounded-full transition-all duration-300';
       if (overBudgetBanner) {
         overBudgetBanner.classList.remove('hidden');
         overBudgetBanner.className = 'neo-alert-overbudget bg-red-600 text-white border-2 border-red-800 rounded-2xl p-3.5 mb-space-md shadow-lg animate-shake';
@@ -1466,16 +1460,8 @@
 
     const budgetTabStatusPill = document.getElementById('budgetTabStatusPill');
     if (budgetTabStatusPill) {
-      if (percentage < 90) {
-        budgetTabStatusPill.textContent = '● AMAN (<90%)';
-        budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-extrabold';
-      } else if (percentage <= 100) {
-        budgetTabStatusPill.textContent = '▲ WASPADA (90-100%)';
-        budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 font-extrabold';
-      } else {
-        budgetTabStatusPill.textContent = '🚨 DEFISIT (>100%)';
-        budgetTabStatusPill.className = 'font-label-sm text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300 font-extrabold animate-pulse';
-      }
+      budgetTabStatusPill.style.display = 'none';
+      budgetTabStatusPill.classList.add('hidden');
     }
 
     const inputBudget = document.getElementById('inputBudgetSetting');
@@ -3675,21 +3661,21 @@
       const hasDiscount = prod.originalPrice && prod.originalPrice > prod.price;
 
       return `
-        <div class="astro-product-card" data-astro-id="${prod.id}">
+        <div class="astro-product-card bg-[#11131c] text-white border border-[#222638] rounded-2xl p-3 shadow-md flex flex-col justify-between" style="background-color: #11131c !important; color: #ffffff !important;" data-astro-id="${prod.id}">
           <div>
-            <!-- Top Badges -->
+            <!-- Top Badges: Icon Only -->
             <div class="flex items-center justify-start gap-1 mb-2">
               <span class="w-8 h-8 rounded-xl bg-[#181d30] border border-[#262f4c] flex items-center justify-center text-lg shadow-xs shrink-0 select-none">${prod.emoji || '🛒'}</span>
             </div>
 
-            <!-- Title & Size -->
-            <h4 class="font-headline-sm text-xs font-bold text-white line-clamp-2 leading-snug mb-1" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
-            <div class="text-[11px] text-white font-semibold mb-2">${escapeHtml(prod.unit)}</div>
+            <!-- Title & Size: Guaranteed High Contrast White -->
+            <h4 class="font-headline-sm text-xs font-black text-white line-clamp-2 leading-snug mb-1" style="color: #ffffff !important; font-weight: 800 !important;" title="${escapeHtml(prod.name)}">${escapeHtml(prod.name)}</h4>
+            <div class="text-[11px] text-slate-300 font-semibold mb-2" style="color: #cbd5e1 !important;">${escapeHtml(prod.unit)}</div>
 
             <!-- Pricing -->
             <div class="flex items-baseline gap-1.5 mb-2.5">
-              ${hasDiscount ? `<del class="text-[10px] text-slate-300 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
-              <span class="font-extrabold text-[13px] text-emerald-400 font-mono">Rp ${formatNumber(prod.price)}</span>
+              ${hasDiscount ? `<del class="text-[10px] text-slate-400 font-mono" style="color: #94a3b8 !important;">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
+              <span class="font-extrabold text-[13px] text-emerald-400 font-mono" style="color: #34d399 !important;">Rp ${formatNumber(prod.price)}</span>
             </div>
           </div>
 
@@ -6453,10 +6439,10 @@
         avatarEl.className = 'w-6 h-6 rounded-full bg-emerald-500 text-stone-950 text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else if (appState.currentUser.avatarClass === 'avatar-brown') {
         avatarEl.className = 'w-6 h-6 rounded-full bg-stone-800 text-white text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
-      } else if (appState.currentUser.provider === 'google') {
+      } else if (appState.currentUser.provider === 'google' || appState.currentUser.avatarClass === 'avatar-blue') {
         avatarEl.className = 'w-6 h-6 rounded-full bg-blue-600 text-white text-[12px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       } else {
-        avatarEl.className = 'w-6 h-6 rounded-full bg-emerald-500 text-[#07080b] text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
+        avatarEl.className = 'w-6 h-6 rounded-full bg-emerald-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 shadow-sm pointer-events-none';
       }
     }
     if (nameEl) nameEl.textContent = appState.currentUser.displayName || appState.currentUser.username || 'User';
@@ -6551,13 +6537,13 @@
       const isGoogle = u.provider === 'google';
       const badgeIcon = isGoogle ? 'verified' : 'person';
       return `
-        <div class="inline-flex items-center rounded-full bg-[#FAF8F5] border-2 border-stone-300 hover:border-stone-800 transition-all shadow-xs group">
-          <button type="button" class="btn-quick-user-chip flex items-center gap-1.5 py-1.5 pl-2.5 pr-1 text-on-surface text-xs font-semibold cursor-pointer active:scale-95 transition-transform" data-user='${escapeHtml(JSON.stringify(u))}'>
-            <span class="w-5 h-5 rounded-full ${isGoogle ? 'bg-blue-600 text-white' : 'bg-primary text-secondary-fixed'} text-[10px] font-bold flex items-center justify-center shrink-0">${escapeHtml(u.avatarText || 'U')}</span>
-            <span class="truncate max-w-[110px]">${escapeHtml(u.displayName || u.username)}</span>
-            <span class="material-symbols-outlined text-[13px] text-stone-400">${badgeIcon}</span>
+        <div class="inline-flex items-center rounded-full bg-[#181d30] border border-[#2a3454] hover:border-emerald-500 transition-all shadow-xs group">
+          <button type="button" class="btn-quick-user-chip flex items-center gap-1.5 py-1.5 pl-2.5 pr-1 text-white text-xs font-bold cursor-pointer active:scale-95 transition-transform" data-user='${escapeHtml(JSON.stringify(u))}'>
+            <span class="w-5 h-5 rounded-full ${isGoogle ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'} text-[10px] font-bold flex items-center justify-center shrink-0">${escapeHtml(u.avatarText || 'U')}</span>
+            <span class="truncate max-w-[110px] text-white font-bold">${escapeHtml(u.displayName || u.username)}</span>
+            <span class="material-symbols-outlined text-[13px] text-emerald-400">${badgeIcon}</span>
           </button>
-          <button type="button" class="btn-delete-saved-user w-6 h-6 mr-1 rounded-full text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer" data-slug="${escapeHtml(u.slug)}" title="Hapus dari daftar tersimpan">
+          <button type="button" class="btn-delete-saved-user w-6 h-6 mr-1 rounded-full text-slate-400 hover:text-red-400 hover:bg-red-950/40 flex items-center justify-center transition-colors cursor-pointer" data-slug="${escapeHtml(u.slug)}" title="Hapus dari daftar tersimpan">
             <span class="material-symbols-outlined text-[14px]">close</span>
           </button>
         </div>

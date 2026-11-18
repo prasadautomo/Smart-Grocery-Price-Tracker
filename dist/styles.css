@@ -972,39 +972,50 @@ body {
 @keyframes heroPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 22px rgba(245, 158, 11, 0.6), 0 6px 16px rgba(24, 21, 18, 0.35);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.6), 0 6px 16px rgba(24, 21, 18, 0.35);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 32px rgba(245, 158, 11, 0.9), 0 10px 24px rgba(24, 21, 18, 0.45);
+    box-shadow: 0 0 32px rgba(16, 185, 129, 0.9), 0 10px 24px rgba(24, 21, 18, 0.45);
   }
 }
 
 /* Python Scanner Card Tactile Glow */
 #pythonScannerCard {
-  box-shadow: 0 12px 32px -4px rgba(24, 21, 18, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 12px 32px -4px rgba(24, 21, 18, 0.25), 0 0 20px rgba(16, 185, 129, 0.15);
 }
 
 /* ==========================================================================
    ASTRO OFFICIAL CATALOG & INTERACTIVE CASHIER CHECKOUT STYLES
    ========================================================================== */
-.astro-product-card {
+.astro-product-card,
+#astroCatalogGrid > div {
+  background-color: #11131c !important;
   background: #11131c !important;
-  border-radius: 1.25rem;
+  border-radius: 1.25rem !important;
   border: 1.5px solid #222638 !important;
-  padding: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  color: #f8fafc !important;
+  padding: 0.85rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
 }
 
-.astro-product-card:hover {
+.astro-product-card h4,
+.astro-product-card h3,
+.astro-product-card .card-item-title,
+#astroCatalogGrid h4 {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+.astro-product-card:hover,
+#astroCatalogGrid > div:hover {
   transform: translateY(-2px);
   border-color: #3b4668 !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7) !important;
 }
 
 .astro-cat-chip,
@@ -1594,9 +1605,9 @@ button.bg-emerald-500 {
 }
 
 #budgetHudCard .segment-block.active-warn {
-  background: #f59e0b !important;
-  border-color: #fbbf24 !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.85) !important;
+  background: #eab308 !important;
+  border-color: #facc15 !important;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.75) !important;
 }
 
 #budgetHudCard .segment-block.active-danger {

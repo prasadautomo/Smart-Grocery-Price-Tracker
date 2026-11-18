@@ -18,7 +18,7 @@
     "supabase",
     "vercel"
   ],
-  "author": "Gavin Utomo",
+  "author": "Prasad Utomo",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.10.2",

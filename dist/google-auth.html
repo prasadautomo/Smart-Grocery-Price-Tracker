@@ -122,6 +122,10 @@
       overflow: hidden;
     }
 
+    .avatar-blue {
+      background-color: #1a73e8;
+    }
+
     .avatar-green {
       background-color: #0f9d58;
     }
@@ -136,11 +140,11 @@
     }
 
     .avatar-amber {
-      background-color: #f29900;
+      background-color: #10b981;
     }
 
     .avatar-brown {
-      background-color: #795548;
+      background-color: #334155;
     }
 
     .account-info {
@@ -364,62 +368,21 @@
       <p class="sub-title">to continue to <span class="app-name">Cartly</span></p>
     </div>
 
-    <!-- Chooser View (Sesuai persis dengan foto Google Chrome user) -->
+    <!-- Chooser View -->
     <div id="accountChooserView">
-      <div class="account-list">
+      <div class="account-list" id="accountListContainer">
 
-        <!-- Account 1: Gavin Utomo (Pemilik / User Utama) -->
-        <div class="account-item" onclick="selectAccount('Gavin Utomo', 'gavinutomo4@gmail.com', 'G', 'avatar-blue')">
+        <!-- Account 1: Prasad Utomo (Akun Anda / User Utama) -->
+        <div class="account-item" id="defaultUserAccount" onclick="selectAccount('Prasad Utomo', 'prasadautomo@gmail.com', 'P', 'avatar-blue')">
           <div class="avatar-wrapper avatar-blue">
-            <span>G</span>
+            <span>P</span>
           </div>
           <div class="account-info">
-            <span class="account-name">Gavin Utomo</span>
-            <span class="account-email">gavinutomo4@gmail.com</span>
+            <span class="account-name">Prasad Utomo</span>
+            <span class="account-email">prasadautomo@gmail.com</span>
           </div>
-        </div>
-
-        <!-- Account 2: Rian Pratama (Siswa Rantau - Anak Kos) -->
-        <div class="account-item" onclick="selectAccount('Rian Pratama', 'rian.rantau@codehub.sch.id', 'R', 'avatar-green')">
-          <div class="avatar-wrapper avatar-green">
-            <span>R</span>
-          </div>
-          <div class="account-info">
-            <span class="account-name">Rian Pratama (Anak Kos)</span>
-            <span class="account-email">rian.rantau@codehub.sch.id</span>
-          </div>
-        </div>
-
-        <!-- Account 3: Joshua Rafael gunawan -->
-        <div class="account-item" onclick="selectAccount('Joshua Rafael gunawan', 'jrafael092009@gmail.com', '🐍', 'avatar-green')">
-          <div class="avatar-wrapper avatar-green">
-            <span>🐍</span>
-          </div>
-          <div class="account-info">
-            <span class="account-name">Joshua Rafael gunawan</span>
-            <span class="account-email">jrafael092009@gmail.com</span>
-          </div>
-        </div>
-
-        <!-- Account 4: Siti Rahma -->
-        <div class="account-item" onclick="selectAccount('Siti Rahma', 'siti.rahma@codehub.sch.id', 'S', 'avatar-amber')">
-          <div class="avatar-wrapper avatar-amber">
-            <span>S</span>
-          </div>
-          <div class="account-info">
-            <span class="account-name">Siti Rahma</span>
-            <span class="account-email">siti.rahma@codehub.sch.id</span>
-          </div>
-        </div>
-
-        <!-- Account 5: Li Bos -->
-        <div class="account-item" onclick="selectAccount('Li Bos', 'volkiegans@gmail.com', '⚡', 'avatar-dark')">
-          <div class="avatar-wrapper avatar-dark">
-            <span>⚡</span>
-          </div>
-          <div class="account-info">
-            <span class="account-name">Li Bos</span>
-            <span class="account-email">volkiegans@gmail.com</span>
+          <div style="font-size: 11px; background: rgba(26,115,232,0.2); color: #8ab4f8; padding: 2px 8px; border-radius: 12px; font-weight: 500;">
+            Akun Anda
           </div>
         </div>
 
@@ -432,17 +395,22 @@
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
           </svg>
         </div>
-        <span class="use-another-text">Use another account</span>
+        <span class="use-another-text">Gunakan Akun Google Lain</span>
       </div>
     </div>
 
     <!-- Custom Account Input View -->
     <div id="customAccountView">
-      <p style="font-size: 14px; color: #9aa0a6; margin-bottom: 4px;">Enter your Google email address</p>
-      <input type="email" id="inputCustomEmail" class="custom-input-box" placeholder="Email or phone" autofocus>
+      <p style="font-size: 14px; color: #9aa0a6; margin-bottom: 8px;">Masukkan Akun Google Anda</p>
+      <input type="text" id="inputCustomName" class="custom-input-box" placeholder="Nama Lengkap Anda (cth: Prasad Utomo)" style="margin-bottom: 10px;">
+      <input type="email" id="inputCustomEmail" class="custom-input-box" placeholder="Alamat Gmail Anda (cth: nama@gmail.com)">
+      <label style="display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 12px; color: #9aa0a6; cursor: pointer;">
+        <input type="checkbox" id="checkRememberCustom" checked style="accent-color: #1a73e8;">
+        <span>Ingat sebagai akun Google utama saya</span>
+      </label>
       <div class="btn-row">
-        <button type="button" class="btn-text" onclick="showChooser()">Back</button>
-        <button type="button" class="btn-primary" onclick="submitCustomEmail()">Next</button>
+        <button type="button" class="btn-text" onclick="showChooser()">Kembali</button>
+        <button type="button" class="btn-primary" onclick="submitCustomEmail()">Masuk</button>
       </div>
     </div>
 
@@ -451,17 +419,48 @@
   <!-- Footer -->
   <div class="footer">
     <div class="footer-lang">
-      <span>English (United States)</span>
+      <span>Indonesia</span>
       <span style="font-size: 10px; margin-left: 2px;">▼</span>
     </div>
     <div class="footer-links">
-      <a href="https://support.google.com/accounts" target="_blank">Help</a>
-      <a href="https://policies.google.com/privacy" target="_blank">Privacy</a>
-      <a href="https://policies.google.com/terms" target="_blank">Terms</a>
+      <a href="https://support.google.com/accounts" target="_blank">Bantuan</a>
+      <a href="https://policies.google.com/privacy" target="_blank">Privasi</a>
+      <a href="https://policies.google.com/terms" target="_blank">Persyaratan</a>
     </div>
   </div>
 
   <script>
+    // Cek apakah ada akun kustom tersimpan sebelumnya
+    function initAccounts() {
+      try {
+        const savedRaw = localStorage.getItem('my_custom_google_account');
+        if (savedRaw) {
+          const saved = JSON.parse(savedRaw);
+          if (saved && saved.email && saved.email !== 'prasadautomo@gmail.com') {
+            const container = document.getElementById('accountListContainer');
+            const customDiv = document.createElement('div');
+            customDiv.className = 'account-item';
+            customDiv.onclick = () => selectAccount(saved.name || 'Akun Anda', saved.email, saved.avatar || (saved.name ? saved.name[0].toUpperCase() : 'P'), 'avatar-blue');
+            customDiv.innerHTML = `
+              <div class="avatar-wrapper avatar-blue">
+                <span>${saved.avatar || (saved.name ? saved.name[0].toUpperCase() : 'P')}</span>
+              </div>
+              <div class="account-info">
+                <span class="account-name">${saved.name || 'Akun Anda'}</span>
+                <span class="account-email">${saved.email}</span>
+              </div>
+              <div style="font-size: 11px; background: rgba(16,185,129,0.2); color: #34d399; padding: 2px 8px; border-radius: 12px; font-weight: 500;">
+                Tersimpan
+              </div>
+            `;
+            container.insertBefore(customDiv, container.firstChild);
+          }
+        }
+      } catch (e) {}
+    }
+
+    initAccounts();
+
     function selectAccount(name, email, avatarSymbol, avatarClass) {
       const overlay = document.getElementById('loadingOverlay');
       const loadingText = document.getElementById('loadingText');
@@ -493,13 +492,13 @@
             window.close();
           }
         }
-      }, 500);
+      }, 400);
     }
 
     function showCustomInput() {
       document.getElementById('accountChooserView').style.display = 'none';
       document.getElementById('customAccountView').style.display = 'flex';
-      const input = document.getElementById('inputCustomEmail');
+      const input = document.getElementById('inputCustomName');
       if (input) input.focus();
     }
 
@@ -509,26 +508,45 @@
     }
 
     function submitCustomEmail() {
-      const input = document.getElementById('inputCustomEmail');
-      const email = input ? input.value.trim() : '';
+      const nameInput = document.getElementById('inputCustomName');
+      const emailInput = document.getElementById('inputCustomEmail');
+      const rememberCheck = document.getElementById('checkRememberCustom');
+
+      const email = emailInput ? emailInput.value.trim() : '';
+      let name = nameInput ? nameInput.value.trim() : '';
+
       if (!email || !email.includes('@')) {
-        alert('Enter a valid email address');
-        if (input) input.focus();
+        alert('Masukkan alamat email Google yang valid');
+        if (emailInput) emailInput.focus();
         return;
       }
 
-      const username = email.split('@')[0];
-      const name = username.charAt(0).toUpperCase() + username.slice(1);
-      const symbol = (username[0] || 'G').toUpperCase();
+      if (!name) {
+        const username = email.split('@')[0];
+        name = username.charAt(0).toUpperCase() + username.slice(1);
+      }
 
-      selectAccount(name, email, symbol, 'avatar-gray');
+      const symbol = (name[0] || 'P').toUpperCase();
+
+      if (rememberCheck && rememberCheck.checked) {
+        try {
+          localStorage.setItem('my_custom_google_account', JSON.stringify({
+            name: name,
+            email: email,
+            avatar: symbol
+          }));
+        } catch (e) {}
+      }
+
+      selectAccount(name, email, symbol, 'avatar-blue');
     }
 
-    // Tangani tombol Enter pada input email
+    // Tangani tombol Enter pada input email & nama
     document.getElementById('inputCustomEmail')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        submitCustomEmail();
-      }
+      if (e.key === 'Enter') submitCustomEmail();
+    });
+    document.getElementById('inputCustomName')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('inputCustomEmail')?.focus();
     });
   </script>
 </body>

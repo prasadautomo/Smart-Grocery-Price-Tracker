@@ -371,13 +371,14 @@
             class="absolute -left-6 -bottom-6 w-36 h-36 rounded-full bg-emerald-600/10 blur-2xl pointer-events-none">
           </div>
 
-          <!-- Top Row: Status Pill & Savings Rubber Stamp -->
+          <!-- Top Row: Live Tracker Title & Savings Badge -->
           <div class="relative z-10 flex items-center justify-between mb-3.5 border-b border-[#1c2234] pb-3">
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[10px] font-black uppercase tracking-wider"
-              id="hudStatusBadge">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span id="hudStatusText">STATUS: AMAN</span>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-400 text-[18px]">query_stats</span>
+              <span class="font-mono text-xs font-black text-white uppercase tracking-wider">Live Budget Tracker</span>
             </div>
+            <!-- Hidden anchor for script compatibility -->
+            <div id="hudStatusBadge" class="hidden" style="display:none !important;"><span id="hudStatusText"></span></div>
             <!-- Savings Badge: Tactile Rubber Stamp with slight tilt -->
             <div
               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600/90 text-white font-mono text-[10.5px] font-black uppercase tracking-wider shadow-sm border border-emerald-400/30"
@@ -501,10 +502,6 @@
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <h2 class="font-headline-sm text-[15px] font-black text-white tracking-tight truncate" id="catalogStoreTitle">Katalog Lotte Mart Grocery - Puri Indah</h2>
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono text-[10.5px] font-extrabold whitespace-nowrap shrink-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Grosir &amp; Fresh</span>
-                  </span>
                 </div>
                 <p class="font-body-sm text-[11px] text-white font-medium truncate mt-0.5" id="catalogStoreSubtitle">Daftar rak Lotte Mart Grocery - Puri Indah • Klik <strong class="text-emerald-400">+ Keranjang</strong> untuk belanja langsung</p>
               </div>
@@ -933,7 +930,7 @@
               <span class="text-[10px] font-mono text-stone-400 uppercase tracking-wider font-bold">Safety Cap SRS F-05 • Dompet Kos</span>
             </div>
           </div>
-          <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold" id="budgetTabStatusPill">● AMAN</span>
+          <span class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold hidden" id="budgetTabStatusPill" style="display:none !important;">● AMAN</span>
         </div>
         <p class="font-body-sm text-xs text-stone-400 leading-relaxed">
           Pantau batas maksimal pengeluaran belanja bulanan agar kantong tetap aman, terkendali, dan bebas defisit di supermarket.
