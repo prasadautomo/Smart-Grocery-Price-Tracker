@@ -213,7 +213,7 @@
             <label for="inputRegPhone">NOMOR TELEPON</label>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined" aria-hidden="true">call</span>
-              <input class="auth-input" type="tel" id="inputRegPhone" placeholder="0812-xxxx-xxxx" autocomplete="tel">
+              <input class="auth-input" type="tel" id="inputRegPhone" placeholder="0812-xxxx-xxxx" required autocomplete="tel">
             </div>
           </div>
 
@@ -252,6 +252,70 @@
             <span>Buat Akun Sekarang</span>
             <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
           </button>
+        </form>
+
+        <form id="phoneVerificationPanel" class="auth-form auth-phone-verification hidden" aria-hidden="true">
+          <div class="auth-verification-heading">
+            <span class="material-symbols-outlined" aria-hidden="true">sms</span>
+            <h2 id="phoneVerificationTitle">Verifikasi nomor telepon</h2>
+            <p id="phoneVerificationDescription">Masukkan kode SMS yang dikirim untuk memverifikasi nomor Anda.</p>
+          </div>
+
+          <div class="auth-field">
+            <label for="authPhoneVerificationInput">NOMOR TELEPON AKTIF</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">call</span>
+              <input class="auth-input" type="tel" id="authPhoneVerificationInput" placeholder="0812-xxxx-xxxx" required autocomplete="tel">
+            </div>
+            <small class="auth-field-help">Masukkan nomor yang dapat menerima SMS. Nomor Indonesia akan diubah ke format +62.</small>
+          </div>
+
+          <div class="auth-field hidden" id="authPhoneOtpField">
+            <label for="authPhoneOtpInput">KODE VERIFIKASI SMS</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">password</span>
+              <input class="auth-input auth-otp-input" type="text" id="authPhoneOtpInput" inputmode="numeric" autocomplete="one-time-code" placeholder="6 digit kode" pattern="[0-9]{6}" minlength="6" maxlength="6">
+            </div>
+          </div>
+
+          <p id="phoneVerificationFeedback" class="auth-verification-feedback" role="status" aria-live="polite"></p>
+
+          <button type="button" id="btnSendPhoneOtp" class="auth-primary-button">
+            <span>Kirim Kode SMS</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnResendPhoneOtp" class="auth-secondary-link hidden">Kirim ulang kode</button>
+          <button type="submit" id="btnVerifyPhoneOtp" class="auth-primary-button hidden">
+            <span>Verifikasi &amp; Lanjutkan</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnCancelPhoneVerification" class="auth-secondary-link">Keluar dari akun</button>
+        </form>
+
+        <form id="emailVerificationPanel" class="auth-form auth-phone-verification hidden" aria-hidden="true">
+          <div class="auth-verification-heading">
+            <span class="material-symbols-outlined" aria-hidden="true">mark_email_unread</span>
+            <h2>Konfirmasi alamat email</h2>
+            <p>Tautan konfirmasi dikirim ke alamat email Anda. Cartly terbuka setelah tautan dibuka dan email berhasil diverifikasi.</p>
+          </div>
+
+          <div class="auth-field">
+            <label for="authEmailVerificationInput">ALAMAT EMAIL</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">mail</span>
+              <input class="auth-input" type="email" id="authEmailVerificationInput" placeholder="nama@email.com" required autocomplete="email">
+            </div>
+            <small class="auth-field-help">Alamat ini akan menjadi email untuk masuk ke akun Cartly.</small>
+          </div>
+
+          <p id="emailVerificationFeedback" class="auth-verification-feedback" role="status" aria-live="polite"></p>
+
+          <button type="submit" id="btnSendEmailVerification" class="auth-primary-button">
+            <span>Kirim tautan konfirmasi</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnResendEmailVerification" class="auth-secondary-link">Kirim ulang tautan</button>
+          <button type="button" id="btnCancelEmailVerification" class="auth-secondary-link">Keluar dari akun</button>
         </form>
 
         <div class="auth-card-bottom-rule" aria-hidden="true"></div>

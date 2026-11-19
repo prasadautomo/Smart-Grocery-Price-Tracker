@@ -53,7 +53,7 @@ Aplikasi ini memiliki fitur **Dual Sync**: dapat langsung digunakan secara offli
 ### 1. Buat Tabel di Supabase SQL Editor
 1. Buka [Supabase Dashboard](https://supabase.com) dan buat proyek baru.
 2. Buka menu **SQL Editor**.
-3. Buka file [`supabase_schema.sql`](./supabase_schema.sql) di folder proyek ini (atau klik tombol **"Salin SQL Schema"** di menu Pengaturan aplikasi).
+3. Buka file [`supabase/schema.sql`](./supabase/schema.sql) di folder proyek ini.
 4. Salin seluruh kodenya, tempel ke SQL Editor Supabase, lalu klik **Run**.
 
 ### 2. Hubungkan ke Aplikasi
@@ -69,6 +69,17 @@ Ada dua cara mudah:
      VITE_SUPABASE_URL=https://your-project.supabase.co
      VITE_SUPABASE_ANON_KEY=your-anon-key-here
      ```
+
+### 3. Aktifkan verifikasi akun sungguhan
+Cartly membuat akun di Supabase Auth. Pendaftaran mengirim OTP SMS terlebih dahulu, lalu mengirim tautan konfirmasi ke email yang dimasukkan. Aplikasi baru terbuka setelah keduanya terverifikasi.
+
+1. Di Supabase Dashboard, buka **Authentication → Providers** dan aktifkan **Phone** serta **Email**.
+2. Di **Authentication → Settings**, aktifkan konfirmasi nomor telepon dan konfirmasi email.
+3. Hubungkan penyedia SMS (misalnya Twilio) pada pengaturan Phone. Supabase tidak dapat mengirim OTP SMS sebelum penyedia dan kredensial SMS dikonfigurasi.
+4. Atur **Site URL** dan **Redirect URLs** agar memuat alamat aplikasi yang digunakan, termasuk domain Vercel dan alamat lokal saat pengembangan.
+5. Jalankan SQL schema di langkah pertama agar tabel profil, trigger sinkronisasi, dan kebijakan akses profil tersedia. Nama, email, nomor telepon, serta status verifikasinya disimpan di Supabase; setiap pengguna hanya dapat membaca profilnya sendiri.
+
+Email baru diverifikasi sesudah kode SMS berhasil. Jika pengiriman SMS gagal, periksa provider SMS, batas pengiriman, dan format nomor internasional (nomor Indonesia seperti `0812...` otomatis menjadi `+62812...`).
 
 ---
 
