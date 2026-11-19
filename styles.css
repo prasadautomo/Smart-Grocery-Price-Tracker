@@ -2291,3 +2291,57 @@ textarea::placeholder {
   border-color: #131312 !important;
   --tw-ring-color: #131312 !important;
 }
+
+/* Cart card readability and tidy checkout layout after the charcoal theme update. */
+.neo-ticket-card {
+  padding: 1rem !important;
+  border-radius: 1.25rem !important;
+  color: #263852 !important;
+}
+.neo-ticket-card.is-checked {
+  background: #f4f7fb !important;
+  border-color: #cbd5e1 !important;
+}
+.neo-ticket-card .card-item-title,
+.neo-ticket-card .font-mono,
+.neo-ticket-card .unit-rate-mono,
+.neo-ticket-card .unit-rate-mono strong,
+.neo-ticket-card .text-right > div:not(.text-slate-500) {
+  color: #263852 !important;
+}
+.neo-ticket-card .text-slate-500,
+.neo-ticket-card .text-stone-500,
+.neo-ticket-card .strike {
+  color: #71829a !important;
+}
+.neo-ticket-card .rubber-stamp,
+.neo-ticket-card .rubber-stamp *,
+.neo-ticket-card .bg-emerald-100,
+.neo-ticket-card .bg-emerald-100 * {
+  color: #ffffff !important;
+}
+.neo-ticket-card .bg-emerald-100 {
+  background: #131312 !important;
+  border-color: #131312 !important;
+}
+#cartSummaryBottom > div {
+  min-height: 76px;
+  padding: 0.75rem 1rem !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid #dce5ef !important;
+  box-shadow: 0 8px 24px rgba(34, 52, 78, 0.14) !important;
+}
+#cartSummaryBottom #summaryTotalSaved {
+  background: #f1f5f9 !important;
+  border-color: #dce5ef !important;
+  color: #526176 !important;
+}
+#cartSummaryBottom #btnFinishShopping,
+#cartSummaryBottom #btnFinishShopping * {
+  color: #ffffff !important;
+}
+#cartSummaryBottom #btnFinishShopping {
+  background: #131312 !important;
+  border-color: #131312 !important;
+  min-height: 3.25rem;
+}
