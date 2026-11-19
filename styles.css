@@ -2439,3 +2439,131 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 #cartSummaryBottom #btnFinishShopping * {
   color: #ffffff !important;
 }
+
+/* Authentication screen: match the compact, clean Cartly reference layout. */
+#loginScreen {
+  background: #e8edf0 !important;
+  align-items: center;
+  padding: 0.6rem;
+}
+#loginScreen > div {
+  width: min(100%, 430px) !important;
+  min-height: calc(100dvh - 1.2rem) !important;
+  padding: clamp(1.25rem, 6vh, 3rem) clamp(1rem, 5vw, 1.5rem) 1.25rem !important;
+  justify-content: flex-start !important;
+  gap: clamp(1rem, 5vh, 2.5rem) !important;
+  border: 0 !important;
+  border-radius: 1rem !important;
+  background: linear-gradient(180deg, #e4f5f2 0%, #f8fafb 45%, #f8fafb 100%) !important;
+  box-shadow: 0 18px 48px rgba(16, 24, 40, 0.12) !important;
+}
+#loginScreen > div > div:first-child {
+  padding-top: 0 !important;
+  margin-bottom: 0.25rem;
+}
+#loginScreen > div > div:first-child > div {
+  display: none !important;
+}
+#loginScreen > div > div:first-child h1 {
+  color: #111827 !important;
+  font-size: 1.65rem !important;
+  line-height: 1.2;
+  letter-spacing: -0.04em !important;
+}
+#loginScreen > div > div:first-child p {
+  display: none !important;
+}
+#loginScreen > div > div:nth-child(2) {
+  width: 100%;
+  margin: auto 0 !important;
+  padding: 1.15rem !important;
+  border: 1px solid #edf1f4 !important;
+  border-radius: 1.25rem !important;
+  background: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(19, 32, 49, 0.08) !important;
+}
+#loginScreen #tabLoginBtn,
+#loginScreen #tabRegisterBtn {
+  min-height: 2.35rem;
+  color: #536579 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+#loginScreen #tabLoginBtn[aria-selected="true"],
+#loginScreen #tabRegisterBtn[aria-selected="true"] {
+  color: #ffffff !important;
+  background: #131312 !important;
+}
+#loginScreen #tabLoginBtn {
+  color: #ffffff !important;
+  background: #131312 !important;
+}
+#loginScreen label {
+  color: #526176 !important;
+  font-size: 0.62rem !important;
+  letter-spacing: 0.045em;
+}
+#loginScreen form {
+  gap: 0.8rem !important;
+}
+#loginScreen form input {
+  min-height: 2.7rem;
+  border: 1px solid #dce5ef !important;
+  border-radius: 0.75rem !important;
+  background: #f8fafc !important;
+  color: #17243a !important;
+  font-weight: 500 !important;
+}
+#loginScreen form input::placeholder {
+  color: #91a0b3 !important;
+}
+#loginScreen form .material-symbols-outlined {
+  color: #8292a6 !important;
+}
+#loginScreen #btnSubmitLogin,
+#loginScreen #btnSubmitRegister {
+  min-height: 2.85rem;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-radius: 0.75rem !important;
+  background: #131312 !important;
+  box-shadow: 0 4px 10px rgba(19, 19, 18, 0.2) !important;
+}
+#loginScreen #btnSubmitLogin *,
+#loginScreen #btnSubmitRegister * {
+  color: #ffffff !important;
+}
+#loginScreen #btnForgotPasswordTrigger {
+  color: #263852 !important;
+}
+#loginScreen .bg-emerald-100,
+#loginScreen #loginFeedbackAlert {
+  color: #263852 !important;
+}
+#loginScreen #btnGoogleLoginTrigger {
+  min-height: 2.7rem;
+  color: #263852 !important;
+  border: 1px solid #e1e8f0 !important;
+  background: #ffffff !important;
+}
+#loginScreen > div > div:last-child {
+  padding-bottom: 0 !important;
+  color: #64748b !important;
+}
+#loginScreen > div > div:last-child * {
+  color: #64748b !important;
+}
+#loginScreen #formRegisterUser {
+  max-height: 52dvh;
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+@media (max-height: 720px) {
+  #loginScreen > div {
+    gap: 0.75rem !important;
+    padding-top: 1rem !important;
+  }
+  #loginScreen > div > div:nth-child(2) {
+    padding: 0.9rem !important;
+  }
+}
