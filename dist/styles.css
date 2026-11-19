@@ -2567,3 +2567,50 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
     padding: 0.9rem !important;
   }
 }
+
+/* Hard override for auth readability: the login canvas is light, so its copy is dark. */
+#loginScreen,
+#loginScreen * {
+  color: #263852 !important;
+}
+#loginScreen h1,
+#loginScreen label,
+#loginScreen p,
+#loginScreen span,
+#loginScreen button:not(#btnSubmitLogin):not(#btnSubmitRegister):not(#tabLoginBtn):not(#tabRegisterBtn) {
+  color: #263852 !important;
+}
+#loginScreen #tabLoginBtn,
+#loginScreen #tabRegisterBtn {
+  color: #526176 !important;
+}
+#loginScreen #tabLoginBtn {
+  background: #131312 !important;
+  color: #ffffff !important;
+}
+#loginScreen #btnSubmitLogin,
+#loginScreen #btnSubmitRegister,
+#loginScreen #btnSubmitLogin span,
+#loginScreen #btnSubmitRegister span {
+  background: #131312 !important;
+  color: #ffffff !important;
+}
+#loginScreen #btnGoogleLoginTrigger,
+#loginScreen #btnGoogleLoginTrigger span {
+  color: #263852 !important;
+  background: #ffffff !important;
+}
+#loginScreen input {
+  color: #17243a !important;
+  background: #f8fafc !important;
+}
+#loginScreen input::placeholder {
+  color: #8292a6 !important;
+}
+#loginScreen .material-symbols-outlined {
+  color: #64748b !important;
+}
+#loginScreen #loginFeedbackAlert,
+#loginScreen #loginFeedbackAlert * {
+  color: #263852 !important;
+}
