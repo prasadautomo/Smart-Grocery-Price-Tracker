@@ -70,13 +70,15 @@ Ada dua cara mudah:
      VITE_SUPABASE_ANON_KEY=your-anon-key-here
      ```
 
-### 3. Aktifkan verifikasi akun sungguhan
-Cartly menggunakan email dan password untuk pendaftaran serta login. Supabase mengirim tautan konfirmasi email; akun baru bisa masuk setelah alamat email dikonfirmasi. Nomor telepon dan provider SMS tidak diperlukan.
+### 3. Aktifkan login langsung tanpa konfirmasi email
+Cartly menggunakan email dan password. Setelah pendaftaran, pengguna langsung masuk tanpa membuka email konfirmasi.
 
 1. Di Supabase Dashboard, buka **Authentication → Providers** dan aktifkan provider **Email**.
-2. Di **Authentication → Settings**, aktifkan konfirmasi email.
+2. Pada pengaturan provider **Email**, matikan **Confirm email**. Jika opsi ini masih aktif, Supabase tidak memberi sesi login saat pendaftaran dan Cartly akan memberi tahu agar pengaturan diubah.
 3. Atur **Site URL** dan **Redirect URLs** agar memuat alamat aplikasi yang digunakan, termasuk domain Vercel dan alamat lokal saat pengembangan.
 4. Jalankan SQL schema di langkah pertama agar tabel profil, trigger sinkronisasi email, dan kebijakan akses profil tersedia. Setiap pengguna hanya dapat membaca profilnya sendiri.
+
+Dengan **Confirm email** dimatikan, Supabase langsung menganggap alamat email sudah terkonfirmasi. Pengguna bisa mendaftar memakai alamat email yang bukan miliknya.
 
 ---
 

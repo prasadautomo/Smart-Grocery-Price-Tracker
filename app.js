@@ -272,109 +272,7 @@
     realtimeChannel: null
   };
 
-  const EMAIL_VERIFY_PENDING_KEY = 'cartly_email_verification_pending';
-  let authUserAwaitingEmailVerification = null;
   let routeAuthenticatedSupabaseUser = null;
-
-  function readPendingEmailVerification(userId) {
-    try {
-      const pending = JSON.parse(
-        sessionStorage.getItem(EMAIL_VERIFY_PENDING_KEY)
-        || sessionStorage.getItem('cartly_phone_verification_pending')
-        || 'null'
-      );
-      return pending?.userId === userId ? pending : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function readAnyPendingEmailVerification() {
-    try {
-      return JSON.parse(
-        sessionStorage.getItem(EMAIL_VERIFY_PENDING_KEY)
-        || sessionStorage.getItem('cartly_phone_verification_pending')
-        || 'null'
-      );
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function savePendingVerification(details) {
-    try {
-      sessionStorage.setItem(EMAIL_VERIFY_PENDING_KEY, JSON.stringify(details));
-      sessionStorage.removeItem('cartly_phone_verification_pending');
-    } catch (e) {}
-  }
-
-  function showAuthVerificationPanel() {
-    const loginScreen = document.getElementById('loginScreen');
-    const tabs = loginScreen?.querySelector('.auth-tabs');
-    const loginForm = document.getElementById('formUsernameLogin');
-    const registerForm = document.getElementById('formRegisterUser');
-    const emailPanel = document.getElementById('emailVerificationPanel');
-    if (!loginScreen || !emailPanel) return;
-
-    loginScreen.classList.remove('hidden', 'is-registering');
-    loginScreen.classList.add('is-email-verification');
-    loginScreen.style.display = '';
-    tabs?.classList.add('hidden');
-    loginForm?.classList.add('hidden');
-    loginForm?.setAttribute('aria-hidden', 'true');
-    registerForm?.classList.add('hidden');
-    registerForm?.setAttribute('aria-hidden', 'true');
-    emailPanel.classList.remove('hidden');
-    emailPanel.setAttribute('aria-hidden', 'false');
-  }
-
-  function showEmailVerificationStep(authUser) {
-    authUserAwaitingEmailVerification = authUser;
-    const pending = readPendingEmailVerification(authUser.id);
-    const email = authUser.email || authUser.new_email || pending?.email || authUser.user_metadata?.email || '';
-    const emailInput = document.getElementById('authEmailVerificationInput');
-    const feedback = document.getElementById('emailVerificationFeedback');
-    const submitButton = document.getElementById('btnSendEmailVerification');
-    const resendButton = document.getElementById('btnResendEmailVerification');
-    const loginAlert = document.getElementById('loginFeedbackAlert');
-    loginAlert?.classList.add('hidden');
-    showAuthVerificationPanel();
-    if (emailInput && email) emailInput.value = email;
-    if (emailInput) emailInput.readOnly = pending?.mode === 'email_signup';
-    submitButton?.classList.toggle('hidden', pending?.mode === 'email_signup');
-    if (resendButton) resendButton.textContent = pending?.mode === 'email_signup' ? 'Kirim ulang tautan konfirmasi email' : 'Kirim ulang tautan';
-    if (feedback && !feedback.textContent) {
-      feedback.dataset.type = 'success';
-      feedback.textContent = 'Buka tautan konfirmasi yang dikirim ke email Anda. Cartly akan terbuka setelah email terverifikasi.';
-    }
-  }
-
-  function resetEmailVerificationStep() {
-    authUserAwaitingEmailVerification = null;
-    try {
-      sessionStorage.removeItem(EMAIL_VERIFY_PENDING_KEY);
-      sessionStorage.removeItem('cartly_phone_verification_pending');
-    } catch (e) {}
-    const loginScreen = document.getElementById('loginScreen');
-    const tabs = loginScreen?.querySelector('.auth-tabs');
-    const loginForm = document.getElementById('formUsernameLogin');
-    const registerForm = document.getElementById('formRegisterUser');
-    const emailPanel = document.getElementById('emailVerificationPanel');
-    loginScreen?.classList.remove('is-email-verification');
-    tabs?.classList.remove('hidden');
-    emailPanel?.classList.add('hidden');
-    emailPanel?.setAttribute('aria-hidden', 'true');
-    if (document.getElementById('authEmailVerificationInput')) document.getElementById('authEmailVerificationInput').value = '';
-    if (document.getElementById('emailVerificationFeedback')) document.getElementById('emailVerificationFeedback').textContent = '';
-    loginForm?.classList.remove('hidden');
-    loginForm?.setAttribute('aria-hidden', 'false');
-    registerForm?.classList.add('hidden');
-    registerForm?.setAttribute('aria-hidden', 'true');
-    document.getElementById('tabLoginBtn')?.setAttribute('aria-selected', 'true');
-    document.getElementById('tabLoginBtn') && (document.getElementById('tabLoginBtn').tabIndex = 0);
-    document.getElementById('tabRegisterBtn')?.setAttribute('aria-selected', 'false');
-    document.getElementById('tabRegisterBtn') && (document.getElementById('tabRegisterBtn').tabIndex = -1);
-  }
 
   // Sound effects are disabled throughout Cartly.
   const AudioEngine = {
@@ -806,13 +704,6 @@
             return;
           }
 
-          if (!authUser.email_confirmed_at) {
-            appState.currentUser = null;
-            showEmailVerificationStep(authUser);
-            return;
-          }
-
-          resetEmailVerificationStep();
           if (appState.currentUser?.id !== authUser.id) {
             loginAsUser(userObj, event === 'SIGNED_IN');
           }
@@ -844,15 +735,6 @@
           if (!authUser || localStorage.getItem('sg_explicit_logout') === 'true' || appState.currentUser?.id === authUser.id) return;
           routeAuthenticatedUser(authUser, 'INITIAL_SESSION');
         }).catch(error => console.warn('Supabase session restore error:', error));
-
-        const pendingSignup = readAnyPendingEmailVerification();
-        if (pendingSignup?.mode === 'email_signup' && pendingSignup.userId) {
-          showEmailVerificationStep({
-            id: pendingSignup.userId,
-            email: pendingSignup.email,
-            user_metadata: { email: pendingSignup.email, full_name: pendingSignup.fullName }
-          });
-        }
 
         const callbackError = new URLSearchParams(window.location.search).get('error_description');
         if (callbackError) {
@@ -4638,78 +4520,6 @@
       });
     }
 
-    function setVerificationFeedback(element, message, type = 'success') {
-      if (!element) return;
-      element.dataset.type = type;
-      element.textContent = message;
-    }
-
-    const emailVerificationForm = document.getElementById('emailVerificationPanel');
-    const emailVerificationInput = document.getElementById('authEmailVerificationInput');
-    const emailVerificationFeedback = document.getElementById('emailVerificationFeedback');
-    const btnResendEmailVerification = document.getElementById('btnResendEmailVerification');
-    const btnCancelEmailVerification = document.getElementById('btnCancelEmailVerification');
-    if (emailVerificationForm) emailVerificationForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (!appState.supabaseClient) initSupabaseClient();
-      const email = emailVerificationInput?.value.trim().toLowerCase() || '';
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setVerificationFeedback(emailVerificationFeedback, 'Masukkan alamat email yang valid.', 'error');
-        emailVerificationInput?.focus();
-        return;
-      }
-      const pendingEmail = readAnyPendingEmailVerification();
-      if (pendingEmail?.mode === 'email_signup') {
-        const { error } = await appState.supabaseClient.auth.resend({ type: 'signup', email });
-        if (error) {
-          setVerificationFeedback(emailVerificationFeedback, error.message || 'Tautan konfirmasi gagal dikirim ulang.', 'error');
-          return;
-        }
-        setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi baru dikirim ke ${email}.`, 'success');
-        return;
-      }
-      const { data, error } = await appState.supabaseClient.auth.updateUser(
-        { email },
-        { emailRedirectTo: `${window.location.origin}${window.location.pathname}` }
-      );
-      if (error) {
-        setVerificationFeedback(emailVerificationFeedback, error.message || 'Tautan konfirmasi gagal dikirim.', 'error');
-        return;
-      }
-      const authUser = data.user || authUserAwaitingEmailVerification;
-      if (authUser) {
-        savePendingVerification({
-          ...(readPendingEmailVerification(authUser.id) || {}),
-          userId: authUser.id,
-          email,
-          mode: 'email'
-        });
-        showEmailVerificationStep(authUser);
-      }
-      setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi dikirim ke ${email}.`, 'success');
-    });
-
-    if (btnResendEmailVerification) btnResendEmailVerification.addEventListener('click', async () => {
-      if (!appState.supabaseClient) initSupabaseClient();
-      const email = emailVerificationInput?.value.trim().toLowerCase() || '';
-      if (!email) {
-        setVerificationFeedback(emailVerificationFeedback, 'Masukkan alamat email yang valid.', 'error');
-        emailVerificationInput?.focus();
-        return;
-      }
-      const pendingEmail = readAnyPendingEmailVerification();
-      const { error } = await appState.supabaseClient.auth.resend({
-        type: pendingEmail?.mode === 'email_signup' ? 'signup' : 'email_change',
-        email
-      });
-      if (error) {
-        setVerificationFeedback(emailVerificationFeedback, error.message || 'Email konfirmasi gagal dikirim ulang.', 'error');
-        return;
-      }
-      setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi baru dikirim ke ${email}.`, 'success');
-    });
-    if (btnCancelEmailVerification) btnCancelEmailVerification.addEventListener('click', () => logoutUser());
-
     // Sign in with a Supabase Auth email/password account.
     if (formLogin) {
       formLogin.addEventListener('submit', async (e) => {
@@ -4785,7 +4595,6 @@
           email: rawEmail.toLowerCase(),
           password: rawPassword,
           options: {
-            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
             data: {
               username: rawUsername,
               display_name: rawUsername,
@@ -4795,6 +4604,14 @@
         });
         if (error) {
           showToast(error.message || 'Pendaftaran gagal.', 'danger');
+          return;
+        }
+
+        if (!data.user || !data.session) {
+          showToast(
+            'Konfirmasi email masih diwajibkan oleh Supabase. Buka Authentication → Providers → Email, matikan “Confirm email”, lalu coba lagi.',
+            'warning'
+          );
           return;
         }
 
@@ -4808,18 +4625,7 @@
         document.getElementById('regPasswordStrengthLabel')?.replaceChildren('Belum diisi');
 
         hideLoginAlert();
-        if (!data.user) {
-          showToast('Pendaftaran belum dapat diproses. Coba lagi beberapa saat.', 'danger');
-          return;
-        }
-        savePendingVerification({
-          userId: data.user.id,
-          email: rawEmail.toLowerCase(),
-          fullName: rawUsername,
-          mode: 'email_signup'
-        });
-        showEmailVerificationStep(data.user);
-        showToast(`Tautan konfirmasi dikirim ke ${rawEmail.toLowerCase()}.`, 'success');
+        showToast(`Akun ${rawUsername} berhasil dibuat. Anda langsung masuk ke Cartly.`, 'success');
       });
     }
 
@@ -5041,8 +4847,6 @@
     }
 
     appState.currentUser = null;
-    resetEmailVerificationStep();
-
     const modalProfile = document.getElementById('modalUserProfileBackdrop');
     if (modalProfile) modalProfile.classList.add('hidden');
 
