@@ -3319,6 +3319,91 @@ body {
   opacity: 1;
 }
 
+/* Keep catalog prices and the floating total readable on narrow phone screens. */
+.astro-price-row {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.4rem;
+  row-gap: 0.15rem;
+}
+
+.astro-price-row > * {
+  white-space: nowrap;
+}
+
+.astro-price-original {
+  color: #64748b !important;
+  font-size: 0.625rem;
+}
+
+.astro-price-current {
+  color: #16243b !important;
+  font-size: 0.8125rem;
+}
+
+#activeStoreName {
+  font-size: 10px !important;
+}
+
+#cartBottomGrandTotal {
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  #astroCatalogGrid > div {
+    min-width: 0;
+  }
+
+  #astroCatalogGrid h4 {
+    min-height: 2.5em;
+    overflow-wrap: anywhere;
+  }
+
+  #astroCatalogGrid .astro-price-row.has-discount {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  #astroCatalogGrid .astro-price-current {
+    font-size: 0.75rem;
+  }
+
+  .astro-product-card button.w-full {
+    gap: 0.35rem;
+    padding-inline: 0.35rem;
+    white-space: nowrap;
+  }
+
+  #cartSummaryBottom > div {
+    gap: 0.5rem !important;
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .cart-summary-total-line {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 0 !important;
+  }
+
+  .cart-summary-total-line > span:first-child {
+    font-size: 9px !important;
+    line-height: 1.2;
+  }
+
+  #cartBottomGrandTotal {
+    font-size: clamp(16px, 4.5vw, 19px) !important;
+    line-height: 1.15;
+  }
+
+  #cartSummaryBottom #btnFinishShopping {
+    min-width: 0;
+    padding-inline: 0.75rem;
+  }
+}
+
 #btnAddNewStore,
 #btnAddNewStore * {
   background-color: #131312 !important;
