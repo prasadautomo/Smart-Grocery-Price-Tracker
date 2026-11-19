@@ -3704,7 +3704,7 @@
   }
 
   function selectCheckoutPaymentMethod(method) {
-    const allowedMethods = ['cash', 'qris', 'ewallet', 'transfer'];
+    const allowedMethods = ['cash', 'qris'];
     checkoutPaymentMethod = allowedMethods.includes(method) ? method : 'cash';
     document.querySelectorAll('.checkout-payment-method').forEach(button => {
       const selected = button.dataset.method === checkoutPaymentMethod;
@@ -3823,7 +3823,7 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const paymentLabels = { cash: 'Tunai', qris: 'QRIS (konfirmasi manual)', ewallet: 'E-Wallet (konfirmasi manual)', transfer: 'Transfer (konfirmasi manual)' };
+    const paymentLabels = { cash: 'Tunai', qris: 'QRIS (konfirmasi manual)' };
     const receiptLabel = paymentLabels[checkoutPaymentMethod];
 
     // Populate Thermal Receipt Elements

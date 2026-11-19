@@ -326,7 +326,7 @@ body {
   font-size: 0.65rem;
   font-weight: 800;
   background: #131312;
-  color: #131312;
+  color: #ffffff;
   padding: 2px 7px;
   border-radius: 6px;
   border: 1px dashed #131312;
@@ -1232,7 +1232,7 @@ body {
 
 .rubber-stamp-terracotta {
   background: #131312;
-  color: #131312;
+  color: #ffffff;
   border: 1.5px dashed #131312;
   box-shadow: 0 2px 0 rgba(5, 150, 105, 0.4);
 }
@@ -1247,7 +1247,7 @@ body {
 .rubber-stamp-pending,
 .rubber-stamp-amber {
   background: #131312;
-  color: #131312;
+  color: #ffffff;
   border: 1.5px solid #131312;
   box-shadow: 0 2px 0 #042f24;
 }
@@ -3317,4 +3317,124 @@ body {
 }
 .store-item-row[class*="bg-emerald"] .store-item-btn:hover {
   background-color: #222638 !important;
+}
+
+/* Keep dark badges readable after the light-card text reset above. */
+.neo-ticket-card .cat-mono-tag,
+.neo-ticket-card .neo-promo-chip,
+.neo-ticket-card .rubber-stamp,
+.neo-ticket-card .rubber-stamp * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.neo-ticket-card .cat-mono-tag,
+.neo-ticket-card .neo-promo-chip {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+}
+
+/* The progress pill uses a dark surface, so override the global emerald text color. */
+#plannerProgressPill,
+#plannerProgressPill * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+#plannerProgressPill {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+}
+
+/* Checkout uses a light surface: keep regular copy dark and selected controls white-on-charcoal. */
+#modalAstroCheckout #checkoutStagePayment {
+  background-color: #ffffff !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutStoreLabel,
+#modalAstroCheckout #checkoutStagePayment label,
+#modalAstroCheckout #checkoutStagePayment #checkoutPaymentItems,
+#modalAstroCheckout #checkoutPaymentSummary,
+#modalAstroCheckout #checkoutStagePayment #checkoutPaymentSubtotal,
+#modalAstroCheckout #checkoutStagePayment #checkoutPaymentTotal {
+  color: #263852 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentSummary {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+#modalAstroCheckout .checkout-payment-method {
+  min-height: 4.25rem;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout .checkout-payment-method * {
+  color: #16243b !important;
+}
+
+#modalAstroCheckout .checkout-payment-method .material-symbols-outlined {
+  color: #526176 !important;
+}
+
+#modalAstroCheckout .checkout-payment-method[aria-pressed="true"] {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+  color: #ffffff !important;
+}
+
+#modalAstroCheckout .checkout-payment-method[aria-pressed="true"] * {
+  color: #ffffff !important;
+}
+
+#modalAstroCheckout #checkoutCashPanel {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutCashChange.text-rose-300 {
+  color: #b42318 !important;
+}
+
+#modalAstroCheckout #checkoutCashChange.text-emerald-300 {
+  color: #166534 !important;
+}
+
+#modalAstroCheckout #checkoutCashAmount {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutDigitalPanel {
+  background-color: #fffbeb !important;
+  border-color: #fbbf24 !important;
+}
+
+#modalAstroCheckout #checkoutDigitalPanel p,
+#modalAstroCheckout #checkoutDigitalPanel label,
+#modalAstroCheckout #checkoutDigitalPanel label * {
+  color: #713f12 !important;
+}
+
+#modalAstroCheckout #checkoutExactCash {
+  background-color: #e2e8f0 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #btnConfirmCheckoutPayment {
+  background-color: #131312 !important;
+  color: #ffffff !important;
+}
+
+#modalAstroCheckout #btnConfirmCheckoutPayment:disabled {
+  background-color: #e2e8f0 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+  opacity: 1 !important;
 }

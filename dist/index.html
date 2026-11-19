@@ -127,7 +127,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.10.0">
+  <link rel="stylesheet" href="styles.css?v=7.11.0">
 </head>
 
 <body class="bg-[#f4f7fb] font-body-md text-on-surface antialiased flex flex-col min-h-screen">
@@ -1027,7 +1027,7 @@
         </div>
         <div class="p-4 overflow-y-auto flex-1 space-y-4">
           <div id="checkoutPaymentItems" class="space-y-2"></div>
-          <div class="rounded-xl bg-[#151a24] border border-[#262f4c] p-3 space-y-1 text-sm">
+          <div id="checkoutPaymentSummary" class="rounded-xl bg-[#151a24] border border-[#262f4c] p-3 space-y-1 text-sm">
             <div class="flex justify-between text-stone-300"><span>Subtotal</span><span id="checkoutPaymentSubtotal">Rp 0</span></div>
             <div class="flex justify-between font-bold text-white text-base"><span>Total bayar</span><span id="checkoutPaymentTotal" class="text-emerald-400">Rp 0</span></div>
           </div>
@@ -1040,12 +1040,6 @@
               <button type="button" class="checkout-payment-method rounded-xl border border-[#30384b] bg-[#151a24] p-3 text-left text-white" data-method="qris" aria-pressed="false">
                 <span class="material-symbols-outlined text-emerald-400">qr_code_2</span><span class="block text-sm font-bold">QRIS</span>
               </button>
-              <button type="button" class="checkout-payment-method rounded-xl border border-[#30384b] bg-[#151a24] p-3 text-left text-white" data-method="ewallet" aria-pressed="false">
-                <span class="material-symbols-outlined text-emerald-400">account_balance_wallet</span><span class="block text-sm font-bold">E-Wallet</span>
-              </button>
-              <button type="button" class="checkout-payment-method rounded-xl border border-[#30384b] bg-[#151a24] p-3 text-left text-white" data-method="transfer" aria-pressed="false">
-                <span class="material-symbols-outlined text-emerald-400">account_balance</span><span class="block text-sm font-bold">Transfer</span>
-              </button>
             </div>
           </div>
           <div id="checkoutCashPanel" class="rounded-xl border border-[#262f4c] bg-[#111722] p-3 space-y-2">
@@ -1057,7 +1051,7 @@
             <p id="checkoutCashChange" class="text-xs font-semibold text-stone-300" aria-live="polite">Kembalian: Rp 0</p>
           </div>
           <div id="checkoutDigitalPanel" class="hidden rounded-xl border border-amber-500/40 bg-amber-950/20 p-3 space-y-3">
-            <p class="text-xs leading-relaxed text-amber-100">Bayar melalui aplikasi bank atau dompet digital Anda. Cartly tidak memproses atau memverifikasi transaksi secara otomatis.</p>
+            <p class="text-xs leading-relaxed text-amber-100">Bayar melalui QRIS, lalu konfirmasi pembayaran di sini. Cartly tidak memproses atau memverifikasi transaksi secara otomatis.</p>
             <label class="flex items-start gap-2 text-xs text-white">
               <input id="checkoutDigitalPaidConfirm" type="checkbox" class="mt-0.5 accent-emerald-500">
               <span>Saya sudah membayar dan transaksi berhasil.</span>
@@ -1457,7 +1451,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=8.6.0"></script>
+  <script src="app.js?v=8.6.1"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {
