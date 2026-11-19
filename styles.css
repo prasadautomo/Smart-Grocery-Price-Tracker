@@ -3162,3 +3162,145 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
     gap: 10px !important;
   }
 }
+
+/* Scenario coverage: clear empty state, visible month-to-month price signals, and thumb-sized controls. */
+.cart-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 2rem 1.25rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 1.25rem;
+  background: #ffffff;
+  color: #263852;
+  text-align: center;
+}
+.cart-empty-state > .material-symbols-outlined {
+  color: #64748b;
+  font-size: 2.25rem;
+}
+.cart-empty-state h3,
+.cart-empty-state p {
+  margin: 0;
+}
+.cart-empty-state h3 {
+  color: #17243a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.cart-empty-state p {
+  max-width: 26rem;
+  color: #526176;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+.cart-empty-action {
+  min-height: 44px;
+  margin-top: 0.35rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 0.8rem;
+  background: #131312;
+  color: #ffffff;
+  font-weight: 800;
+}
+.price-comparison {
+  flex: 1 1 100%;
+  color: #526176 !important;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.price-comparison.price-trend-up {
+  color: #b42318 !important;
+}
+.price-comparison.price-trend-down {
+  color: #087443 !important;
+}
+.price-comparison.price-trend-stable,
+.price-comparison.price-trend-unknown {
+  color: #526176 !important;
+}
+.price-comparison-store {
+  color: inherit !important;
+  font-weight: 600;
+}
+.budget-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid;
+  border-radius: 0.85rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.budget-alert-warning {
+  border-color: #d49b00;
+  background: #fff5cc;
+  color: #5c4300 !important;
+}
+.budget-alert-warning * {
+  color: #5c4300 !important;
+}
+.budget-alert-over {
+  border-color: #a61b1b;
+  background: #a61b1b;
+  color: #ffffff !important;
+}
+.budget-alert-over * {
+  color: #ffffff !important;
+}
+.btn-ico-subtle {
+  min-width: 44px;
+  min-height: 44px;
+}
+.cart-qty-input {
+  min-height: 44px;
+}
+.neo-ticket-card,
+.astro-product-card,
+#tabCart,
+#tabBudget,
+#tabDompet {
+  min-width: 0;
+  max-width: 100%;
+}
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 480px) {
+  #btnModalQtyMinus,
+  #btnModalQtyPlus,
+  #btnEditBudgetTrigger,
+  #btnUserProfileTrigger,
+  #modalBudgetBackdrop button,
+  #modalConfirmDeleteItem button,
+  #modalConfirmClearCart button,
+  .cart-check-btn,
+  .btn-add-discount-pill,
+  .astro-product-card button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .cart-check-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .astro-product-card button.w-full {
+    width: 100%;
+  }
+
+  #modalItemBackdrop .grid.grid-cols-2 {
+    gap: 0.6rem;
+  }
+}

@@ -19,6 +19,7 @@
     BUDGET: 'smart_grocery_budget',
     HISTORY: 'smart_grocery_history',
     MASTER: 'smart_grocery_master',
+    PRICE_HISTORY: 'smart_grocery_price_history',
     SOUND: 'smart_grocery_sound_enabled',
     PLANNER: 'smart_grocery_planner'
   };
@@ -188,6 +189,8 @@
       qty: 1,
       price: 74000,
       lastMonthPrice: 68000,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      priceDate: getLocalDateKey(),
       discountRaw: '',
       isPlanned: true,
       inPhysicalCart: true,
@@ -201,6 +204,8 @@
       qty: 1,
       price: 28000,
       lastMonthPrice: 32000,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      priceDate: getLocalDateKey(),
       discountRaw: '',
       isPlanned: true,
       inPhysicalCart: true,
@@ -214,6 +219,8 @@
       qty: 1,
       price: 5000,
       lastMonthPrice: 5000,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      priceDate: getLocalDateKey(),
       discountRaw: '',
       isPlanned: true,
       inPhysicalCart: true,
@@ -227,6 +234,8 @@
       qty: 1,
       price: 38900,
       lastMonthPrice: 42000,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      priceDate: getLocalDateKey(),
       discountRaw: '7%',
       isPlanned: true,
       inPhysicalCart: false,
@@ -240,6 +249,8 @@
       qty: 5,
       price: 3100,
       lastMonthPrice: 3100,
+      storeName: 'Lotte Mart Grocery - Puri Indah',
+      priceDate: getLocalDateKey(),
       discountRaw: '',
       isPlanned: true,
       inPhysicalCart: false,
@@ -255,6 +266,7 @@
     budgetLimit: 350000,
     history: [],
     masterItems: [],
+    priceHistory: [],
     activeCategory: 'ALL',
     searchQuery: '',
     astroCategory: 'ALL',
@@ -265,6 +277,7 @@
     supabaseKey: '',
     supabaseClient: null,
     isCloudConnected: false,
+    isRealtimeSubscribed: false,
     hasInitialCloudPulled: false,
     lastCartPushTimestamp: 0,
     lastPlannerPushTimestamp: 0,
@@ -367,6 +380,7 @@
       const savedBudget = localStorage.getItem(budgetKey);
       const savedHistory = localStorage.getItem(historyKey);
       const savedMaster = localStorage.getItem(masterKey);
+      const savedPriceHistory = localStorage.getItem(getUserKey(STORAGE_KEYS.PRICE_HISTORY));
       const savedSound = localStorage.getItem(soundKey);
       const savedStore = localStorage.getItem(storeKey);
 
@@ -418,14 +432,24 @@
         const existing = appState.masterItems.find(m => m.name.toLowerCase() === def.name.toLowerCase());
         if (!existing) {
           appState.masterItems.push(def);
-        } else {
-          existing.lastPrice = def.lastPrice;
         }
       });
 
       appState.soundEnabled = savedSound !== null ? savedSound === 'true' : true;
+      appState.priceHistory = savedPriceHistory ? JSON.parse(savedPriceHistory) : [];
       appState.activeStore = savedStore || localStorage.getItem('smart_grocery_store') || 'Lotte Mart Grocery - Puri Indah';
       updateStoreAcrossApp(appState.activeStore);
+
+      appState.cart.forEach(item => {
+        const previousMonthPrice = Number(item.lastMonthPrice);
+        const store = String(item.storeName || appState.activeStore).trim().toLocaleLowerCase('id-ID');
+        const month = getPreviousMonthKey(item.priceDate || getLocalDateKey());
+        const name = String(item.name || '').trim().toLocaleLowerCase('id-ID');
+        const historyExists = appState.priceHistory.some(entry => entry.name === name && entry.store === store && entry.month === month);
+        if (item.priceDate && item.storeName && previousMonthPrice > 0 && month && !historyExists) {
+          recordPriceObservation(item.name, previousMonthPrice, item.storeName, `${month}-01`);
+        }
+      });
 
       appState.supabaseUrl = SUPABASE_CONFIG.URL;
       appState.supabaseKey = SUPABASE_CONFIG.KEY;
@@ -663,6 +687,98 @@
     localStorage.setItem('smart_grocery_store', storeName);
   }
 
+  function getLocalDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getShoppingDate() {
+    return document.getElementById('sessionDatePicker')?.value || getLocalDateKey();
+  }
+
+  function getPreviousMonthKey(dateKey) {
+    const [year, month] = String(dateKey || getLocalDateKey()).split('-').map(Number);
+    if (!year || !month) return '';
+    const previous = new Date(year, month - 2, 1);
+    return `${previous.getFullYear()}-${String(previous.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function getMonthKey(dateKey) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || '')) ? dateKey.slice(0, 7) : '';
+  }
+
+  function savePriceHistory() {
+    localStorage.setItem(getUserKey(STORAGE_KEYS.PRICE_HISTORY), JSON.stringify(appState.priceHistory));
+  }
+
+  function recordPriceObservation(name, price, storeName = appState.activeStore, date = getShoppingDate()) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    const month = getMonthKey(date);
+    const numericPrice = Number(price);
+    if (!normalizedName || !month || !Number.isFinite(numericPrice) || numericPrice <= 0 || !storeName) return;
+
+    const observation = {
+      name: normalizedName,
+      store: String(storeName).trim().toLocaleLowerCase('id-ID'),
+      storeName: String(storeName).trim(),
+      month,
+      date,
+      price: Math.round(numericPrice),
+      recordedAt: Date.now()
+    };
+    const existingIndex = appState.priceHistory.findIndex(entry =>
+      entry.name === observation.name && entry.store === observation.store && entry.month === observation.month
+    );
+    if (existingIndex >= 0) appState.priceHistory[existingIndex] = observation;
+    else appState.priceHistory.push(observation);
+    savePriceHistory();
+  }
+
+  function getPriceComparison(item) {
+    const name = String(item.name || '').trim().toLocaleLowerCase('id-ID');
+    const storeName = item.storeName || appState.activeStore;
+    const store = String(storeName || '').trim().toLocaleLowerCase('id-ID');
+    const date = item.priceDate || getShoppingDate();
+    const previousMonth = getPreviousMonthKey(date);
+    const savedObservation = appState.priceHistory
+      .filter(entry => entry.name === name && entry.store === store && entry.month === previousMonth)
+      .sort((a, b) => Number(b.recordedAt) - Number(a.recordedAt))[0];
+    const previousPrice = Number(savedObservation?.price ?? item.lastMonthPrice);
+    const currentPrice = Number(item.price);
+    if (!Number.isFinite(previousPrice) || previousPrice <= 0 || !Number.isFinite(currentPrice) || currentPrice <= 0) return null;
+
+    const comparison = comparePrices(currentPrice, previousPrice);
+    return {
+      ...comparison,
+      previousPrice,
+      storeName: savedObservation?.storeName || storeName
+    };
+  }
+
+  function comparePrices(currentPrice, previousPrice) {
+    const current = Number(currentPrice);
+    const previous = Number(previousPrice);
+    if (!Number.isFinite(current) || current <= 0 || !Number.isFinite(previous) || previous <= 0) return null;
+    const difference = current - previous;
+    return {
+      difference,
+      direction: difference > 0 ? 'up' : difference < 0 ? 'down' : 'stable'
+    };
+  }
+
+  function validateCartItemInput({ name, category, unit, qty, price, storeName, date }) {
+    if (!String(name || '').trim()) return 'name';
+    if (!String(category || '').trim()) return 'category';
+    if (!String(unit || '').trim()) return 'unit';
+    if (!String(storeName || '').trim()) return 'store';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date || ''))) return 'date';
+    if (!Number.isInteger(Number(qty)) || Number(qty) < 1) return 'qty';
+    if (!Number.isInteger(Number(price)) || Number(price) <= 0) return 'price';
+    return '';
+  }
+
 
   // ==========================================================================
   // SUPABASE CLOUD INTEGRATION MODULE (REALTIME HYBRID)
@@ -792,7 +908,13 @@
         })
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
+            appState.isRealtimeSubscribed = true;
+            appState.isCloudConnected = true;
             updateCloudStatusUI(true);
+          } else if (['CHANNEL_ERROR', 'TIMED_OUT', 'CLOSED'].includes(status)) {
+            appState.isRealtimeSubscribed = false;
+            appState.isCloudConnected = false;
+            updateCloudStatusUI(false);
           }
         });
     } catch (e) {
@@ -800,15 +922,15 @@
     }
   }
 
-  // Active Realtime Heartbeat Polling: syncs every 2.5s if visible
+  // Poll only as a fallback while the Realtime listener is disconnected.
   let realtimeHeartbeatTimer = null;
   function startRealtimeHeartbeat() {
     if (realtimeHeartbeatTimer) clearInterval(realtimeHeartbeatTimer);
     realtimeHeartbeatTimer = setInterval(() => {
-      if (typeof document !== 'undefined' && document.visibilityState === 'visible' && appState.supabaseClient && appState.isCloudConnected) {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible' && appState.supabaseClient && appState.currentUser?.id && !appState.isRealtimeSubscribed) {
         pullDataFromSupabase(true);
       }
-    }, 2500);
+    }, 1800);
   }
 
   if (typeof document !== 'undefined') {
@@ -1116,9 +1238,10 @@
       };
     }
 
-    // Direct Nominal
-    if (cleanStr.startsWith('rp') || (!cleanStr.includes('+') && !cleanStr.includes('%') && !isNaN(Number(cleanStr)))) {
-      const nominal = Number(cleanStr.replace(/[^0-9]/g, ''));
+    // Direct Nominal (accept both "Rp 5.000" and "-Rp 5.000").
+    const nominalMatch = cleanStr.match(/^-?\s*(?:rp\s*)?([\d.]+)$/);
+    if (nominalMatch) {
+      const nominal = Number(nominalMatch[1].replace(/\./g, ''));
       if (nominal > 0 && nominal < price) {
         const finalPrice = price - nominal;
         return {
@@ -1138,6 +1261,14 @@
       }).filter(num => num > 0);
 
       if (parts.length > 0) {
+        if (parts.some(pct => pct > 100)) {
+          return {
+            finalUnitPrice: price,
+            savedPerUnit: 0,
+            discountLabel: '',
+            formulaText: 'Setiap lapis diskon harus antara 1% dan 100%'
+          };
+        }
         let currentAmount = price;
         const steps = [];
         parts.forEach((pct, index) => {
@@ -1169,6 +1300,18 @@
   }
 
   // ==========================================================================
+  function calculateLineTotal(price, discountString, qty) {
+    const quantity = Number(qty);
+    if (!Number.isInteger(quantity) || quantity < 1) return 0;
+    return calculateDiscount(price, discountString).finalUnitPrice * quantity;
+  }
+
+  function getBudgetLevel(percentage) {
+    if (percentage >= 90 && percentage <= 100) return 'warning';
+    if (percentage > 100) return 'over';
+    return 'normal';
+  }
+
   // F-05: PENGENDALI ANGGARAN (NEO-BENTO SAFETY CAP) CALCULATION & UI
   // ==========================================================================
   function getPurchasedCartItems() {
@@ -1177,8 +1320,7 @@
 
   function calculateCurrentSubtotal() {
     return getPurchasedCartItems().reduce((total, item) => {
-      const discount = calculateDiscount(item.price, item.discountRaw);
-      return total + discount.finalUnitPrice * (Number(item.qty) || 0);
+      return total + calculateLineTotal(item.price, item.discountRaw, item.qty);
     }, 0);
   }
 
@@ -1190,7 +1332,7 @@
     const purchasedItems = getPurchasedCartItems();
     purchasedItems.forEach(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
-      const lineTotal = disc.finalUnitPrice * item.qty;
+      const lineTotal = calculateLineTotal(item.price, item.discountRaw, item.qty);
       totalSpent += lineTotal;
       totalSaved += disc.savedPerUnit * item.qty;
       totalQty += item.qty;
@@ -1253,16 +1395,17 @@
       statusBadge.classList.add('hidden');
     }
 
-    if (percentage < 90) {
+    const budgetLevel = getBudgetLevel(percentage);
+    if (budgetLevel === 'normal') {
       if (remainingText) {
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#334155]"><span class="text-slate-200 text-[11px] font-semibold">Sisa anggaran:</span><strong class="text-emerald-300 font-black text-[13px]">Rp ${formatNumber(remaining)}</strong></span>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-emerald-400 font-black tracking-tight';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 absolute -top-0.5 -right-1';
       if (progressBar) progressBar.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
-    } else if (percentage >= 90 && percentage <= 100) {
+    } else if (budgetLevel === 'warning') {
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-yellow-400/50"><span class="text-yellow-100 text-[11px] font-semibold">Sisa anggaran:</span><strong class="text-yellow-300 font-black text-[13px]">Rp ${formatNumber(remaining)}</strong></span>`;
+        remainingText.innerHTML = `<div class="budget-alert budget-alert-warning" role="status"><strong>⚠ Anggaran hampir habis (${percentage.toFixed(0)}%)</strong><span>Sisa Rp ${formatNumber(remaining)}</span></div>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-yellow-400 font-black tracking-tight';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-yellow-400 absolute -top-0.5 -right-1';
@@ -1270,7 +1413,7 @@
     } else {
       const overAmount = Math.abs(remaining);
       if (remainingText) {
-        remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-950/80 border border-rose-500/70"><span class="text-rose-100 text-[11px] font-semibold">Melebihi batas:</span><strong class="text-rose-300 font-black text-[13px]">Rp ${formatNumber(overAmount)}</strong></span>`;
+        remainingText.innerHTML = `<div class="budget-alert budget-alert-over" role="alert"><strong>Anggaran terlampaui (${percentage.toFixed(0)}%)</strong><span>Kurangi Rp ${formatNumber(overAmount)} untuk kembali ke batas.</span></div>`;
       }
       if (hudPercentEl) hudPercentEl.className = 'font-mono text-sm sm:text-base text-rose-400 font-black tracking-tight animate-pulse';
       if (navBudgetDot) navBudgetDot.className = 'w-2 h-2 rounded-full bg-rose-500 absolute -top-0.5 -right-1';
@@ -1311,9 +1454,9 @@
     const planMeter = document.getElementById('budgetHealthMeter');
     if (planMeter) {
       planMeter.style.width = `${clampedPercentage}%`;
-      if (percentage < 90) {
+      if (budgetLevel === 'normal') {
         planMeter.className = 'h-full bg-emerald-500 rounded-full transition-all duration-300';
-      } else if (percentage <= 100) {
+      } else if (budgetLevel === 'warning') {
         planMeter.className = 'h-full bg-yellow-500 rounded-full transition-all duration-300';
       } else {
         planMeter.className = 'h-full bg-rose-600 rounded-full transition-all duration-300';
@@ -1347,7 +1490,14 @@
     });
 
     if (appState.cart.length === 0) {
-      container.innerHTML = '';
+      container.innerHTML = `
+        <div class="cart-empty-state" role="status">
+          <span class="material-symbols-outlined" aria-hidden="true">shopping_basket</span>
+          <h3>Troli belanja masih kosong</h3>
+          <p>Tambahkan barang dari katalog atau catat barang yang Anda temukan di toko.</p>
+          <button type="button" class="cart-empty-action" onclick="document.getElementById('btnOpenAddModal')?.click()">Tambah barang</button>
+        </div>
+      `;
       summaryBottom.classList.add('hidden');
       updateBudgetHud();
       return;
@@ -1368,12 +1518,20 @@
     let html = '';
     filteredItems.forEach((item, index) => {
       const discount = calculateDiscount(item.price, item.discountRaw);
-      const lineTotal = discount.finalUnitPrice * item.qty;
+      const lineTotal = calculateLineTotal(item.price, item.discountRaw, item.qty);
       const hasDiscount = discount.savedPerUnit > 0;
       const isChecked = !!item.inPhysicalCart;
+      const comparison = getPriceComparison(item);
+      const comparisonText = comparison
+        ? comparison.direction === 'up'
+          ? `↗ Naik Rp ${formatNumber(comparison.difference)} dari bulan lalu`
+          : comparison.direction === 'down'
+            ? `↘ Turun Rp ${formatNumber(Math.abs(comparison.difference))} dari bulan lalu`
+            : '→ Stabil dibanding bulan lalu'
+        : 'Belum ada riwayat harga bulan lalu';
 
       html += `
-        <div class="neo-ticket-card ticket-perforation-left ${isChecked ? 'is-checked' : 'is-pending'}" data-id="${item.id}">
+        <div class="neo-ticket-card ticket-perforation-left ${isChecked ? 'is-checked' : 'is-pending'}" data-id="${escapeHtml(item.id)}">
           <!-- Top Row: Checkbox, Category, Barcode Strip & Quick Actions -->
           <div class="flex items-center justify-between border-b border-stone-200/80 pb-2">
             <div class="flex items-center gap-2">
@@ -1395,7 +1553,7 @@
                 <button class="btn-ico-subtle" onclick="window.editCartItem('${item.id}')" title="Edit">
                   <i data-lucide="edit-3"></i>
                 </button>
-                <button class="btn-ico-subtle trash" onclick="window.deleteCartItem('${item.id}')" title="Hapus">
+                <button type="button" class="btn-ico-subtle trash" onclick="window.deleteCartItem('${escapeHtml(item.id)}')" title="Hapus">
                   <i data-lucide="trash-2"></i>
                 </button>
               </div>
@@ -1429,6 +1587,9 @@
               ${hasDiscount ? `<span class="strike text-stone-400">Rp ${formatNumber(item.price)}</span>` : ''}
               <strong>Rp ${formatNumber(discount.finalUnitPrice)}</strong><span class="text-stone-500">/${escapeHtml(item.unit)}</span>
             </span>
+            <span class="price-comparison price-trend-${comparison?.direction || 'unknown'}" aria-label="${escapeHtml(comparisonText)} di ${escapeHtml(comparison?.storeName || item.storeName || appState.activeStore)}">
+              ${escapeHtml(comparisonText)} <span class="price-comparison-store">· ${escapeHtml(comparison?.storeName || item.storeName || appState.activeStore)}</span>
+            </span>
 
             <!-- F-03: Stamped Discount Rubber Stamp -->
             ${hasDiscount ? `
@@ -1451,15 +1612,15 @@
               <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer ${item.qty === 1 ? 'text-rose-400' : ''}" onclick="window.changeItemQty('${item.id}', -1)" title="${item.qty === 1 ? 'Hapus Barang' : 'Kurangi'}">
                 <i data-lucide="${item.qty === 1 ? 'trash-2' : 'minus'}"></i>
               </button>
-              <input type="number" inputmode="numeric" min="1" class="w-12 text-center font-mono font-black text-sm text-white bg-transparent border-0 focus:ring-1 focus:ring-emerald-500 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${item.id}', this.value)" oninput="window.setItemQty('${item.id}', this.value)" title="Ketik kuantitas langsung" />
+              <input type="number" inputmode="numeric" min="1" step="1" class="cart-qty-input w-12 text-center font-mono font-black text-sm text-white bg-transparent border-0 focus:ring-1 focus:ring-emerald-500 rounded p-1" value="${item.qty}" onchange="window.setItemQty('${escapeHtml(item.id)}', this.value)" oninput="window.previewItemQty('${escapeHtml(item.id)}', this.value)" title="Ketik kuantitas langsung" aria-label="Kuantitas ${escapeHtml(item.name)}" />
               <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer" onclick="window.changeItemQty('${item.id}', 1)" title="Tambah">
                 <i data-lucide="plus"></i>
               </button>
             </div>
 
             <div class="text-right">
-              <div class="font-mono text-[9px] ${isChecked ? 'text-stone-500' : 'text-slate-500'} font-bold uppercase tracking-wider">${isChecked ? `Subtotal (${item.qty} ${escapeHtml(item.unit)})` : 'Belum dibeli'}</div>
-              <div class="font-headline-md text-[18px] font-black ${isChecked ? 'text-emerald-700' : 'text-slate-400 line-through'} tracking-tight">Rp ${formatNumber(lineTotal)}</div>
+              <div data-item-subtotal-label class="font-mono text-[9px] ${isChecked ? 'text-stone-500' : 'text-slate-500'} font-bold uppercase tracking-wider">${isChecked ? `Subtotal (${item.qty} ${escapeHtml(item.unit)})` : 'Belum dibeli'}</div>
+              <div data-item-subtotal class="font-headline-md text-[18px] font-black ${isChecked ? 'text-emerald-700' : 'text-slate-400 line-through'} tracking-tight">Rp ${formatNumber(lineTotal)}</div>
               ${isChecked ? '' : '<div class="text-[9px] text-slate-500">Tidak masuk total</div>'}
             </div>
           </div>
@@ -1508,24 +1669,67 @@
     const item = appState.cart.find(i => i.id === id);
     if (!item) return;
 
-    let parsed = parseInt(value, 10);
-    if (isNaN(parsed) || parsed < 1) parsed = 1;
-    item.qty = parsed;
+    const parsed = Number(value);
+    item.qty = Number.isInteger(parsed) && parsed >= 1 ? parsed : Math.max(1, Number(item.qty) || 1);
     AudioEngine.playTap();
     saveCart();
     renderCart();
+  };
+
+  window.previewItemQty = function (id, value) {
+    const item = appState.cart.find(i => i.id === id);
+    const parsed = Number(value);
+    if (!item || !Number.isInteger(parsed) || parsed < 1) return;
+
+    item.qty = parsed;
+    const row = [...document.querySelectorAll('.neo-ticket-card')].find(card => card.dataset.id === String(id));
+    const discount = calculateDiscount(item.price, item.discountRaw);
+    const subtotal = row?.querySelector('[data-item-subtotal]');
+    const subtotalLabel = row?.querySelector('[data-item-subtotal-label]');
+    if (subtotal) subtotal.textContent = `Rp ${formatNumber(discount.finalUnitPrice * parsed)}`;
+    if (subtotalLabel && item.inPhysicalCart) subtotalLabel.textContent = `Subtotal (${parsed} ${item.unit})`;
+    saveCart();
+    updateBudgetHud();
   };
 
   window.deleteCartItem = function (id) {
     const item = appState.cart.find(i => i.id === id);
     if (!item) return;
+    const modal = document.getElementById('modalConfirmDeleteItem');
+    if (!modal) return;
+    document.getElementById('confirmDeleteItemName').textContent = item.name;
+    modal.classList.remove('hidden');
+    modal.dataset.itemId = String(item.id);
+    document.getElementById('btnConfirmDeleteItem')?.focus();
+  };
 
-    appState.cart = appState.cart.filter(i => i.id !== id);
+  const deleteItemModal = document.getElementById('modalConfirmDeleteItem');
+  const closeDeleteItemModal = () => {
+    if (!deleteItemModal) return;
+    deleteItemModal.classList.add('hidden');
+    deleteItemModal.dataset.itemId = '';
+  };
+  document.getElementById('btnCancelDeleteItem')?.addEventListener('click', closeDeleteItemModal);
+  document.getElementById('btnConfirmDeleteItem')?.addEventListener('click', () => {
+    const itemId = deleteItemModal?.dataset.itemId;
+    const item = appState.cart.find(entry => String(entry.id) === String(itemId));
+    if (!item) return closeDeleteItemModal();
+    appState.cart = appState.cart.filter(entry => String(entry.id) !== String(itemId));
+    closeDeleteItemModal();
     AudioEngine.playTap();
     saveCart();
     renderCart();
+    renderAstroCatalog();
     showToast(`"${item.name}" dihapus dari troli`, 'warning');
-  };
+  });
+  deleteItemModal?.addEventListener('click', event => {
+    if (event.target === deleteItemModal) closeDeleteItemModal();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && deleteItemModal && !deleteItemModal.classList.contains('hidden')) {
+      closeDeleteItemModal();
+    }
+  });
 
   // ==========================================================================
   // MODAL TAMBAH & EDIT ITEM
@@ -1669,21 +1873,33 @@
     const name = inputItemName.value.trim();
     const category = selectItemCategory.value;
     const unit = selectItemUnit.value;
-    const qty = parseInt(inputItemQty.value, 10) || 1;
-    const price = parseFloat(inputItemPrice.value) || 0;
+    const qty = Number(inputItemQty.value);
+    const price = Number(inputItemPrice.value);
     const discountRaw = inputItemDiscount.value.trim();
 
-    if (!name) {
-      showToast('Gagal: Nama barang tidak boleh kosong!', 'danger');
+    const invalidField = validateCartItemInput({
+      name, category, unit, qty, price, storeName: appState.activeStore, date: getShoppingDate()
+    });
+    if (invalidField) {
+      const messages = {
+        name: 'Nama barang tidak boleh kosong.',
+        category: 'Pilih kategori barang.',
+        unit: 'Pilih kemasan atau satuan barang.',
+        store: 'Pilih toko belanja terlebih dahulu.',
+        date: 'Pilih tanggal belanja yang valid.',
+        qty: 'Kuantitas harus berupa angka bulat minimal 1.',
+        price: 'Harga harus berupa angka positif.'
+      };
+      const fields = {
+        name: inputItemName,
+        category: selectItemCategory,
+        unit: selectItemUnit,
+        qty: inputItemQty,
+        price: inputItemPrice
+      };
+      showToast(`Gagal: ${messages[invalidField]}`, 'danger');
       AudioEngine.playAlert();
-      inputItemName.focus();
-      return;
-    }
-
-    if (isNaN(price) || price <= 0) {
-      showToast('Gagal: Harga tidak boleh kosong atau bernilai negatif / 0!', 'danger');
-      AudioEngine.playAlert();
-      inputItemPrice.focus();
+      fields[invalidField]?.focus();
       return;
     }
 
@@ -1692,7 +1908,9 @@
       if (idx !== -1) {
         appState.cart[idx] = {
           ...appState.cart[idx],
-          name, category, unit, qty, price, discountRaw
+          name, category, unit, qty, price, discountRaw,
+          storeName: appState.activeStore,
+          priceDate: getShoppingDate()
         };
         showToast(`"${name}" berhasil diubah`, 'success');
       }
@@ -1700,6 +1918,10 @@
       const newItem = {
         id: 'item-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
         name, category, unit, qty, price, discountRaw,
+        storeName: appState.activeStore,
+        priceDate: getShoppingDate(),
+        inPhysicalCart: true,
+        isPlanned: true,
         createdAt: Date.now()
       };
       appState.cart.unshift(newItem);
@@ -1714,6 +1936,7 @@
   });
 
   function updateMasterDatabaseItem(name, category, unit, price) {
+    recordPriceObservation(name, price);
     const existing = appState.masterItems.find(m => m.name.toLowerCase() === name.toLowerCase());
     if (existing) {
       existing.category = category;
@@ -1949,14 +2172,16 @@
     document.getElementById('btnCloseBudgetModal').addEventListener('click', () => budgetModal.classList.add('hidden'));
     document.getElementById('btnCancelQuickBudget').addEventListener('click', () => budgetModal.classList.add('hidden'));
     document.getElementById('btnSaveQuickBudget').addEventListener('click', () => {
-      const val = parseFloat(document.getElementById('inputQuickBudget').value) || 0;
-      if (val > 0) {
+      const val = Number(document.getElementById('inputQuickBudget').value);
+      if (Number.isInteger(val) && val > 0) {
         appState.budgetLimit = val;
         saveBudget();
         updateBudgetHud();
         budgetModal.classList.add('hidden');
         AudioEngine.playSuccess();
         showToast('Batas anggaran berhasil disimpan', 'success');
+      } else {
+        showToast('Masukkan batas anggaran berupa angka bulat yang lebih besar dari 0.', 'danger');
       }
     });
 
@@ -2013,7 +2238,7 @@
     // Selector Tanggal Belanja (Skenario 1 & 6)
     const datePickerEl = document.getElementById('sessionDatePicker');
     if (datePickerEl) {
-      const savedDate = localStorage.getItem('smart_grocery_date') || '2026-10-26';
+      const savedDate = localStorage.getItem('smart_grocery_date') || getLocalDateKey();
       datePickerEl.value = savedDate;
       datePickerEl.addEventListener('change', (e) => {
         const newDate = e.target.value;
@@ -2208,10 +2433,12 @@
           unit: 'pcs',
           qty: 1,
           price: priceVal,
-          lastMonthPrice: priceVal,
           discountRaw: (traySelectedPromo && traySelectedPromo !== '0') ? traySelectedPromo : '',
+          storeName: appState.activeStore,
+          priceDate: getShoppingDate(),
           createdAt: Date.now(),
-          inPhysicalCart: false
+          inPhysicalCart: true,
+          isPlanned: true
         };
 
         appState.cart.unshift(newItem);
@@ -2802,6 +3029,9 @@
       qty: 1,
       price: currentScannedItem.price,
       discountRaw: discountEffective,
+      lastMonthPrice: Number(currentScannedItem.lastMonthPrice) || undefined,
+      storeName: appState.activeStore,
+      priceDate: getShoppingDate(),
       barcode: currentScannedItem.barcode,
       createdAt: Date.now(),
       inPhysicalCart: true
@@ -3394,8 +3624,9 @@
         unit: prod.unit,
         qty: 1,
         price: prod.price,
-        lastMonthPrice: prod.originalPrice || prod.price,
         discountRaw: prod.discountRaw || '',
+        storeName: appState.activeStore,
+        priceDate: getShoppingDate(),
         isPlanned: true,
         inPhysicalCart: true,
         createdAt: Date.now()
@@ -3406,9 +3637,8 @@
     } else {
       const nextQty = existing.qty + delta;
       if (nextQty <= 0) {
-        appState.cart = appState.cart.filter(c => c.id !== existing.id);
-        AudioEngine.playTap();
-        showToast(`"${prod.name}" dikeluarkan dari troli`, 'warning');
+        window.deleteCartItem(existing.id);
+        return;
       } else {
         existing.qty = nextQty;
         AudioEngine.playTap();
@@ -4028,6 +4258,7 @@
       budgetLimit: appState.budgetLimit,
       history: appState.history,
       masterItems: appState.masterItems,
+      priceHistory: appState.priceHistory,
       exportedAt: new Date().toISOString()
     };
 
@@ -4053,11 +4284,13 @@
         if (data.budgetLimit) appState.budgetLimit = data.budgetLimit;
         if (data.history) appState.history = data.history;
         if (data.masterItems) appState.masterItems = data.masterItems;
+        if (Array.isArray(data.priceHistory)) appState.priceHistory = data.priceHistory;
 
         saveCart();
         saveBudget();
         saveHistory();
         saveMaster();
+        savePriceHistory();
         renderAll();
         showToast('Data berhasil diimpor', 'success');
       } catch (err) {
@@ -4073,11 +4306,13 @@
       appState.budgetLimit = 350000;
       appState.history = [];
       appState.masterItems = JSON.parse(JSON.stringify(DEFAULT_MASTER_ITEMS));
+      appState.priceHistory = [];
 
       saveCart();
       saveBudget();
       saveHistory();
       saveMaster();
+      savePriceHistory();
       renderAll();
       AudioEngine.playSuccess();
       showToast('Data direset', 'success');
@@ -4226,6 +4461,8 @@
       qty: currentShelfModalPlannerItem.qty,
       price: price,
       discountRaw: discountRaw,
+      storeName: appState.activeStore,
+      priceDate: getShoppingDate(),
       createdAt: Date.now(),
       inPhysicalCart: true,
       isPlanned: true,

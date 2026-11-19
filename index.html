@@ -127,7 +127,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.9.0">
+  <link rel="stylesheet" href="styles.css?v=7.10.0">
 </head>
 
 <body class="bg-[#f4f7fb] font-body-md text-on-surface antialiased flex flex-col min-h-screen">
@@ -281,7 +281,7 @@
         <div class="flex items-center gap-1 mt-0.5">
           <div class="flex items-center gap-1 text-[10.5px] font-bold text-primary bg-white px-2 py-1 rounded-md border border-slate-200 shadow-2xs shrink-0" title="Tanggal belanja aktif">
             <span class="material-symbols-outlined text-[13px] text-slate-500">calendar_month</span>
-            <input type="date" id="sessionDatePicker" class="w-[125px] max-w-[125px] bg-transparent border-0 p-0 text-[11px] font-mono font-bold text-primary cursor-pointer focus:outline-none" value="2026-10-26" />
+            <input type="date" id="sessionDatePicker" required class="w-[125px] max-w-[125px] bg-transparent border-0 p-0 text-[11px] font-mono font-bold text-primary cursor-pointer focus:outline-none" />
           </div>
         </div>
       </div>
@@ -856,19 +856,20 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KATEGORI</label>
-            <select id="selectItemCategory"
+            <select id="selectItemCategory" required
               class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary">
               <option value="Bahan Pokok">Bahan Pokok</option>
               <option value="Makanan & Minuman">Makanan & Minuman</option>
               <option value="Kebersihan">Kebersihan</option>
               <option value="Dapur & Bumbu">Dapur & Bumbu</option>
+              <option value="Peralatan">Peralatan</option>
               <option value="Lainnya">Lainnya</option>
             </select>
           </div>
           <div>
             <label
               class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KEMASAN/SATUAN</label>
-            <select id="selectItemUnit"
+            <select id="selectItemUnit" required
               class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary">
               <option value="karung/5kg">karung/5kg</option>
               <option value="pcs">pcs (buah)</option>
@@ -893,7 +894,7 @@
               id="btnModalQtyMinus">
               <span class="material-symbols-outlined text-[16px]">remove</span>
             </button>
-            <input type="number" id="inputItemQty" value="1" min="1" inputmode="numeric" required
+            <input type="number" id="inputItemQty" value="1" min="1" step="1" inputmode="numeric" required
               class="flex-1 text-center bg-transparent font-numeric-md text-numeric-md font-bold text-primary focus:outline-none">
             <button type="button"
               class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-primary shadow-xs active:scale-90"
@@ -906,7 +907,7 @@
         <div>
           <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN (RP)
             *</label>
-          <input type="number" id="inputItemPrice" placeholder="18000" required inputmode="numeric"
+          <input type="number" id="inputItemPrice" placeholder="18000" min="1" step="1" required inputmode="numeric"
             class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md font-bold focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
         </div>
 
@@ -1001,7 +1002,7 @@
         <div>
           <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">NOMINAL ANGGARAN
             (RP)</label>
-          <input type="number" id="inputQuickBudget" placeholder="350000" inputmode="numeric"
+          <input type="number" id="inputQuickBudget" placeholder="350000" min="1" step="1" inputmode="numeric"
             class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md font-bold focus:outline-none focus:ring-2 focus:ring-secondary">
         </div>
         <div class="grid grid-cols-4 gap-2">
@@ -1301,6 +1302,21 @@
   </div>
 
   <!-- ================= MODAL: KONFIRMASI KOSONGKAN KERANJANG (Skenario 8) ================= -->
+  <div class="modal-backdrop hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" id="modalConfirmDeleteItem" role="alertdialog" aria-modal="true" aria-labelledby="confirmDeleteItemTitle" aria-describedby="confirmDeleteItemDescription">
+    <div class="w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-700 bg-slate-950 text-white">
+      <div class="w-12 h-12 rounded-2xl bg-red-950/70 text-red-300 flex items-center justify-center mx-auto mb-4 border border-red-800/60">
+        <span class="material-symbols-outlined text-[26px]" aria-hidden="true">delete_outline</span>
+      </div>
+      <h3 id="confirmDeleteItemTitle" class="text-lg font-black text-center mb-1">Hapus barang dari troli?</h3>
+      <p id="confirmDeleteItemDescription" class="text-sm text-slate-300 text-center mb-6">Barang ini akan dihapus dari daftar belanja:</p>
+      <p id="confirmDeleteItemName" class="font-bold text-center text-white break-words mb-6"></p>
+      <div class="flex gap-2">
+        <button type="button" id="btnCancelDeleteItem" class="flex-1 min-h-11 py-3 rounded-xl bg-slate-800 text-white font-bold border border-slate-700">Batal</button>
+        <button type="button" id="btnConfirmDeleteItem" class="flex-1 min-h-11 py-3 rounded-xl bg-red-700 text-white font-black">Ya, hapus</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" id="modalConfirmClearCart">
     <div class="w-full max-w-sm bg-[#11131c] rounded-3xl p-6 shadow-2xl border-2 border-[#1e2338] animate-scale-up text-white">
       <div class="w-12 h-12 rounded-2xl bg-red-950/60 text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-800/50">
@@ -1461,12 +1477,12 @@
   </div>
 
   <!-- Toast Notification Element -->
-  <div class="neo-toast" id="neoToast">
+  <div class="neo-toast" id="neoToast" role="status" aria-live="polite" aria-atomic="true">
     <span class="material-symbols-outlined text-[18px]" id="toastIcon">info</span>
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=8.5.0"></script>
+  <script src="app.js?v=8.6.0"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {

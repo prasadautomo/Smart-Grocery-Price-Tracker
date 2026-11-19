@@ -19,12 +19,14 @@ Aplikasi ini mengatasi 3 dilema belanja utama:
 
 | Kode | Nama Fitur | Status | Deskripsi Implementasi |
 | :--- | :--- | :---: | :--- |
-| **F-01** | **Pencatatan Item Belanja Lengkap** | ✅ Selesai | Form modal fleksibel mencatat nama, kategori, satuan (kg, liter, pcs, pack, botol, dll), kuantitas, harga satuan, dan harga bulan lalu. |
+| **F-01** | **Pencatatan Item Belanja Lengkap** | ✅ Selesai | Form memvalidasi nama, kategori, satuan, kuantitas bulat positif, harga positif, toko aktif, dan tanggal belanja. |
 | **F-02** | **Perhitungan Kuantitas Otomatis** | ✅ Selesai | Stepper kuantitas (+ / -) ramah sentuhan jempol yang seketika mengalikan harga satuan ke total baris item. |
 | **F-03** | **Kalkulator Diskon Bertingkat** | ✅ Selesai | Menangani diskon tunggal (%), diskon bertumpuk (e.g. 50% + 20%), dan potongan tunai langsung (Rp) dengan formula matematika presisi. |
-| **F-04** | **Komparator Harga Realtime vs Bulan Lalu** | ✅ Selesai | Indikator visual seketika: Panah Merah Naik (↑), Panah Hijau Turun (↓), dan Tanda Stabil (=). |
-| **F-05** | **Pengendali Anggaran (Safety Cap)** | ✅ Selesai | Pantauan sisa dompet dengan kartu visual: Hijau (<80%), Kuning (80-99%), dan Merah Bahaya (≥100% / Over Budget). |
-| **F-06** | **Riwayat & Database Belanja** | ✅ Selesai | Fitur *Checkout & Archive* struk digital permanen, ekspor laporan JSON/CSV, serta otomatis memperbarui patokan harga bulan berikutnya. |
+| **F-04** | **Komparator Harga Realtime vs Bulan Lalu** | ✅ Selesai | Riwayat harga disimpan per toko dan bulan; indikator menunjukkan naik merah, turun hijau, atau stabil. |
+| **F-05** | **Pengendali Anggaran (Safety Cap)** | ✅ Selesai | Hijau di bawah 90%, peringatan kuning pada 90–100%, dan banner merah saat melewati 100%. |
+| **F-06A** | **Persistensi Data Lokal** | ✅ Selesai | Keranjang, limit, toko, tanggal, dan riwayat harga memakai LocalStorage dan bertahan setelah reload. |
+| **F-06B** | **Sinkronisasi Antar-Perangkat** | ⚠️ Supabase Realtime | Listener Broadcast dan perubahan tabel Supabase memperbarui perangkat lain; proyek ini belum dikonfigurasi dengan Firebase Firestore `onSnapshot()`. |
+| **UX** | **Ergonomi Mobile** | ✅ Selesai | Input angka, tombol sentuh minimal 44 px, pesan troli kosong, toast non-blocking, serta dialog konfirmasi hapus. |
 | **F-07** | **Checklist Lorong Toko & Prioritas** | ✅ Selesai | Centang barang interaktif saat mengambil di rak fisik + klasifikasi Wajib (Pokok) vs Jajan (Opsional). |
 | **F-08** | **Auto-Trim Over-Budget Optimizer** | ✅ Selesai | Tombol 1-klik pangkas otomatis barang jajan jika total troli melebihi batas anggaran bulanan. |
 | **F-09** | **Katalog Cepat 1-Tap Produk Rutin** | ✅ Selesai | Modal katalog instan kebutuhan anak kos (Beras, Minyak, Telur, Indomie, Sabun) dengan patokan harga otomatis. |
@@ -42,6 +44,7 @@ Aplikasi ini mengatasi 3 dilema belanja utama:
 - **Database Hybrid:**
   - **Offline/Default:** LocalStorage browser dengan *seed data* realistis kasus Rian
   - **Cloud:** Terintegrasi penuh dengan **Supabase** via `@supabase/supabase-js`
+- **Sinkronisasi Langsung:** Supabase Realtime Broadcast dan `postgres_changes`, dengan polling cadangan saat listener terputus.
 - **Hosting / Deployment:** Siap deploy ke **Vercel** (`vercel.json` SPA rewrite & header PWA telah terkonfigurasi)
 
 ---
