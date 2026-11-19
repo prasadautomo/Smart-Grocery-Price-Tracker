@@ -4762,7 +4762,12 @@
         localStorage.removeItem('sg_explicit_logout');
         const { error } = await appState.supabaseClient.auth.signInWithPassword({ email: rawEmail, password: rawPassword });
         if (error) {
-          showLoginAlert(error.message || 'Email atau password tidak cocok.', 'danger');
+          const loginErrorMessage = error.code === 'invalid_credentials'
+            ? 'Email atau kata sandi tidak cocok. Gunakan metode masuk yang sama seperti saat membuat akun. Untuk akun Google, pilih “Lanjutkan dengan Google” atau gunakan “Lupa Password?” untuk menambahkan kata sandi.'
+            : error.code === 'email_not_confirmed'
+              ? 'Email akun belum dikonfirmasi. Periksa kotak masuk email Anda.'
+              : error.message || 'Email atau password tidak cocok.';
+          showLoginAlert(loginErrorMessage, 'danger');
           return;
         }
         hideLoginAlert();

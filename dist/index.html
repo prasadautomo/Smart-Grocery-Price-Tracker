@@ -1374,7 +1374,7 @@
         </div>
         <h3 class="font-headline-sm text-lg text-white font-black tracking-tight">Atur Ulang Password</h3>
         <p class="font-body-sm text-xs text-stone-400 mt-1" id="forgotModalDesc">
-          Masukkan email akun kamu untuk menerima 6-digit kode verifikasi
+          Masukkan email akun kamu untuk menerima tautan reset password.
         </p>
       </div>
 
@@ -1391,7 +1391,7 @@
 
         <button type="submit" id="btnSubmitForgotStep1"
           class="w-full py-3.5 rounded-xl bg-emerald-500 text-stone-950 font-headline-md text-sm font-black shadow-pos-key hover:bg-emerald-400 active:translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer">
-          <span>Kirim Kode Verifikasi</span>
+          <span>Kirim Tautan Reset</span>
           <span class="material-symbols-outlined text-[18px] text-stone-950">send</span>
         </button>
       </form>
@@ -1420,7 +1420,7 @@
           <label class="font-mono text-[11px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Password Baru</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[18px]">lock</span>
-            <input type="password" id="inputForgotNewPassword" placeholder="Minimal 4 karakter" required autocomplete="new-password"
+            <input type="password" id="inputForgotNewPassword" placeholder="Minimal 8 karakter" required autocomplete="new-password"
               class="w-full pl-10 pr-10 py-3 rounded-xl bg-[#0b0c14] text-white font-body-md text-sm font-bold border-2 border-[#222638] focus:border-emerald-500 focus:outline-none transition-all placeholder:font-normal placeholder:text-stone-500">
             <button type="button" id="btnToggleForgotPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">visibility</span>
@@ -1451,7 +1451,7 @@
     <span id="toastMessage">Pesan</span>
   </div>
 
-  <script src="app.js?v=8.6.1"></script>
+  <script src="app.js?v=8.6.2"></script>
   <script>
     // Unregister service worker lama agar kode terbaru selalu dimuat seketika
     if ('serviceWorker' in navigator) {
