@@ -1535,7 +1535,6 @@
               <div class="flex items-center gap-1.5">
                 <span class="cat-mono-tag">${escapeHtml(item.category)}</span>
               </div>
-              <span class="barcode-strip hidden sm:inline-block" title="Barcode Lot"></span>
             </div>
             <div class="flex items-center gap-1.5">
               ${isChecked ? `

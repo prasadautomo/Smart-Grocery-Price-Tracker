@@ -131,14 +131,6 @@ body {
   clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
 }
 
-/* Decorative Barcode Strip */
-.barcode-strip {
-  width: 36px;
-  height: 14px;
-  background: repeating-linear-gradient(90deg, #181512 0px, #181512 2px, transparent 2px, transparent 4px, #181512 4px, #181512 7px, transparent 7px, transparent 9px, #181512 9px, #181512 10px, transparent 10px, transparent 12px);
-  opacity: 0.75;
-}
-
 .card-top-header {
   display: flex;
   align-items: center;
@@ -1478,11 +1470,6 @@ textarea::placeholder {
 .ticket-perforation-left::before {
   background-color: #07080b !important;
   border: 2px solid #222638 !important;
-}
-
-.barcode-strip {
-  background: repeating-linear-gradient(90deg, #94a3b8 0px, #94a3b8 2px, transparent 2px, transparent 4px, #94a3b8 4px, #94a3b8 7px, transparent 7px, transparent 9px, #94a3b8 9px, #94a3b8 10px, transparent 10px, transparent 12px) !important;
-  opacity: 0.6;
 }
 
 /* Cart item check button */
@@ -3462,4 +3449,33 @@ body {
 
 #modalConfirmDeleteItem #btnConfirmDeleteItem:hover {
   background-color: #8f1d14 !important;
+}
+
+/* Make the selected checklist tick clearly visible on its dark button. */
+#cartItemsList .neo-ticket-card .cart-check-btn.checked {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+#cartItemsList .neo-ticket-card .cart-check-btn.checked svg,
+#cartItemsList .neo-ticket-card .cart-check-btn.checked svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+/* Keep the quantity value optically centered inside its input. */
+#cartItemsList .neo-ticket-card .cart-qty-input {
+  text-align: center !important;
+  text-align-last: center !important;
+  padding-inline: 0 !important;
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+
+#cartItemsList .neo-ticket-card .cart-qty-input::-webkit-inner-spin-button,
+#cartItemsList .neo-ticket-card .cart-qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
