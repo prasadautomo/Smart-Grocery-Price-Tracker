@@ -2381,3 +2381,61 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 #loginScreen button[class*="bg-emerald"] *, #loginScreen button[class*="bg-green"] * {
   color: #ffffff !important;
 }
+
+/* Repair: preserve budget HUD content and apply text colors by surface. */
+#budgetHudCard .pointer-events-none {
+  display: block !important;
+}
+#budgetHudCard,
+#budgetHudCard > div,
+#budgetHudCard [class*="bg-[#0b0c14]"],
+#budgetHudCard [class*="bg-[#202838]"],
+#tabDompet > div,
+#tabDompet > div > div {
+  color: #263852 !important;
+}
+#budgetHudCard [class*="bg-[#0b0c14]"],
+#budgetHudCard [class*="bg-[#202838]"] {
+  background: #f1f5f9 !important;
+  border-color: #dce5ef !important;
+}
+#budgetHudCard .text-white,
+#budgetHudCard [class*="text-white"],
+#tabDompet .text-white,
+#tabDompet [class*="text-white"] {
+  color: #263852 !important;
+}
+#budgetHudCard [class*="text-emerald"],
+#tabDompet [class*="text-emerald"] {
+  color: #131312 !important;
+}
+#budgetHudCard #budgetPercentBadge,
+#budgetHudCard #budgetPercentBadge *,
+#tabDompet button[class*="bg-emerald"],
+#tabDompet button[class*="bg-emerald"] * {
+  color: #ffffff !important;
+}
+.neo-ticket-card, .neo-history-card, .astro-product-card, .store-item-row,
+#astroCatalogGrid > div, #tabRencana > div, #tabDompet > div {
+  color: #263852 !important;
+}
+.neo-ticket-card [class*="text-white"],
+.astro-product-card [class*="text-white"],
+.store-item-row [class*="text-white"],
+#astroCatalogGrid [class*="text-white"] {
+  color: #263852 !important;
+}
+.astro-product-card button[class*="bg-emerald"],
+.astro-product-card button[class*="bg-emerald"] *,
+#astroCatalogGrid button[class*="bg-emerald"],
+#astroCatalogGrid button[class*="bg-emerald"] * {
+  color: #ffffff !important;
+}
+#btnEditBudgetTrigger,
+#btnEditBudgetTrigger *,
+#btnUserProfileTrigger,
+#btnUserProfileTrigger *,
+#cartSummaryBottom #btnFinishShopping,
+#cartSummaryBottom #btnFinishShopping * {
+  color: #ffffff !important;
+}
