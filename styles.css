@@ -2622,3 +2622,28 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   background: #475569 !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+/* The budget pill is rendered on a light surface, so keep its label dark. */
+#btnEditBudgetTrigger,
+#btnEditBudgetTrigger * {
+  color: #000000 !important;
+}
+
+/* Keep the planner's white fields and cards readable with solid dark text. */
+#sectionPlannerShelfChecklist,
+#sectionPlannerShelfChecklist input,
+#sectionPlannerShelfChecklist select,
+#sectionPlannerShelfChecklist textarea {
+  color: #000000 !important;
+}
+
+#sectionPlannerShelfChecklist input::placeholder,
+#sectionPlannerShelfChecklist textarea::placeholder {
+  color: #475569 !important;
+  opacity: 1;
+}
+
+#sectionPlannerShelfChecklist button.bg-primary,
+#sectionPlannerShelfChecklist button.bg-primary * {
+  color: #ffffff !important;
+}
