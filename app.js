@@ -4370,9 +4370,12 @@
     const inputPassword = document.getElementById('inputLoginPassword');
     const inputRegUsername = document.getElementById('inputRegUsername');
     const inputRegEmail = document.getElementById('inputRegEmail');
+    const inputRegPhone = document.getElementById('inputRegPhone');
     const inputRegPassword = document.getElementById('inputRegPassword');
+    const inputRegPasswordConfirm = document.getElementById('inputRegPasswordConfirm');
     const btnToggleLoginPwd = document.getElementById('btnToggleLoginPwd');
     const btnToggleRegPwd = document.getElementById('btnToggleRegPwd');
+    const btnToggleRegConfirmPwd = document.getElementById('btnToggleRegConfirmPwd');
 
 
     // Email Verification Modal Elements
@@ -4414,40 +4417,77 @@
     const btnLogoutUser = document.getElementById('btnLogoutUser');
 
     // Tab Switching Logic: Masuk vs Daftar
-    if (tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
-      tabLoginBtn.addEventListener('click', () => {
-        tabLoginBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-emerald-400 font-extrabold border border-emerald-500/30 shadow-xs transition-all cursor-pointer';
-        tabRegisterBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
-        formLogin.classList.remove('hidden');
-        formRegister.classList.add('hidden');
-        if (inputUsername) inputUsername.focus();
-      });
+    function setAuthTab(activeTab, moveFocus = true) {
+      const registering = activeTab === 'register';
+      if (loginScreen) loginScreen.classList.toggle('is-registering', registering);
+      if (tabLoginBtn) {
+        tabLoginBtn.setAttribute('aria-selected', String(!registering));
+        tabLoginBtn.tabIndex = registering ? -1 : 0;
+      }
+      if (tabRegisterBtn) {
+        tabRegisterBtn.setAttribute('aria-selected', String(registering));
+        tabRegisterBtn.tabIndex = registering ? 0 : -1;
+      }
+      if (formLogin) {
+        formLogin.classList.toggle('hidden', registering);
+        formLogin.setAttribute('aria-hidden', String(registering));
+      }
+      if (formRegister) {
+        formRegister.classList.toggle('hidden', !registering);
+        formRegister.setAttribute('aria-hidden', String(!registering));
+      }
+      if (moveFocus) (registering ? inputRegUsername : inputUsername)?.focus();
+    }
 
-      tabRegisterBtn.addEventListener('click', () => {
-        tabRegisterBtn.className = 'py-2 rounded-lg bg-[#1c2136] text-emerald-400 font-extrabold border border-emerald-500/30 shadow-xs transition-all cursor-pointer';
-        tabLoginBtn.className = 'py-2 rounded-lg text-stone-400 hover:text-white transition-all cursor-pointer';
-        formRegister.classList.remove('hidden');
-        formLogin.classList.add('hidden');
-        if (inputRegUsername) inputRegUsername.focus();
+    if (tabLoginBtn && tabRegisterBtn && formLogin && formRegister) {
+      tabLoginBtn.addEventListener('click', () => setAuthTab('login'));
+      tabRegisterBtn.addEventListener('click', () => setAuthTab('register'));
+      [tabLoginBtn, tabRegisterBtn].forEach((tab) => {
+        tab.addEventListener('keydown', (event) => {
+          if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+          event.preventDefault();
+          const next = tab === tabLoginBtn ? 'register' : 'login';
+          setAuthTab(next);
+          (next === 'register' ? tabRegisterBtn : tabLoginBtn).focus();
+        });
       });
+      setAuthTab('login', false);
     }
 
     // Password visibility toggles
-    if (btnToggleLoginPwd && inputPassword) {
-      btnToggleLoginPwd.addEventListener('click', () => {
-        const isPwd = inputPassword.type === 'password';
-        inputPassword.type = isPwd ? 'text' : 'password';
-        const icon = btnToggleLoginPwd.querySelector('.material-symbols-outlined');
-        if (icon) icon.textContent = isPwd ? 'visibility_off' : 'visibility';
+    function bindPasswordToggle(button, input, visibleLabel, hiddenLabel) {
+      if (!button || !input) return;
+      button.addEventListener('click', () => {
+        const showPassword = input.type === 'password';
+        input.type = showPassword ? 'text' : 'password';
+        button.setAttribute('aria-pressed', String(showPassword));
+        button.setAttribute('aria-label', showPassword ? hiddenLabel : visibleLabel);
+        const icon = button.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = showPassword ? 'visibility_off' : 'visibility';
       });
     }
-    if (btnToggleRegPwd && inputRegPassword) {
-      btnToggleRegPwd.addEventListener('click', () => {
-        const isPwd = inputRegPassword.type === 'password';
-        inputRegPassword.type = isPwd ? 'text' : 'password';
-        const icon = btnToggleRegPwd.querySelector('.material-symbols-outlined');
-        if (icon) icon.textContent = isPwd ? 'visibility_off' : 'visibility';
-      });
+    bindPasswordToggle(btnToggleLoginPwd, inputPassword, 'Tampilkan password', 'Sembunyikan password');
+    bindPasswordToggle(btnToggleRegPwd, inputRegPassword, 'Tampilkan password', 'Sembunyikan password');
+    bindPasswordToggle(btnToggleRegConfirmPwd, inputRegPasswordConfirm, 'Tampilkan konfirmasi password', 'Sembunyikan konfirmasi password');
+
+    if (inputRegPassword) {
+      const strengthWrap = document.getElementById('regPasswordStrength');
+      const strengthLabel = document.getElementById('regPasswordStrengthLabel');
+      const updatePasswordStrength = () => {
+        const value = inputRegPassword.value;
+        const score = value
+          ? [value.length >= 8, /[a-z]/.test(value) && /[A-Z]/.test(value), /\d/.test(value), /[^A-Za-z0-9]/.test(value)]
+            .filter(Boolean).length
+          : 0;
+        const labels = ['Belum diisi', 'Lemah', 'Cukup', 'Baik', 'Kuat'];
+        if (strengthWrap) strengthWrap.dataset.strength = String(score);
+        if (strengthLabel) strengthLabel.textContent = labels[score];
+      };
+      inputRegPassword.addEventListener('input', updatePasswordStrength);
+      updatePasswordStrength();
+    }
+    if (inputRegPasswordConfirm) {
+      inputRegPasswordConfirm.addEventListener('input', () => inputRegPasswordConfirm.setCustomValidity(''));
     }
 
     // Clear legacy browser-stored passwords and cached identities.
@@ -4473,13 +4513,13 @@
       alertEl.style.display = 'flex';
       void alertEl.offsetWidth; // restart shake animation
       if (type === 'danger') {
-        alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-red-100 border-2 border-red-500 text-red-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
+        alertEl.dataset.type = 'danger';
         if (alertIcon) alertIcon.textContent = 'error';
       } else if (type === 'warning') {
-        alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-yellow-100 border-2 border-yellow-500 text-yellow-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm animate-shake';
+        alertEl.dataset.type = 'warning';
         if (alertIcon) alertIcon.textContent = 'warning';
       } else {
-        alertEl.className = 'mb-3.5 p-3.5 rounded-xl bg-emerald-100 border-2 border-emerald-500 text-emerald-900 font-body-md text-xs font-black flex items-start gap-2 shadow-sm';
+        alertEl.dataset.type = 'success';
         if (alertIcon) alertIcon.textContent = 'check_circle';
       }
     }
@@ -4549,7 +4589,9 @@
         e.preventDefault();
         const rawUsername = inputRegUsername ? inputRegUsername.value.trim() : '';
         const rawEmail = inputRegEmail ? inputRegEmail.value.trim() : '';
+        const rawPhone = inputRegPhone ? inputRegPhone.value.trim() : '';
         const rawPassword = inputRegPassword ? inputRegPassword.value : '';
+        const rawPasswordConfirm = inputRegPasswordConfirm ? inputRegPasswordConfirm.value : '';
 
         if (!rawUsername || rawUsername.length < 3) {
           showToast('Username minimal 3 karakter!', 'warning');
@@ -4569,6 +4611,14 @@
           if (inputRegPassword) inputRegPassword.focus();
           return;
         }
+        if (rawPassword !== rawPasswordConfirm) {
+          if (inputRegPasswordConfirm) {
+            inputRegPasswordConfirm.setCustomValidity('Kata sandi belum sama.');
+            inputRegPasswordConfirm.reportValidity();
+            inputRegPasswordConfirm.focus();
+          }
+          return;
+        }
 
         if (!appState.supabaseClient) initSupabaseClient();
         if (!appState.supabaseClient) {
@@ -4581,7 +4631,7 @@
           password: rawPassword,
           options: {
             emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-            data: { username: rawUsername, display_name: rawUsername }
+            data: { username: rawUsername, display_name: rawUsername, full_name: rawUsername, phone: rawPhone }
           }
         });
         if (error) {
@@ -4591,7 +4641,13 @@
 
         if (inputRegUsername) inputRegUsername.value = '';
         if (inputRegEmail) inputRegEmail.value = '';
+        if (inputRegPhone) inputRegPhone.value = '';
         if (inputRegPassword) inputRegPassword.value = '';
+        if (inputRegPasswordConfirm) inputRegPasswordConfirm.value = '';
+        const inputRegTerms = document.getElementById('inputRegTerms');
+        if (inputRegTerms) inputRegTerms.checked = false;
+        document.getElementById('regPasswordStrength')?.setAttribute('data-strength', '0');
+        document.getElementById('regPasswordStrengthLabel')?.replaceChildren('Belum diisi');
 
         hideLoginAlert();
         if (data.session) {
