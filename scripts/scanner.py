@@ -136,9 +136,31 @@ def calculate_discount(original_price: float, discount_expr: str):
             "formula_text": "Tanpa diskon (Harga Normal)"
         }
 
-    # Bersihkan string diskon (contoh: '50% + 20%' -> ['50', '20'])
-    clean_str = str(discount_expr).replace("%", "").strip()
-    parts = re.split(r"[\+\,\&]", clean_str)
+    clean_str = str(discount_expr).strip().lower()
+    if "buy 2 get 1" in clean_str or "beli 2 gratis 1" in clean_str:
+        final_price = round(original_price * 2 / 3)
+        return {
+            "original_price": original_price,
+            "final_price": final_price,
+            "saved_amount": original_price - final_price,
+            "saved_pct": round((original_price - final_price) / original_price * 100.0, 1),
+            "formula_text": "Beli 3 bayar 2"
+        }
+
+    nominal_match = re.fullmatch(r"-?\s*(?:rp\s*)?([\d.]+)", clean_str)
+    if nominal_match:
+        nominal = float(nominal_match.group(1).replace(".", ""))
+        final_price = original_price - nominal if 0 < nominal < original_price else original_price
+        return {
+            "original_price": original_price,
+            "final_price": final_price,
+            "saved_amount": original_price - final_price,
+            "saved_pct": round((original_price - final_price) / original_price * 100.0, 1),
+            "formula_text": "Potongan langsung" if final_price < original_price else "Harga Normal"
+        }
+
+    clean_str = clean_str.replace("%", "")
+    parts = re.split(r"[+, &]+", clean_str)
 
     current_price = float(original_price)
     steps = []
@@ -149,6 +171,14 @@ def calculate_discount(original_price: float, discount_expr: str):
             continue
         try:
             val = float(part)
+            if val < 0 or val > 100:
+                return {
+                    "original_price": original_price,
+                    "final_price": original_price,
+                    "saved_amount": 0.0,
+                    "saved_pct": 0.0,
+                    "formula_text": "Diskon harus berada di antara 0 dan 100 persen"
+                }
             if val > 0:
                 cut = current_price * (val / 100.0)
                 current_price -= cut
@@ -237,7 +267,7 @@ def evaluate_budget_cap(current_spending: float, new_item_cost: float, budget_li
         status = "DANGER"
         tag = "Over-Budget 🚨"
         desc = f"Melebihi limit dompet sebesar Rp {int(abs(remaining)):,}!"
-    elif ratio >= 0.8:
+    elif ratio >= 0.9:
         status = "WARNING"
         tag = "Waspada ⚠️"
         desc = f"Mendekati limit saku dompet ({round(ratio*100, 1)}% terpakai)."
@@ -293,7 +323,7 @@ def compare_package_economy(size_a: float, price_a: float, size_b: float, price_
 # ---------------------------------------------------------------------------
 # PIPELINE UTAMA SCANNER PYTHON
 # ---------------------------------------------------------------------------
-def analyze_scanned_barcode(barcode: str, discount_input: str = None, current_cart_spending: float = 0.0, budget_limit: float = 350000.0):
+def analyze_scanned_barcode(barcode: str, discount_input: str = None, current_cart_spending: float = 0.0, budget_limit: float = 350000.0, price_override: float = None, last_price_override: float = None):
     """
     Menganalisis barcode inputan:
     1. Pencarian di katalog EAN-13
@@ -318,6 +348,10 @@ def analyze_scanned_barcode(barcode: str, discount_input: str = None, current_ca
 
     shelf_price = product["price"]
     last_price = product["lastMonthPrice"]
+    if price_override is not None and price_override > 0:
+        shelf_price = price_override
+    if last_price_override is not None and last_price_override > 0:
+        last_price = last_price_override
     discount_expr = discount_input if discount_input is not None else product.get("defaultDiscounts", "0")
 
     # Hitung diskon F-03
@@ -363,7 +397,6 @@ if __name__ == "__main__":
                     res = analyze_scanned_barcode(barcode, discount)
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
-                    self.send_header("Access-Control-Allow-Origin", "*")
                     self.end_headers()
                     self.wfile.write(json.dumps(res, indent=2).encode("utf-8"))
                 else:
@@ -389,9 +422,12 @@ if __name__ == "__main__":
             print(f"  Status Dompet: {res['budget_evaluation']['tag']}")
             print("-" * 65)
 
-    elif len(sys.argv) > 1 and sys.argv[1].isdigit():
+    elif len(sys.argv) > 1 and re.fullmatch(r"\d{8,14}", sys.argv[1]):
         code = sys.argv[1]
-        res = analyze_scanned_barcode(code)
+        discount = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else None
+        price = float(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3] else None
+        last_price = float(sys.argv[4]) if len(sys.argv) > 4 and sys.argv[4] else None
+        res = analyze_scanned_barcode(code, discount_input=discount, price_override=price, last_price_override=last_price)
         print(json.dumps(res, indent=2))
 
     else:

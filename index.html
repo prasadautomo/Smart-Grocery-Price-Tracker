@@ -1451,20 +1451,13 @@
 
   <script src="app.js?v=8.6.2"></script>
   <script>
-    // Unregister service worker lama agar kode terbaru selalu dimuat seketika
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => {
-        for (let reg of regs) {
-          reg.unregister();
-        }
-      });
-      if ('caches' in window) {
-        caches.keys().then(keys => {
-          keys.forEach(k => caches.delete(k));
+    if ('serviceWorker' in navigator && window.isSecureContext) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(error => {
+          console.warn('Service worker Cartly tidak dapat dijalankan:', error);
         });
-      }
+      }, { once: true });
     }
-
   </script>
 </body>
 

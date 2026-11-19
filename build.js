@@ -5,12 +5,15 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const distDir = path.join(__dirname, 'dist');
+const projectRoot = path.resolve(__dirname);
+const distDir = path.resolve(projectRoot, 'dist');
 
-// Ensure dist directory exists
-if (!fs.existsSync(distDir)) {
-  fs.mkdirSync(distDir, { recursive: true });
+// dist/ is generated output; clear it so removed assets cannot survive a build.
+if (path.dirname(distDir) !== projectRoot || path.basename(distDir) !== 'dist') {
+  throw new Error('Refusing to clear a build directory outside the project root.');
 }
+fs.rmSync(distDir, { recursive: true, force: true });
+fs.mkdirSync(distDir, { recursive: true });
 
 // Helper to copy file
 function copyFile(src, dest) {
@@ -41,18 +44,13 @@ function copyDir(src, dest) {
   }
 }
 
-// 1. Copy essential root files to dist
+// Copy the app shell; the public folder below is the only source for static assets.
 const rootFiles = [
   'index.html',
   'styles.css',
   'app.js',
-  'google-auth.html',
   'manifest.json',
-  'sw.js',
-  'favicon.svg',
-  'pwa-icon.svg',
-  'icons.svg',
-  'auth-helper-server.cjs'
+  'sw.js'
 ];
 
 for (const file of rootFiles) {
@@ -61,28 +59,10 @@ for (const file of rootFiles) {
   copyFile(src, dest);
 }
 
-// 2. Copy public directory contents to dist
+// Preserve public asset paths used by index.html and manifest.json.
 const publicDir = path.join(__dirname, 'public');
 if (fs.existsSync(publicDir)) {
-  const publicFiles = fs.readdirSync(publicDir);
-  for (const f of publicFiles) {
-    const src = path.join(publicDir, f);
-    const dest = path.join(distDir, f);
-    if (fs.statSync(src).isDirectory()) {
-      copyDir(src, dest);
-    } else {
-      copyFile(src, dest);
-    }
-  }
-
-  // Keep the conventional public URL available too for references in HTML/manifest.
-  copyFile(path.join(publicDir, 'pwa-icon.svg'), path.join(distDir, 'public', 'pwa-icon.svg'));
-}
-
-// 3. Copy assets directory if any
-const assetsDir = path.join(__dirname, 'assets');
-if (fs.existsSync(assetsDir)) {
-  copyDir(assetsDir, path.join(distDir, 'assets'));
+  copyDir(publicDir, path.join(distDir, 'public'));
 }
 
 console.log('✅ Build successful! All web assets copied to dist/ for Vercel deployment.');

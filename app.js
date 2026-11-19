@@ -280,6 +280,7 @@
     hasInitialCloudPulled: false,
     lastCartPushTimestamp: 0,
     lastPlannerPushTimestamp: 0,
+    realtimePullTimer: null,
     deviceId: 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now(),
     realtimeChannel: null
   };
@@ -511,18 +512,6 @@
       if (localSyncChannel) localSyncChannel.postMessage(message);
     } catch (e) {}
 
-    // 2. Broadcast to other devices over Supabase Realtime WebSocket (< 100ms latency)
-    if (appState.realtimeChannel) {
-      try {
-        appState.realtimeChannel.send({
-          type: 'broadcast',
-          event: 'MULTIDEVICE_SYNC',
-          payload: message
-        });
-      } catch (e) {
-        console.warn('Realtime broadcast error:', e);
-      }
-    }
   }
 
   function handleIncomingRealtimePayload(payload) {
@@ -579,7 +568,7 @@
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
         const cartSyncId = 'active_cart_' + userSyncId;
         appState.lastCartPushTimestamp = Date.now();
-        await appState.supabaseClient.from('receipts').upsert({
+        const result = await appState.supabaseClient.from('receipts').upsert({
           id: cartSyncId,
           owner_id: appState.currentUser.id,
           date_label: 'ACTIVE_CART',
@@ -590,6 +579,7 @@
           items: appState.cart,
           created_at: new Date().toISOString()
         }, { onConflict: 'owner_id,id' });
+        if (result.error) throw result.error;
       } catch (e) {
         console.warn('Realtime cart push error:', e);
       }
@@ -605,7 +595,7 @@
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
         const plannerSyncId = 'active_planner_' + userSyncId;
         appState.lastPlannerPushTimestamp = Date.now();
-        await appState.supabaseClient.from('receipts').upsert({
+        const result = await appState.supabaseClient.from('receipts').upsert({
           id: plannerSyncId,
           owner_id: appState.currentUser.id,
           date_label: 'ACTIVE_PLANNER',
@@ -616,6 +606,7 @@
           items: appState.planner,
           created_at: new Date().toISOString()
         }, { onConflict: 'owner_id,id' });
+        if (result.error) throw result.error;
       } catch (e) {
         console.warn('Realtime planner push error:', e);
       }
@@ -629,13 +620,14 @@
       if (!appState.supabaseClient || !appState.currentUser?.id) return;
       try {
         const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
-        await appState.supabaseClient.from('user_settings').upsert({
+        const result = await appState.supabaseClient.from('user_settings').upsert({
           id: userSyncId,
           owner_id: appState.currentUser.id,
           budget_limit: Number(appState.budgetLimit) || 350000,
           sound_enabled: appState.soundEnabled,
           updated_at: new Date().toISOString()
         });
+        if (result.error) throw result.error;
       } catch (e) {
         console.warn('Realtime settings push error:', e);
       }
@@ -884,26 +876,24 @@
 
       const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
       const channelName = 'room_' + userSyncId;
+      const schedulePull = () => {
+        clearTimeout(appState.realtimePullTimer);
+        appState.realtimePullTimer = setTimeout(() => {
+          appState.realtimePullTimer = null;
+          pullDataFromSupabase(true);
+        }, 200);
+      };
 
       appState.realtimeChannel = appState.supabaseClient
-        .channel(channelName, {
-          config: {
-            broadcast: { self: false }
-          }
-        })
-        .on('broadcast', { event: 'MULTIDEVICE_SYNC' }, (payload) => {
-          if (payload && payload.payload) {
-            handleIncomingRealtimePayload(payload.payload);
-          }
-        })
+        .channel(channelName)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'receipts' }, () => {
-          pullDataFromSupabase(true);
+          schedulePull();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'master_products' }, () => {
-          pullDataFromSupabase(true);
+          schedulePull();
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'user_settings' }, () => {
-          pullDataFromSupabase(true);
+          schedulePull();
         })
         .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
@@ -982,10 +972,15 @@
     if (window.lucide) lucide.createIcons();
   }
 
+  function throwCloudWriteError(result) {
+    if (result?.error) throw result.error;
+    return result?.data;
+  }
+
   async function pushDataToSupabase(silent = false) {
     if (!appState.supabaseClient || !appState.currentUser?.id) {
       if (!silent) showToast('Koneksi sinkronisasi belum aktif!', 'warning');
-      return;
+      return false;
     }
 
     try {
@@ -993,13 +988,13 @@
 
       // 1. Sync User Settings / Budget
       const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
-      await appState.supabaseClient.from('user_settings').upsert({
+      throwCloudWriteError(await appState.supabaseClient.from('user_settings').upsert({
         id: userSyncId,
         owner_id: appState.currentUser.id,
         budget_limit: appState.budgetLimit,
         sound_enabled: appState.soundEnabled,
         updated_at: new Date().toISOString()
-      });
+      }));
 
       // 2. Sync Master Items
       if (appState.masterItems.length > 0) {
@@ -1011,7 +1006,7 @@
           last_price: item.lastPrice,
           updated_at: new Date().toISOString()
         }));
-        await appState.supabaseClient.from('master_products').upsert(masterPayload, { onConflict: 'owner_id,name' });
+        throwCloudWriteError(await appState.supabaseClient.from('master_products').upsert(masterPayload, { onConflict: 'owner_id,name' }));
       }
 
       // 3. Sync Receipts (excluding active carts/planners)
@@ -1028,17 +1023,17 @@
             item_count: rcp.itemCount,
             items: rcp.items,
             payment_method: rcp.paymentMethod || '',
-            created_at: new Date().toISOString()
+            created_at: rcp.createdAt || new Date().toISOString()
           }));
         if (receiptsPayload.length > 0) {
-          await appState.supabaseClient.from('receipts').upsert(receiptsPayload, { onConflict: 'owner_id,id' });
+          throwCloudWriteError(await appState.supabaseClient.from('receipts').upsert(receiptsPayload, { onConflict: 'owner_id,id' }));
         }
       }
 
       // 4. Sync Active Cart in Cloud (Realtime Across Phones)
       const cartSyncId = 'active_cart_' + userSyncId;
       appState.lastCartPushTimestamp = Date.now();
-      await appState.supabaseClient.from('receipts').upsert({
+      throwCloudWriteError(await appState.supabaseClient.from('receipts').upsert({
         id: cartSyncId,
         owner_id: appState.currentUser.id,
         date_label: 'ACTIVE_CART',
@@ -1048,12 +1043,12 @@
         item_count: appState.cart.length,
         items: appState.cart,
         created_at: new Date().toISOString()
-      }, { onConflict: 'owner_id,id' });
+      }, { onConflict: 'owner_id,id' }));
 
       // 5. Sync Active Planner in Cloud
       const plannerSyncId = 'active_planner_' + userSyncId;
       appState.lastPlannerPushTimestamp = Date.now();
-      await appState.supabaseClient.from('receipts').upsert({
+      throwCloudWriteError(await appState.supabaseClient.from('receipts').upsert({
         id: plannerSyncId,
         owner_id: appState.currentUser.id,
         date_label: 'ACTIVE_PLANNER',
@@ -1063,22 +1058,24 @@
         item_count: appState.planner.length,
         items: appState.planner,
         created_at: new Date().toISOString()
-      }, { onConflict: 'owner_id,id' });
+      }, { onConflict: 'owner_id,id' }));
 
       if (!silent) {
         AudioEngine.playSuccess();
         showToast('Seluruh data belanja tersimpan aman!', 'success');
       }
+      return true;
     } catch (err) {
       console.error('Push error:', err);
       if (!silent) showToast('Gagal menyimpan data: ' + (err.message || 'Koneksi terputus'), 'danger');
+      return false;
     }
   }
 
   async function pullDataFromSupabase(silent = false) {
     if (!appState.supabaseClient || !appState.currentUser?.id) {
       if (!silent) showToast('Koneksi sinkronisasi belum aktif!', 'warning');
-      return;
+      return false;
     }
 
     try {
@@ -1090,7 +1087,8 @@
         .select('*')
         .eq('owner_id', appState.currentUser.id);
 
-      if (!masterErr && masterData && masterData.length > 0) {
+      if (masterErr) throw masterErr;
+      if (masterData && masterData.length > 0) {
         appState.masterItems = masterData.map(m => ({
           name: m.name,
           category: m.category,
@@ -1107,7 +1105,8 @@
         .eq('owner_id', appState.currentUser.id)
         .order('created_at', { ascending: false });
 
-      if (!rcpErr && receiptsData && receiptsData.length > 0) {
+      if (rcpErr) throw rcpErr;
+      if (receiptsData && receiptsData.length > 0) {
         // Struk riwayat transaksi selesai (filter out active cart / planner)
         const actualReceipts = receiptsData.filter(r => !r.id.startsWith('active_cart_') && !r.id.startsWith('active_planner_'));
         const cloudHistory = actualReceipts.map(r => ({
@@ -1163,12 +1162,14 @@
 
       // 3. Fetch Settings
       const userSyncId = 'user_' + (appState.currentUser ? appState.currentUser.slug : 'rian');
-      const { data: settingsData } = await appState.supabaseClient
+      const { data: settingsData, error: settingsErr } = await appState.supabaseClient
         .from('user_settings')
         .select('*')
         .eq('id', userSyncId)
         .eq('owner_id', appState.currentUser.id)
-        .single();
+        .maybeSingle();
+
+      if (settingsErr) throw settingsErr;
 
       if (settingsData) {
         appState.budgetLimit = Number(settingsData.budget_limit) || 350000;
@@ -1183,10 +1184,12 @@
         AudioEngine.playSuccess();
         showToast('Data belanja berhasil disinkronkan!', 'success');
       }
+      return true;
     } catch (err) {
       console.error('Pull error:', err);
       appState.hasInitialCloudPulled = true;
       if (!silent) showToast('Gagal menyinkronkan data: ' + (err.message || 'Error'), 'danger');
+      return false;
     }
   }
 
@@ -1200,8 +1203,16 @@
     }
     AudioEngine.playTap();
     showToast('Menyinkronkan antar perangkat...', 'info');
-    await pushDataToSupabase();
-    await pullDataFromSupabase();
+    const didPush = await pushDataToSupabase(true);
+    if (!didPush) {
+      showToast('Data belum berhasil disimpan ke cloud.', 'danger');
+      return;
+    }
+    const didPull = await pullDataFromSupabase(true);
+    if (!didPull) {
+      showToast('Data tersimpan, tetapi pembaruan cloud gagal dimuat.', 'warning');
+      return;
+    }
     showToast('Semua data belanja sudah sinkron!', 'success');
   }
 
@@ -1945,7 +1956,9 @@
       if (appState.currentUser?.id) appState.supabaseClient.from('master_products').upsert({
         owner_id: appState.currentUser?.id,
         name, category, unit, last_price: price, updated_at: new Date().toISOString()
-      }, { onConflict: 'owner_id,name' }).then(() => { });
+      }, { onConflict: 'owner_id,name' }).then(({ error }) => {
+        if (error) console.warn('Master product sync error:', error.message);
+      });
     }
   }
 
@@ -2931,7 +2944,8 @@
     try {
       let data = null;
       try {
-        const res = await fetch(`/api/scan-python?barcode=${encodeURIComponent(code)}&discount=${encodeURIComponent(disc)}&price=${shelfPrice}`);
+        const lastPrice = currentScannedItem ? Number(currentScannedItem.lastMonthPrice) || 0 : 0;
+        const res = await fetch(`/api/scan-python?barcode=${encodeURIComponent(code)}&discount=${encodeURIComponent(disc)}&price=${encodeURIComponent(shelfPrice)}&lastPrice=${encodeURIComponent(lastPrice)}`);
         if (res.ok) data = await res.json();
       } catch (netErr) {
         // Fallback offline calculation
@@ -4001,7 +4015,8 @@
 
     if (appState.supabaseClient) {
       try {
-        await appState.supabaseClient.from('receipts').delete().eq('id', receiptId).eq('owner_id', appState.currentUser?.id);
+        const { error } = await appState.supabaseClient.from('receipts').delete().eq('id', receiptId).eq('owner_id', appState.currentUser?.id);
+        if (error) throw error;
       } catch (err) {
         console.warn('Failed to delete receipt from Supabase:', err);
       }
@@ -4024,7 +4039,8 @@
 
     if (appState.supabaseClient && idsToDelete.length > 0) {
       try {
-        await appState.supabaseClient.from('receipts').delete().in('id', idsToDelete).eq('owner_id', appState.currentUser?.id);
+        const { error } = await appState.supabaseClient.from('receipts').delete().in('id', idsToDelete).eq('owner_id', appState.currentUser?.id);
+        if (error) throw error;
       } catch (err) {
         console.warn('Failed to clear receipts in Supabase:', err);
       }
@@ -4583,7 +4599,6 @@
     const formLogin = document.getElementById('formUsernameLogin');
     const formRegister = document.getElementById('formRegisterUser');
     const btnGoogle = document.getElementById('btnGoogleLoginTrigger');
-    const GOOGLE_CLIENT_ID_KEY = 'smart_grocery_google_client_id';
     const inputUsername = document.getElementById('inputLoginUsername');
     const inputPassword = document.getElementById('inputLoginPassword');
     const inputRegUsername = document.getElementById('inputRegUsername');
