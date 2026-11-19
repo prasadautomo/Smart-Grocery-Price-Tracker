@@ -3304,3 +3304,17 @@ body {
     gap: 0.6rem;
   }
 }
+
+/* Keep the active supermarket label readable on its dark selected surface. */
+.store-item-row[class*="bg-emerald"] {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+}
+.store-item-row[class*="bg-emerald"] .store-item-btn,
+.store-item-row[class*="bg-emerald"] .store-item-btn *,
+.store-item-row[class*="bg-emerald"] .store-check-icon {
+  color: #ffffff !important;
+}
+.store-item-row[class*="bg-emerald"] .store-item-btn:hover {
+  background-color: #222638 !important;
+}
