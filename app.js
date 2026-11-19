@@ -37,20 +37,6 @@
       .slice(0, 32) || 'user';
   }
 
-  function normalizePhoneNumber(value) {
-    const raw = String(value || '').trim();
-    const digits = raw.replace(/\D/g, '');
-    if (!digits) return '';
-    if (raw.startsWith('+') || digits.startsWith('62')) return `+${digits}`;
-    if (digits.startsWith('0')) return `+62${digits.slice(1)}`;
-    if (digits.startsWith('8')) return `+62${digits}`;
-    return `+${digits}`;
-  }
-
-  function isValidE164Phone(value) {
-    return /^\+[1-9]\d{7,14}$/.test(value);
-  }
-
   function getUserKey(baseKey) {
     const slug = (appState && appState.currentUser && appState.currentUser.slug)
       ? appState.currentUser.slug
@@ -286,22 +272,30 @@
     realtimeChannel: null
   };
 
-  const PHONE_VERIFY_PENDING_KEY = 'cartly_phone_verification_pending';
-  let authUserAwaitingPhoneVerification = null;
+  const EMAIL_VERIFY_PENDING_KEY = 'cartly_email_verification_pending';
+  let authUserAwaitingEmailVerification = null;
   let routeAuthenticatedSupabaseUser = null;
 
-  function readPendingPhoneVerification(userId) {
+  function readPendingEmailVerification(userId) {
     try {
-      const pending = JSON.parse(sessionStorage.getItem(PHONE_VERIFY_PENDING_KEY) || 'null');
+      const pending = JSON.parse(
+        sessionStorage.getItem(EMAIL_VERIFY_PENDING_KEY)
+        || sessionStorage.getItem('cartly_phone_verification_pending')
+        || 'null'
+      );
       return pending?.userId === userId ? pending : null;
     } catch (e) {
       return null;
     }
   }
 
-  function readAnyPendingPhoneVerification() {
+  function readAnyPendingEmailVerification() {
     try {
-      return JSON.parse(sessionStorage.getItem(PHONE_VERIFY_PENDING_KEY) || 'null');
+      return JSON.parse(
+        sessionStorage.getItem(EMAIL_VERIFY_PENDING_KEY)
+        || sessionStorage.getItem('cartly_phone_verification_pending')
+        || 'null'
+      );
     } catch (e) {
       return null;
     }
@@ -309,81 +303,34 @@
 
   function savePendingVerification(details) {
     try {
-      sessionStorage.setItem(PHONE_VERIFY_PENDING_KEY, JSON.stringify(details));
+      sessionStorage.setItem(EMAIL_VERIFY_PENDING_KEY, JSON.stringify(details));
+      sessionStorage.removeItem('cartly_phone_verification_pending');
     } catch (e) {}
   }
 
-  function showAuthVerificationPanel(panelId, authUser) {
+  function showAuthVerificationPanel() {
     const loginScreen = document.getElementById('loginScreen');
     const tabs = loginScreen?.querySelector('.auth-tabs');
     const loginForm = document.getElementById('formUsernameLogin');
     const registerForm = document.getElementById('formRegisterUser');
-    const phonePanel = document.getElementById('phoneVerificationPanel');
     const emailPanel = document.getElementById('emailVerificationPanel');
-    const panel = document.getElementById(panelId);
-    if (!loginScreen || !panel) return;
+    if (!loginScreen || !emailPanel) return;
 
     loginScreen.classList.remove('hidden', 'is-registering');
-    loginScreen.classList.add('is-phone-verification');
+    loginScreen.classList.add('is-email-verification');
     loginScreen.style.display = '';
     tabs?.classList.add('hidden');
     loginForm?.classList.add('hidden');
     loginForm?.setAttribute('aria-hidden', 'true');
     registerForm?.classList.add('hidden');
     registerForm?.setAttribute('aria-hidden', 'true');
-    [phonePanel, emailPanel].forEach((candidate) => {
-      candidate?.classList.add('hidden');
-      candidate?.setAttribute('aria-hidden', 'true');
-    });
-    panel.classList.remove('hidden');
-    panel.setAttribute('aria-hidden', 'false');
-  }
-
-  function showPhoneVerificationStep(authUser) {
-    authUserAwaitingPhoneVerification = authUser;
-    const panel = document.getElementById('phoneVerificationPanel');
-    const phoneInput = document.getElementById('authPhoneVerificationInput');
-    const otpField = document.getElementById('authPhoneOtpField');
-    const sendButton = document.getElementById('btnSendPhoneOtp');
-    const resendButton = document.getElementById('btnResendPhoneOtp');
-    const verifyButton = document.getElementById('btnVerifyPhoneOtp');
-    const feedback = document.getElementById('phoneVerificationFeedback');
-    const title = document.getElementById('phoneVerificationTitle');
-    const description = document.getElementById('phoneVerificationDescription');
-    if (!panel) return;
-    showAuthVerificationPanel('phoneVerificationPanel', authUser);
-
-    const pending = readPendingPhoneVerification(authUser.id);
-    const challengePending = pending && ['phone_change', 'signup'].includes(pending.mode);
-    const metaPhone = authUser.user_metadata?.phone || '';
-    const currentPhone = authUser.phone || '';
-    if (phoneInput) phoneInput.value = pending?.phone || normalizePhoneNumber(currentPhone || metaPhone);
-    if (phoneInput) phoneInput.readOnly = Boolean(challengePending);
-    if (title) title.textContent = 'Verifikasi nomor telepon';
-    if (description) description.textContent = challengePending
-      ? `Masukkan kode SMS yang dikirim ke ${pending.phone}.`
-      : 'Email Anda sudah terkonfirmasi. Tambahkan nomor aktif yang dapat menerima SMS untuk membuka Cartly.';
-    if (challengePending) {
-      otpField?.classList.remove('hidden');
-      if (sendButton) sendButton.classList.add('hidden');
-      resendButton?.classList.remove('hidden');
-      verifyButton?.classList.remove('hidden');
-      if (feedback) {
-        feedback.dataset.type = 'success';
-        feedback.textContent = `Kode verifikasi sudah dikirim ke ${pending.phone}.`;
-      }
-    } else {
-      otpField?.classList.add('hidden');
-      if (sendButton) sendButton.classList.remove('hidden');
-      resendButton?.classList.add('hidden');
-      verifyButton?.classList.add('hidden');
-      if (phoneInput) phoneInput.readOnly = false;
-      if (feedback) feedback.textContent = '';
-    }
+    emailPanel.classList.remove('hidden');
+    emailPanel.setAttribute('aria-hidden', 'false');
   }
 
   function showEmailVerificationStep(authUser) {
-    const pending = readPendingPhoneVerification(authUser.id);
+    authUserAwaitingEmailVerification = authUser;
+    const pending = readPendingEmailVerification(authUser.id);
     const email = authUser.email || authUser.new_email || pending?.email || authUser.user_metadata?.email || '';
     const emailInput = document.getElementById('authEmailVerificationInput');
     const feedback = document.getElementById('emailVerificationFeedback');
@@ -391,7 +338,7 @@
     const resendButton = document.getElementById('btnResendEmailVerification');
     const loginAlert = document.getElementById('loginFeedbackAlert');
     loginAlert?.classList.add('hidden');
-    showAuthVerificationPanel('emailVerificationPanel', authUser);
+    showAuthVerificationPanel();
     if (emailInput && email) emailInput.value = email;
     if (emailInput) emailInput.readOnly = pending?.mode === 'email_signup';
     submitButton?.classList.toggle('hidden', pending?.mode === 'email_signup');
@@ -402,27 +349,21 @@
     }
   }
 
-  function resetPhoneVerificationStep() {
-    authUserAwaitingPhoneVerification = null;
+  function resetEmailVerificationStep() {
+    authUserAwaitingEmailVerification = null;
     try {
-      sessionStorage.removeItem(PHONE_VERIFY_PENDING_KEY);
+      sessionStorage.removeItem(EMAIL_VERIFY_PENDING_KEY);
+      sessionStorage.removeItem('cartly_phone_verification_pending');
     } catch (e) {}
     const loginScreen = document.getElementById('loginScreen');
     const tabs = loginScreen?.querySelector('.auth-tabs');
     const loginForm = document.getElementById('formUsernameLogin');
     const registerForm = document.getElementById('formRegisterUser');
-    const panel = document.getElementById('phoneVerificationPanel');
     const emailPanel = document.getElementById('emailVerificationPanel');
-    loginScreen?.classList.remove('is-phone-verification');
+    loginScreen?.classList.remove('is-email-verification');
     tabs?.classList.remove('hidden');
-    panel?.classList.add('hidden');
-    panel?.setAttribute('aria-hidden', 'true');
     emailPanel?.classList.add('hidden');
     emailPanel?.setAttribute('aria-hidden', 'true');
-    document.getElementById('authPhoneVerificationInput')?.removeAttribute('readonly');
-    if (document.getElementById('authPhoneVerificationInput')) document.getElementById('authPhoneVerificationInput').value = '';
-    if (document.getElementById('authPhoneOtpInput')) document.getElementById('authPhoneOtpInput').value = '';
-    if (document.getElementById('phoneVerificationFeedback')) document.getElementById('phoneVerificationFeedback').textContent = '';
     if (document.getElementById('authEmailVerificationInput')) document.getElementById('authEmailVerificationInput').value = '';
     if (document.getElementById('emailVerificationFeedback')) document.getElementById('emailVerificationFeedback').textContent = '';
     loginForm?.classList.remove('hidden');
@@ -865,20 +806,13 @@
             return;
           }
 
-          // Require an actual verified inbox before asking to attach an SMS phone.
           if (!authUser.email_confirmed_at) {
             appState.currentUser = null;
             showEmailVerificationStep(authUser);
             return;
           }
 
-          if (!authUser.phone_confirmed_at) {
-            appState.currentUser = null;
-            showPhoneVerificationStep(authUser);
-            return;
-          }
-
-          resetPhoneVerificationStep();
+          resetEmailVerificationStep();
           if (appState.currentUser?.id !== authUser.id) {
             loginAsUser(userObj, event === 'SIGNED_IN');
           }
@@ -911,18 +845,12 @@
           routeAuthenticatedUser(authUser, 'INITIAL_SESSION');
         }).catch(error => console.warn('Supabase session restore error:', error));
 
-        const pendingSignup = readAnyPendingPhoneVerification();
+        const pendingSignup = readAnyPendingEmailVerification();
         if (pendingSignup?.mode === 'email_signup' && pendingSignup.userId) {
           showEmailVerificationStep({
             id: pendingSignup.userId,
             email: pendingSignup.email,
-            user_metadata: { phone: pendingSignup.phone, email: pendingSignup.email, full_name: pendingSignup.fullName }
-          });
-        } else if (pendingSignup?.mode === 'signup' && pendingSignup.userId) {
-          showPhoneVerificationStep({
-            id: pendingSignup.userId,
-            phone: pendingSignup.phone,
-            user_metadata: { phone: pendingSignup.phone, email: pendingSignup.email, full_name: pendingSignup.fullName }
+            user_metadata: { email: pendingSignup.email, full_name: pendingSignup.fullName }
           });
         }
 
@@ -4559,7 +4487,6 @@
     const inputPassword = document.getElementById('inputLoginPassword');
     const inputRegUsername = document.getElementById('inputRegUsername');
     const inputRegEmail = document.getElementById('inputRegEmail');
-    const inputRegPhone = document.getElementById('inputRegPhone');
     const inputRegPassword = document.getElementById('inputRegPassword');
     const inputRegPasswordConfirm = document.getElementById('inputRegPasswordConfirm');
     const btnToggleLoginPwd = document.getElementById('btnToggleLoginPwd');
@@ -4711,126 +4638,11 @@
       });
     }
 
-    const phoneVerificationForm = document.getElementById('phoneVerificationPanel');
-    const phoneInput = document.getElementById('authPhoneVerificationInput');
-    const phoneOtpInput = document.getElementById('authPhoneOtpInput');
-    const phoneFeedback = document.getElementById('phoneVerificationFeedback');
-    const btnSendPhoneOtp = document.getElementById('btnSendPhoneOtp');
-    const btnResendPhoneOtp = document.getElementById('btnResendPhoneOtp');
-    const btnCancelPhoneVerification = document.getElementById('btnCancelPhoneVerification');
-
     function setVerificationFeedback(element, message, type = 'success') {
       if (!element) return;
       element.dataset.type = type;
       element.textContent = message;
     }
-
-    if (btnSendPhoneOtp) btnSendPhoneOtp.addEventListener('click', async () => {
-      if (!appState.supabaseClient) initSupabaseClient();
-      const authUser = authUserAwaitingPhoneVerification;
-      const phone = normalizePhoneNumber(phoneInput?.value);
-      if (!isValidE164Phone(phone)) {
-        setVerificationFeedback(phoneFeedback, 'Masukkan nomor telepon yang valid, contoh 081234567890.', 'error');
-        phoneInput?.focus();
-        return;
-      }
-      if (!authUser || !appState.supabaseClient) {
-        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
-        return;
-      }
-      const { data, error } = await appState.supabaseClient.auth.updateUser({ phone });
-      if (error) {
-        const message = /phone.*(disabled|signups are disabled)/i.test(error.message || '')
-          ? 'Provider Phone atau layanan SMS belum aktif di Supabase. Aktifkan Phone Provider dan konfigurasi penyedia SMS terlebih dahulu.'
-          : error.message || 'Kode SMS gagal dikirim.';
-        setVerificationFeedback(phoneFeedback, message, 'error');
-        return;
-      }
-      const pending = {
-        userId: authUser.id,
-        phone,
-        email: authUser.email || authUser.user_metadata?.email || '',
-        fullName: authUser.user_metadata?.full_name || authUser.user_metadata?.name || '',
-        mode: 'phone_change'
-      };
-      savePendingVerification(pending);
-      showPhoneVerificationStep(data.user || authUser);
-      setVerificationFeedback(phoneFeedback, `Kode verifikasi dikirim ke ${phone}.`, 'success');
-    });
-
-    if (btnResendPhoneOtp) btnResendPhoneOtp.addEventListener('click', async () => {
-      const authUser = authUserAwaitingPhoneVerification;
-      const pending = authUser ? readPendingPhoneVerification(authUser.id) : null;
-      if (!pending || !appState.supabaseClient) {
-        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
-        return;
-      }
-      const { error } = await appState.supabaseClient.auth.resend({
-        type: pending.mode === 'phone_change' ? 'phone_change' : 'sms',
-        phone: pending.phone
-      });
-      if (error) {
-        setVerificationFeedback(phoneFeedback, error.message || 'Kode SMS gagal dikirim ulang.', 'error');
-        return;
-      }
-      setVerificationFeedback(phoneFeedback, `Kode verifikasi baru dikirim ke ${pending.phone}.`, 'success');
-    });
-
-    if (phoneVerificationForm) phoneVerificationForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const authUser = authUserAwaitingPhoneVerification;
-      const pending = authUser ? readPendingPhoneVerification(authUser.id) : null;
-      const token = phoneOtpInput?.value.trim() || '';
-      if (!pending || !appState.supabaseClient) {
-        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
-        return;
-      }
-      if (!/^\d{6}$/.test(token)) {
-        setVerificationFeedback(phoneFeedback, 'Masukkan kode SMS 6 digit yang valid.', 'error');
-        phoneOtpInput?.focus();
-        return;
-      }
-
-      const otpType = pending.mode === 'phone_change' ? 'phone_change' : 'sms';
-      const { data, error } = await appState.supabaseClient.auth.verifyOtp({
-        phone: pending.phone,
-        token,
-        type: otpType
-      });
-      if (error) {
-        setVerificationFeedback(phoneFeedback, error.message || 'Kode verifikasi tidak cocok.', 'error');
-        return;
-      }
-
-      phoneOtpInput.value = '';
-      if (otpType === 'phone_change') {
-        try { sessionStorage.removeItem(PHONE_VERIFY_PENDING_KEY); } catch (e) {}
-        if (routeAuthenticatedSupabaseUser) routeAuthenticatedSupabaseUser(data.user, 'USER_UPDATED');
-        return;
-      }
-
-      const verifiedUser = data.user;
-      const email = pending.email || verifiedUser?.user_metadata?.email || '';
-      if (!verifiedUser || !email) {
-        setVerificationFeedback(phoneFeedback, 'Nomor sudah diverifikasi, tetapi alamat email pendaftaran tidak ditemukan. Hubungi pengelola aplikasi.', 'error');
-        return;
-      }
-      savePendingVerification({ ...pending, email, mode: 'email' });
-      const { data: emailData, error: emailError } = await appState.supabaseClient.auth.updateUser(
-        { email },
-        { emailRedirectTo: `${window.location.origin}${window.location.pathname}` }
-      );
-      showEmailVerificationStep(emailData?.user || verifiedUser);
-      setVerificationFeedback(
-        document.getElementById('emailVerificationFeedback'),
-        emailError
-          ? `Nomor terverifikasi, tetapi email belum terkirim: ${emailError.message}`
-          : `Nomor terverifikasi. Tautan konfirmasi dikirim ke ${email}.`,
-        emailError ? 'error' : 'success'
-      );
-    });
-
-    if (btnCancelPhoneVerification) btnCancelPhoneVerification.addEventListener('click', () => logoutUser());
 
     const emailVerificationForm = document.getElementById('emailVerificationPanel');
     const emailVerificationInput = document.getElementById('authEmailVerificationInput');
@@ -4846,7 +4658,7 @@
         emailVerificationInput?.focus();
         return;
       }
-      const pendingEmail = readAnyPendingPhoneVerification();
+      const pendingEmail = readAnyPendingEmailVerification();
       if (pendingEmail?.mode === 'email_signup') {
         const { error } = await appState.supabaseClient.auth.resend({ type: 'signup', email });
         if (error) {
@@ -4864,13 +4676,12 @@
         setVerificationFeedback(emailVerificationFeedback, error.message || 'Tautan konfirmasi gagal dikirim.', 'error');
         return;
       }
-      const authUser = data.user || authUserAwaitingPhoneVerification;
+      const authUser = data.user || authUserAwaitingEmailVerification;
       if (authUser) {
         savePendingVerification({
-          ...(readPendingPhoneVerification(authUser.id) || {}),
+          ...(readPendingEmailVerification(authUser.id) || {}),
           userId: authUser.id,
           email,
-          phone: authUser.phone || '',
           mode: 'email'
         });
         showEmailVerificationStep(authUser);
@@ -4886,7 +4697,7 @@
         emailVerificationInput?.focus();
         return;
       }
-      const pendingEmail = readAnyPendingPhoneVerification();
+      const pendingEmail = readAnyPendingEmailVerification();
       const { error } = await appState.supabaseClient.auth.resend({
         type: pendingEmail?.mode === 'email_signup' ? 'signup' : 'email_change',
         email
@@ -4934,8 +4745,6 @@
         e.preventDefault();
         const rawUsername = inputRegUsername ? inputRegUsername.value.trim() : '';
         const rawEmail = inputRegEmail ? inputRegEmail.value.trim() : '';
-        const rawPhone = inputRegPhone ? inputRegPhone.value.trim() : '';
-        const normalizedPhone = normalizePhoneNumber(rawPhone);
         const rawPassword = inputRegPassword ? inputRegPassword.value : '';
         const rawPasswordConfirm = inputRegPasswordConfirm ? inputRegPasswordConfirm.value : '';
 
@@ -4949,12 +4758,6 @@
         if (!rawEmail || !emailRegex.test(rawEmail)) {
           showToast('Masukkan alamat email yang valid!', 'warning');
           if (inputRegEmail) inputRegEmail.focus();
-          return;
-        }
-
-        if (!isValidE164Phone(normalizedPhone)) {
-          showToast('Masukkan nomor telepon aktif yang valid, contoh 081234567890.', 'warning');
-          if (inputRegPhone) inputRegPhone.focus();
           return;
         }
 
@@ -4986,9 +4789,7 @@
             data: {
               username: rawUsername,
               display_name: rawUsername,
-              full_name: rawUsername,
-              email: rawEmail.toLowerCase(),
-              phone: normalizedPhone
+              full_name: rawUsername
             }
           }
         });
@@ -4999,7 +4800,6 @@
 
         if (inputRegUsername) inputRegUsername.value = '';
         if (inputRegEmail) inputRegEmail.value = '';
-        if (inputRegPhone) inputRegPhone.value = '';
         if (inputRegPassword) inputRegPassword.value = '';
         if (inputRegPasswordConfirm) inputRegPasswordConfirm.value = '';
         const inputRegTerms = document.getElementById('inputRegTerms');
@@ -5014,7 +4814,6 @@
         }
         savePendingVerification({
           userId: data.user.id,
-          phone: normalizedPhone,
           email: rawEmail.toLowerCase(),
           fullName: rawUsername,
           mode: 'email_signup'
@@ -5242,7 +5041,7 @@
     }
 
     appState.currentUser = null;
-    resetPhoneVerificationStep();
+    resetEmailVerificationStep();
 
     const modalProfile = document.getElementById('modalUserProfileBackdrop');
     if (modalProfile) modalProfile.classList.add('hidden');

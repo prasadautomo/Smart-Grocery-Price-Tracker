@@ -3163,20 +3163,20 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   }
 }
 
-#loginScreen.is-phone-verification .auth-shell {
+#loginScreen.is-email-verification .auth-shell {
   justify-content: center !important;
   padding-top: 0 !important;
 }
 
-#loginScreen.is-phone-verification .auth-brand {
+#loginScreen.is-email-verification .auth-brand {
   display: flex;
 }
 
-#loginScreen.is-phone-verification .auth-card-bottom-rule {
+#loginScreen.is-email-verification .auth-card-bottom-rule {
   display: none;
 }
 
-#loginScreen.is-phone-verification .auth-form {
+#loginScreen.is-email-verification .auth-form {
   gap: 16px !important;
 }
 
@@ -3215,20 +3215,6 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #64748b !important;
   font-size: 12px;
   line-height: 1.5;
-}
-
-#loginScreen .auth-field-help {
-  color: #64748b !important;
-  font-size: 10px;
-  line-height: 1.4;
-}
-
-#loginScreen .auth-otp-input {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.28em;
-  text-align: center;
 }
 
 #loginScreen .auth-verification-feedback {
