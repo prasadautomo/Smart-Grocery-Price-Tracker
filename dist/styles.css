@@ -2345,3 +2345,39 @@ textarea::placeholder {
   border-color: #131312 !important;
   min-height: 3.25rem;
 }
+
+/* Final contrast pass: light surfaces use dark text; charcoal controls use white text. */
+.neo-ticket-card, .neo-ticket-card *, .neo-history-card, .neo-history-card *,
+.astro-product-card, .astro-product-card *, .store-item-row, .store-item-row * {
+  color: #263852 !important;
+}
+.neo-ticket-card .rubber-stamp, .neo-ticket-card .rubber-stamp *,
+.neo-ticket-card [class*="bg-emerald"], .neo-ticket-card [class*="bg-emerald"] *,
+.neo-ticket-card [class*="bg-yellow"], .neo-ticket-card [class*="bg-yellow"] * {
+  color: #ffffff !important;
+}
+.neo-ticket-card [class*="bg-emerald"], .neo-ticket-card [class*="bg-yellow"] {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+}
+button[class*="bg-emerald"], button[class*="bg-green"],
+button.bg-citrus, #btnFinishShopping, #btnFinishShopping * {
+  color: #ffffff !important;
+}
+button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
+  background-color: #131312 !important;
+}
+#cartSummaryBottom #summaryTotalItems,
+#cartSummaryBottom #summaryTotalItems *,
+#cartSummaryBottom #cartBottomGrandTotal,
+#cartSummaryBottom #cartBottomGrandTotal * {
+  color: #263852 !important;
+}
+#cartSummaryBottom #summaryTotalSaved,
+#cartSummaryBottom #summaryTotalSaved * {
+  color: #526176 !important;
+}
+#loginScreen button[class*="bg-emerald"], #loginScreen button[class*="bg-green"],
+#loginScreen button[class*="bg-emerald"] *, #loginScreen button[class*="bg-green"] * {
+  color: #ffffff !important;
+}
