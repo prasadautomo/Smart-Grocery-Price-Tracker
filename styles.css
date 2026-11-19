@@ -7,13 +7,13 @@
 :root {
   --color-primary: #181512;
   --color-primary-container: #241f1a;
-  --color-secondary: #007432;
+  --color-secondary: #131312;
   --color-secondary-container: #dcf4e3;
-  --color-secondary-fixed: #10b981;
-  --color-citrus: #10b981;
-  --color-citrus-glow: #34d399;
-  --color-terracotta: #059669;
-  --color-tertiary: #10b981;
+  --color-secondary-fixed: #131312;
+  --color-citrus: #131312;
+  --color-citrus-glow: #131312;
+  --color-terracotta: #131312;
+  --color-tertiary: #131312;
   --color-surface: #07080b;
   --color-surface-card: #11131c;
   --color-text-dark: #f8fafc;
@@ -103,7 +103,7 @@ body {
 .neo-card-row.in-physical-cart,
 .neo-ticket-card.is-checked {
   background: #0d1a16;
-  border-color: #059669;
+  border-color: #131312;
   box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15);
 }
 
@@ -166,8 +166,8 @@ body {
 }
 
 .cart-check-btn.checked {
-  background: #007432;
-  border-color: #007432;
+  background: #131312;
+  border-color: #131312;
   color: #ffffff;
   box-shadow: 0 2px 0 #004d21;
 }
@@ -325,11 +325,11 @@ body {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 800;
-  background: #064e3b;
-  color: #34d399;
+  background: #131312;
+  color: #131312;
   padding: 2px 7px;
   border-radius: 6px;
-  border: 1px dashed #10b981;
+  border: 1px dashed #131312;
 }
 
 .neo-promo-chip svg,
@@ -379,8 +379,8 @@ body {
 }
 
 .stepper-tap-btn:hover {
-  background: #10b981;
-  border-color: #059669;
+  background: #131312;
+  border-color: #131312;
   color: #07080b;
 }
 
@@ -468,8 +468,8 @@ body {
   left: 5%;
   right: 5%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #6bff8f 20%, #ffffff 50%, #6bff8f 80%, transparent);
-  box-shadow: 0 0 12px 2px #6bff8f;
+  background: linear-gradient(90deg, transparent, #131312 20%, #ffffff 50%, #131312 80%, transparent);
+  box-shadow: 0 0 12px 2px #131312;
   animation: scanLaser 2.2s ease-in-out infinite;
   pointer-events: none;
 }
@@ -524,7 +524,7 @@ body {
   font-size: 9px;
   font-weight: 700;
   background: #001d0f;
-  color: #6bff8f;
+  color: #131312;
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -548,7 +548,7 @@ body {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
-  color: #006e2f;
+  color: #131312;
 }
 
 .preset-barcode-badge {
@@ -603,7 +603,7 @@ body {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  color: #10b981;
+  color: #131312;
 }
 
 .neo-history-card .h-date span {
@@ -617,7 +617,7 @@ body {
   font-family: var(--font-mono);
   font-size: 0.95rem;
   font-weight: 800;
-  color: #10b981;
+  color: #131312;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -637,8 +637,8 @@ body {
   width: 100%;
   padding: 0.55rem;
   border-radius: 9999px;
-  border: 1px solid #059669;
-  background: #064e3b;
+  border: 1px solid #131312;
+  background: #131312;
   color: #ffffff;
   font-family: var(--font-display);
   font-size: 0.75rem;
@@ -652,7 +652,7 @@ body {
 }
 
 .neo-history-card .btn-neo-secondary:hover {
-  background: #059669;
+  background: #131312;
   color: #ffffff;
 }
 
@@ -704,7 +704,7 @@ body {
   font-family: var(--font-display);
   font-size: 0.88rem;
   font-weight: 800;
-  color: #34d399;
+  color: #131312;
 }
 
 /* Budget Macro Category Rows (OLED Midnight Edition) */
@@ -735,7 +735,7 @@ body {
 }
 
 .cat-neo-meta .cat-amt {
-  color: #10b981 !important;
+  color: #131312 !important;
   font-family: var(--font-mono);
   font-weight: 800;
   font-size: 0.82rem;
@@ -754,7 +754,7 @@ body {
 .cat-fill-neo {
   height: 100%;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+  background: linear-gradient(90deg, #131312 0%, #131312 100%) !important;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.6) !important;
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -823,7 +823,7 @@ body {
 .receipt-savings-banner {
   text-align: center;
   background: #eaf7ec;
-  color: #006e2f;
+  color: #131312;
   font-family: var(--font-display);
   font-size: 0.75rem;
   font-weight: 700;
@@ -864,7 +864,7 @@ body {
 }
 
 .neo-toast.success {
-  border-color: #10b981;
+  border-color: #131312;
 }
 
 .neo-toast.warning {
@@ -962,7 +962,7 @@ body {
 }
 
 .dock-tab.active:not(.dock-tab-hero) .material-symbols-outlined {
-  color: #10b981 !important;
+  color: #131312 !important;
 }
 
 .dock-tab.active:not(.dock-tab-hero) span {
@@ -972,7 +972,7 @@ body {
 
 .dock-tab-hero {
   position: relative;
-  background: linear-gradient(135deg, #181512 0%, #064e3b 50%, #10b981 100%) !important;
+  background: linear-gradient(135deg, #181512 0%, #131312 50%, #131312 100%) !important;
   box-shadow: 0 8px 24px -2px rgba(16, 185, 129, 0.45), 0 4px 10px rgba(24, 21, 18, 0.25);
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -987,7 +987,7 @@ body {
 }
 
 .dock-tab-hero.active {
-  ring-color: #10b981 !important;
+  ring-color: #131312 !important;
   box-shadow: 0 0 28px rgba(16, 185, 129, 0.75), 0 8px 22px rgba(24, 21, 18, 0.4) !important;
   animation: heroPulse 2s infinite ease-in-out;
 }
@@ -1060,8 +1060,8 @@ body {
 
 .astro-cat-chip.active {
   background-color: #0d2319 !important;
-  color: #10b981 !important;
-  border-color: #10b981 !important;
+  color: #131312 !important;
+  border-color: #131312 !important;
   font-weight: 800 !important;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
 }
@@ -1189,8 +1189,8 @@ body {
 }
 
 .segment-block.active-safe {
-  background: #10b981;
-  border-color: #34d399;
+  background: #131312;
+  border-color: #131312;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.75);
 }
 
@@ -1231,14 +1231,14 @@ body {
 }
 
 .rubber-stamp-terracotta {
-  background: #064e3b;
-  color: #34d399;
-  border: 1.5px dashed #059669;
+  background: #131312;
+  color: #131312;
+  border: 1.5px dashed #131312;
   box-shadow: 0 2px 0 rgba(5, 150, 105, 0.4);
 }
 
 .rubber-stamp-green {
-  background: #007432;
+  background: #131312;
   color: #ffffff;
   border: 1.5px solid #6ee7b7;
   box-shadow: 0 2px 0 rgba(0, 116, 50, 0.3);
@@ -1246,9 +1246,9 @@ body {
 
 .rubber-stamp-pending,
 .rubber-stamp-amber {
-  background: #064e3b;
-  color: #34d399;
-  border: 1.5px solid #059669;
+  background: #131312;
+  color: #131312;
+  border: 1.5px solid #131312;
   box-shadow: 0 2px 0 #042f24;
 }
 
@@ -1285,7 +1285,7 @@ body {
 }
 
 .pos-dial-pill:hover {
-  background: #10b981;
+  background: #131312;
   color: #07080b;
 }
 
@@ -1365,7 +1365,7 @@ nav.fixed.bottom-0 {
 }
 
 .dock-tab.active {
-  color: #10b981 !important;
+  color: #131312 !important;
 }
 
 .dock-tab:hover {
@@ -1401,7 +1401,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #10b981 !important;
+  border-color: #131312 !important;
   outline: none !important;
 }
 
@@ -1446,7 +1446,7 @@ textarea::placeholder {
 }
 
 #btnGoogleLoginTrigger:hover {
-  border-color: #10b981 !important;
+  border-color: #131312 !important;
   background-color: #1e2233 !important;
 }
 
@@ -1466,7 +1466,7 @@ textarea::placeholder {
 .neo-card-row.in-physical-cart,
 .neo-ticket-card.is-checked {
   background-color: #0d1a16 !important;
-  border-color: #059669 !important;
+  border-color: #131312 !important;
   box-shadow: 0 4px 18px rgba(5, 150, 105, 0.15) !important;
 }
 
@@ -1493,8 +1493,8 @@ textarea::placeholder {
 }
 
 .cart-check-btn.checked {
-  background: #059669 !important;
-  border-color: #10b981 !important;
+  background: #131312 !important;
+  border-color: #131312 !important;
   color: #ffffff !important;
 }
 
@@ -1660,13 +1660,13 @@ button.bg-emerald-500 {
 :root {
   --color-primary: #16243b;
   --color-primary-container: #eef2f7;
-  --color-secondary: #079b70;
+  --color-secondary: #131312;
   --color-secondary-container: #dff8ef;
-  --color-secondary-fixed: #00b981;
-  --color-citrus: #00b981;
+  --color-secondary-fixed: #131312;
+  --color-citrus: #131312;
   --color-citrus-glow: #37d8ad;
-  --color-terracotta: #079b70;
-  --color-tertiary: #079b70;
+  --color-terracotta: #131312;
+  --color-tertiary: #131312;
   --color-surface: #f4f7fb;
   --color-surface-card: #ffffff;
   --color-text-dark: #16243b;
@@ -1718,13 +1718,13 @@ nav.fixed.bottom-0 {
 
 .dock-tab.active:not(.dock-tab-hero) {
   background: #e3f8ef !important;
-  color: #087b5c !important;
+  color: #131312 !important;
   box-shadow: none !important;
 }
 
 .dock-tab.active:not(.dock-tab-hero) span,
 .dock-tab.active:not(.dock-tab-hero) .material-symbols-outlined {
-  color: #087b5c !important;
+  color: #131312 !important;
 }
 
 #btnEditBudgetTrigger,
@@ -1851,7 +1851,7 @@ nav.fixed.bottom-0 {
 [class*="text-emerald-300"],
 [class*="text-emerald-400"],
 [class*="text-emerald-500"] {
-  color: #07835f !important;
+  color: #131312 !important;
 }
 
 [class*="text-amber-400"],
@@ -1881,7 +1881,7 @@ nav.fixed.bottom-0 {
 [class*="bg-emerald-800/"],
 [class*="bg-emerald-700/"],
 [class*="bg-emerald-600/"],
-[class*="bg-[#064e3b]"],
+[class*="bg-[#131312]"],
 [class*="bg-[#043427]"],
 [class*="bg-[#022c22]"] {
   background-color: #e4f8f0 !important;
@@ -1889,7 +1889,7 @@ nav.fixed.bottom-0 {
 
 [class*="bg-emerald-600"],
 [class*="bg-emerald-700"] {
-  background-color: #11b98a !important;
+  background-color: #131312 !important;
 }
 
 .stitch-card,
@@ -1949,7 +1949,7 @@ nav.fixed.bottom-0 {
 .neo-history-card .btn-neo-secondary:hover {
   background: #e3f8ef !important;
   border-color: #b9ead7 !important;
-  color: #087b5c !important;
+  color: #131312 !important;
 }
 
 .ticket-perforation-left::before {
@@ -1964,8 +1964,8 @@ nav.fixed.bottom-0 {
 }
 
 .cart-check-btn.checked {
-  background: #11b98a !important;
-  border-color: #11b98a !important;
+  background: #131312 !important;
+  border-color: #131312 !important;
   color: #ffffff !important;
 }
 
@@ -1998,7 +1998,7 @@ nav.fixed.bottom-0 {
 
 #checkoutStageReceipt .thermal-receipt-roll #receiptGrandTotal,
 #checkoutStageReceipt .thermal-receipt-roll #receiptPaymentStatus {
-  color: #087b5c !important;
+  color: #131312 !important;
 }
 
 input,
@@ -2102,7 +2102,7 @@ textarea::placeholder {
   align-items: baseline;
   gap: 0.3rem;
   margin-top: 0.22rem;
-  color: #00a879;
+  color: #131312;
   font-size: 1rem;
   font-weight: 800;
 }
@@ -2129,18 +2129,18 @@ textarea::placeholder {
   border: 1px solid #d7f1e7 !important;
   border-radius: 0.7rem !important;
   background: #f0fbf6 !important;
-  color: #07835f !important;
+  color: #131312 !important;
   font-size: 0.62rem !important;
   line-height: 1.2;
 }
 
 #hudRemainingText > span > span {
-  color: #087b5c !important;
+  color: #131312 !important;
   font-size: inherit !important;
 }
 
 #hudRemainingText strong {
-  color: #07835f !important;
+  color: #131312 !important;
   font-size: inherit !important;
   font-weight: 800 !important;
 }
@@ -2247,7 +2247,7 @@ textarea::placeholder {
 }
 
 .neo-bottom-dock .dock-tab.active {
-  color: #07835f !important;
+  color: #131312 !important;
 }
 
 ::-webkit-scrollbar-track {
@@ -2256,4 +2256,16 @@ textarea::placeholder {
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
+}
+
+/* Replace remaining utility-driven green UI accents with the requested charcoal. */
+[class*="bg-emerald"], [class*="bg-green"] {
+  background-color: #131312 !important;
+}
+[class*="text-emerald"], [class*="text-green"] {
+  color: #131312 !important;
+}
+[class*="border-emerald"], [class*="border-green"], [class*="ring-emerald"], [class*="ring-green"] {
+  border-color: #131312 !important;
+  --tw-ring-color: #131312 !important;
 }
