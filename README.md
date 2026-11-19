@@ -71,15 +71,15 @@ Ada dua cara mudah:
      ```
 
 ### 3. Aktifkan verifikasi akun sungguhan
-Cartly membuat akun di Supabase Auth. Pendaftaran mengirim OTP SMS terlebih dahulu, lalu mengirim tautan konfirmasi ke email yang dimasukkan. Aplikasi baru terbuka setelah keduanya terverifikasi.
+Cartly membuat akun melalui email/password di Supabase Auth, lalu mengirim tautan konfirmasi email. Setelah email dikonfirmasi, pengguna menambahkan nomor dan memverifikasinya lewat OTP SMS. Aplikasi baru terbuka setelah keduanya terverifikasi.
 
-1. Di Supabase Dashboard, buka **Authentication → Providers** dan aktifkan **Phone** serta **Email**.
-2. Di **Authentication → Settings**, aktifkan konfirmasi nomor telepon dan konfirmasi email.
-3. Hubungkan penyedia SMS (misalnya Twilio) pada pengaturan Phone. Supabase tidak dapat mengirim OTP SMS sebelum penyedia dan kredensial SMS dikonfigurasi.
+1. Di Supabase Dashboard, buka **Authentication → Providers** dan aktifkan provider **Phone** serta **Email**. Cartly tidak memakai Phone Signups untuk membuat akun, tetapi provider Phone tetap diperlukan untuk verifikasi nomor.
+2. Di **Authentication → Settings**, aktifkan konfirmasi email. Cartly meminta verifikasi nomor setelah email dikonfirmasi.
+3. Hubungkan penyedia SMS (misalnya Twilio) pada pengaturan Phone. Supabase tidak dapat mengirim OTP SMS sebelum provider dan kredensial SMS dikonfigurasi.
 4. Atur **Site URL** dan **Redirect URLs** agar memuat alamat aplikasi yang digunakan, termasuk domain Vercel dan alamat lokal saat pengembangan.
 5. Jalankan SQL schema di langkah pertama agar tabel profil, trigger sinkronisasi, dan kebijakan akses profil tersedia. Nama, email, nomor telepon, serta status verifikasinya disimpan di Supabase; setiap pengguna hanya dapat membaca profilnya sendiri.
 
-Email baru diverifikasi sesudah kode SMS berhasil. Jika pengiriman SMS gagal, periksa provider SMS, batas pengiriman, dan format nomor internasional (nomor Indonesia seperti `0812...` otomatis menjadi `+62812...`).
+Jika pengiriman SMS gagal, periksa Phone Provider, provider SMS, batas pengiriman, dan format nomor internasional (nomor Indonesia seperti `0812...` otomatis menjadi `+62812...`).
 
 ---
 

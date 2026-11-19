@@ -354,15 +354,16 @@
     showAuthVerificationPanel('phoneVerificationPanel', authUser);
 
     const pending = readPendingPhoneVerification(authUser.id);
+    const challengePending = pending && ['phone_change', 'signup'].includes(pending.mode);
     const metaPhone = authUser.user_metadata?.phone || '';
     const currentPhone = authUser.phone || '';
     if (phoneInput) phoneInput.value = pending?.phone || normalizePhoneNumber(currentPhone || metaPhone);
-    if (phoneInput) phoneInput.readOnly = Boolean(pending);
-    if (title) title.textContent = pending?.mode === 'signup' ? 'Verifikasi nomor telepon' : 'Amankan akun dengan nomor telepon';
-    if (description) description.textContent = pending?.mode === 'signup'
-      ? 'Masukkan kode SMS yang dikirim untuk memverifikasi nomor Anda.'
-      : 'Masukkan nomor aktif yang dapat menerima SMS. Verifikasi nomor diperlukan sebelum membuka Cartly.';
-    if (pending) {
+    if (phoneInput) phoneInput.readOnly = Boolean(challengePending);
+    if (title) title.textContent = 'Verifikasi nomor telepon';
+    if (description) description.textContent = challengePending
+      ? `Masukkan kode SMS yang dikirim ke ${pending.phone}.`
+      : 'Email Anda sudah terkonfirmasi. Tambahkan nomor aktif yang dapat menerima SMS untuk membuka Cartly.';
+    if (challengePending) {
       otpField?.classList.remove('hidden');
       if (sendButton) sendButton.classList.add('hidden');
       resendButton?.classList.remove('hidden');
@@ -386,10 +387,15 @@
     const email = authUser.email || authUser.new_email || pending?.email || authUser.user_metadata?.email || '';
     const emailInput = document.getElementById('authEmailVerificationInput');
     const feedback = document.getElementById('emailVerificationFeedback');
+    const submitButton = document.getElementById('btnSendEmailVerification');
+    const resendButton = document.getElementById('btnResendEmailVerification');
     const loginAlert = document.getElementById('loginFeedbackAlert');
     loginAlert?.classList.add('hidden');
     showAuthVerificationPanel('emailVerificationPanel', authUser);
     if (emailInput && email) emailInput.value = email;
+    if (emailInput) emailInput.readOnly = pending?.mode === 'email_signup';
+    submitButton?.classList.toggle('hidden', pending?.mode === 'email_signup');
+    if (resendButton) resendButton.textContent = pending?.mode === 'email_signup' ? 'Kirim ulang tautan konfirmasi email' : 'Kirim ulang tautan';
     if (feedback && !feedback.textContent) {
       feedback.dataset.type = 'success';
       feedback.textContent = 'Buka tautan konfirmasi yang dikirim ke email Anda. Cartly akan terbuka setelah email terverifikasi.';
@@ -859,17 +865,16 @@
             return;
           }
 
-          if (!authUser.phone_confirmed_at) {
-            appState.currentUser = null;
-            showPhoneVerificationStep(authUser);
-            return;
-          }
-
-          // A real inbox and a verified phone are both required before the app
-          // opens. Email confirmation is requested only after SMS verification.
+          // Require an actual verified inbox before asking to attach an SMS phone.
           if (!authUser.email_confirmed_at) {
             appState.currentUser = null;
             showEmailVerificationStep(authUser);
+            return;
+          }
+
+          if (!authUser.phone_confirmed_at) {
+            appState.currentUser = null;
+            showPhoneVerificationStep(authUser);
             return;
           }
 
@@ -907,7 +912,13 @@
         }).catch(error => console.warn('Supabase session restore error:', error));
 
         const pendingSignup = readAnyPendingPhoneVerification();
-        if (pendingSignup?.mode === 'signup' && pendingSignup.userId) {
+        if (pendingSignup?.mode === 'email_signup' && pendingSignup.userId) {
+          showEmailVerificationStep({
+            id: pendingSignup.userId,
+            email: pendingSignup.email,
+            user_metadata: { phone: pendingSignup.phone, email: pendingSignup.email, full_name: pendingSignup.fullName }
+          });
+        } else if (pendingSignup?.mode === 'signup' && pendingSignup.userId) {
           showPhoneVerificationStep({
             id: pendingSignup.userId,
             phone: pendingSignup.phone,
@@ -4729,7 +4740,10 @@
       }
       const { data, error } = await appState.supabaseClient.auth.updateUser({ phone });
       if (error) {
-        setVerificationFeedback(phoneFeedback, error.message || 'Kode SMS gagal dikirim.', 'error');
+        const message = /phone.*(disabled|signups are disabled)/i.test(error.message || '')
+          ? 'Provider Phone atau layanan SMS belum aktif di Supabase. Aktifkan Phone Provider dan konfigurasi penyedia SMS terlebih dahulu.'
+          : error.message || 'Kode SMS gagal dikirim.';
+        setVerificationFeedback(phoneFeedback, message, 'error');
         return;
       }
       const pending = {
@@ -4832,6 +4846,16 @@
         emailVerificationInput?.focus();
         return;
       }
+      const pendingEmail = readAnyPendingPhoneVerification();
+      if (pendingEmail?.mode === 'email_signup') {
+        const { error } = await appState.supabaseClient.auth.resend({ type: 'signup', email });
+        if (error) {
+          setVerificationFeedback(emailVerificationFeedback, error.message || 'Tautan konfirmasi gagal dikirim ulang.', 'error');
+          return;
+        }
+        setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi baru dikirim ke ${email}.`, 'success');
+        return;
+      }
       const { data, error } = await appState.supabaseClient.auth.updateUser(
         { email },
         { emailRedirectTo: `${window.location.origin}${window.location.pathname}` }
@@ -4862,7 +4886,11 @@
         emailVerificationInput?.focus();
         return;
       }
-      const { error } = await appState.supabaseClient.auth.resend({ type: 'email_change', email });
+      const pendingEmail = readAnyPendingPhoneVerification();
+      const { error } = await appState.supabaseClient.auth.resend({
+        type: pendingEmail?.mode === 'email_signup' ? 'signup' : 'email_change',
+        email
+      });
       if (error) {
         setVerificationFeedback(emailVerificationFeedback, error.message || 'Email konfirmasi gagal dikirim ulang.', 'error');
         return;
@@ -4951,10 +4979,10 @@
         }
         localStorage.removeItem('sg_explicit_logout');
         const { data, error } = await appState.supabaseClient.auth.signUp({
-          phone: normalizedPhone,
+          email: rawEmail.toLowerCase(),
           password: rawPassword,
           options: {
-            channel: 'sms',
+            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
             data: {
               username: rawUsername,
               display_name: rawUsername,
@@ -4989,10 +5017,10 @@
           phone: normalizedPhone,
           email: rawEmail.toLowerCase(),
           fullName: rawUsername,
-          mode: 'signup'
+          mode: 'email_signup'
         });
-        showPhoneVerificationStep(data.user);
-        showToast(`Kode verifikasi dikirim ke ${normalizedPhone}.`, 'success');
+        showEmailVerificationStep(data.user);
+        showToast(`Tautan konfirmasi dikirim ke ${rawEmail.toLowerCase()}.`, 'success');
       });
     }
 
