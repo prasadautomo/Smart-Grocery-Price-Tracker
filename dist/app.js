@@ -3575,9 +3575,9 @@
               <div class="text-[11px] text-slate-500 font-semibold mb-2">${escapeHtml(prod.unit)}</div>
 
             <!-- Pricing -->
-            <div class="flex items-baseline gap-1.5 mb-2.5">
-              ${hasDiscount ? `<del class="text-[10px] text-slate-400 font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
-              <span class="font-extrabold text-[13px] text-emerald-700 font-mono">Rp ${formatNumber(prod.price)}</span>
+            <div class="astro-price-row ${hasDiscount ? 'has-discount' : ''} mb-2.5">
+              ${hasDiscount ? `<del class="astro-price-original font-mono">Rp ${formatNumber(prod.originalPrice)}</del>` : ''}
+              <span class="astro-price-current font-extrabold text-emerald-700 font-mono">Rp ${formatNumber(prod.price)}</span>
             </div>
           </div>
 

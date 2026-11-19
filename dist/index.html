@@ -269,10 +269,10 @@
         <!-- Line 2: Store Selector with Dropdown Arrow -->
         <div class="flex items-center gap-1 mt-0.5">
           <button
-            class="flex items-center gap-1 text-primary transition-colors text-left cursor-pointer truncate max-w-[190px]"
+            class="flex min-w-0 max-w-full items-center gap-1 text-primary transition-colors text-left cursor-pointer"
             id="btnStoreSelector" title="Pilih Lokasi Toko Belanja">
             <span class="material-symbols-outlined text-[14px] text-emerald-700 shrink-0">storefront</span>
-            <span class="font-label-sm text-[11px] font-bold text-primary truncate" id="activeStoreName">Lotte Mart Grocery - Puri Indah</span>
+            <span class="min-w-0 font-label-sm text-[10px] font-bold text-primary truncate" id="activeStoreName">Lotte Mart Grocery - Puri Indah</span>
             <span class="material-symbols-outlined text-[14px] text-primary shrink-0">expand_more</span>
           </button>
         </div>
@@ -667,7 +667,7 @@
           <span class="w-1 h-1 rounded-full bg-stone-500 shrink-0"></span>
           <span class="font-mono text-[10px] text-emerald-300 font-extrabold bg-emerald-950/70 border border-emerald-700/50 px-1.5 py-0.5 rounded-full shrink-0" id="summaryTotalSaved">Hemat Rp 0</span>
         </div>
-        <div class="flex items-baseline gap-1 mt-0.5">
+        <div class="cart-summary-total-line flex items-baseline gap-1 mt-0.5">
           <span class="font-mono text-[10px] text-stone-300 font-bold uppercase">Total</span>
           <span class="font-headline-md text-[20px] font-black text-white tracking-tight" id="cartBottomGrandTotal">Rp 0</span>
         </div>
