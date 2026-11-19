@@ -2269,3 +2269,25 @@ textarea::placeholder {
   border-color: #131312 !important;
   --tw-ring-color: #131312 !important;
 }
+
+/* Accessible contrast for the charcoal replacement of green UI accents. */
+[class*="bg-emerald"], [class*="bg-green"], .bg-citrus {
+  background-color: #131312 !important;
+  color: #ffffff !important;
+}
+[class*="bg-emerald"] *, [class*="bg-green"] *, .bg-citrus * {
+  color: #ffffff !important;
+}
+[class*="bg-emerald"] [class*="text-stone-950"],
+[class*="bg-green"] [class*="text-stone-950"],
+[class*="bg-emerald"].text-stone-950,
+[class*="bg-green"].text-stone-950 {
+  color: #ffffff !important;
+}
+[class*="text-emerald"], [class*="text-green"] {
+  color: #131312 !important;
+}
+[class*="border-emerald"], [class*="border-green"], [class*="ring-emerald"], [class*="ring-green"] {
+  border-color: #131312 !important;
+  --tw-ring-color: #131312 !important;
+}
