@@ -3306,6 +3306,42 @@ body {
   background-color: #222638 !important;
 }
 
+/* The store picker is light by default and charcoal for the selected row. */
+#inputNewStoreName {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #16243b !important;
+  caret-color: #16243b;
+}
+
+#inputNewStoreName::placeholder {
+  color: #526176 !important;
+  opacity: 1;
+}
+
+#btnAddNewStore,
+#btnAddNewStore * {
+  background-color: #131312 !important;
+  border-color: #131312 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.store-item-row .store-item-delete,
+.store-item-row .store-item-delete * {
+  color: #526176 !important;
+}
+
+.store-item-row[class*="bg-emerald"] .store-item-delete,
+.store-item-row[class*="bg-emerald"] .store-item-delete * {
+  color: #ffffff !important;
+}
+
+.store-item-row[class*="bg-emerald"] .store-item-delete:hover,
+.store-item-row[class*="bg-emerald"] .store-item-delete:hover * {
+  color: #fecaca !important;
+}
+
 /* Keep dark badges readable after the light-card text reset above. */
 .neo-ticket-card .cat-mono-tag,
 .neo-ticket-card .neo-promo-chip,

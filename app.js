@@ -3100,7 +3100,7 @@
           </button>
           ${isCustom ? `
             <button type="button"
-              class="p-2 text-stone-500 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
+              class="store-item-delete p-2 text-stone-500 hover:text-rose-400 transition-colors shrink-0 cursor-pointer"
               onclick="window.removeCustomStore('${escapeHtml(store)}', event)"
               title="Hapus supermarket ini">
               <span class="material-symbols-outlined text-[16px]">delete</span>
