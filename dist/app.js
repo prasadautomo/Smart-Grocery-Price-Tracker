@@ -267,7 +267,6 @@
     history: [],
     masterItems: [],
     priceHistory: [],
-    activeCategory: 'ALL',
     searchQuery: '',
     astroCategory: 'ALL',
     astroSearchQuery: '',
@@ -1430,9 +1429,6 @@
     const navCartBadge = document.getElementById('navCartBadge');
     if (navCartBadge) navCartBadge.textContent = appState.cart.length;
 
-    const countAll = document.getElementById('countAll');
-    if (countAll) countAll.textContent = appState.cart.length;
-
     // Macro Allocator & Budget Screen Sync (tabDompet)
     const dompetLimitEl = document.getElementById('hudDompetLimitDisplay');
     if (dompetLimitEl) dompetLimitEl.textContent = `Rp ${formatNumber(limit)}`;
@@ -1483,11 +1479,9 @@
   function renderCart() {
     const container = document.getElementById('cartItemsList');
     const summaryBottom = document.getElementById('cartSummaryBottom');
-    let filteredItems = appState.cart.filter(item => {
-      const matchCat = appState.activeCategory === 'ALL' || item.category === appState.activeCategory;
-      const matchSearch = appState.searchQuery === '' || item.name.toLowerCase().includes(appState.searchQuery.toLowerCase());
-      return matchCat && matchSearch;
-    });
+    const filteredItems = appState.cart.filter(item =>
+      appState.searchQuery === '' || item.name.toLowerCase().includes(appState.searchQuery.toLowerCase())
+    );
 
     if (appState.cart.length === 0) {
       container.innerHTML = `
@@ -2128,17 +2122,6 @@
     inputItemPrice.addEventListener('input', updateModalLiveCalculations);
     inputItemDiscount.addEventListener('input', updateModalLiveCalculations);
     inputItemQty.addEventListener('input', updateModalLiveCalculations);
-
-    // Category Tabs
-    document.querySelectorAll('.neo-cat-chip').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('.neo-cat-chip').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        appState.activeCategory = pill.getAttribute('data-category');
-        AudioEngine.playTap();
-        renderCart();
-      });
-    });
 
     // Search
     const searchInput = document.getElementById('searchCartInput');
