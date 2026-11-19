@@ -3438,3 +3438,28 @@ body {
   color: #475569 !important;
   opacity: 1 !important;
 }
+
+/* Keep both destructive-dialog actions readable when global text rules are applied. */
+#modalConfirmDeleteItem #btnCancelDeleteItem,
+#modalConfirmDeleteItem #btnCancelDeleteItem * {
+  background-color: #16243b !important;
+  border-color: #16243b !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+#modalConfirmDeleteItem #btnConfirmDeleteItem,
+#modalConfirmDeleteItem #btnConfirmDeleteItem * {
+  background-color: #b42318 !important;
+  border-color: #b42318 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+#modalConfirmDeleteItem #btnCancelDeleteItem:hover {
+  background-color: #0f1b2d !important;
+}
+
+#modalConfirmDeleteItem #btnConfirmDeleteItem:hover {
+  background-color: #8f1d14 !important;
+}
