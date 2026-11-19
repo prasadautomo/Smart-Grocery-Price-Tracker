@@ -2684,11 +2684,11 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 }
 
 #loginScreen:not(.is-registering) .auth-shell {
-  padding-top: 104px !important;
+  padding-top: 0 !important;
 }
 
 #loginScreen .auth-brand {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -2696,16 +2696,16 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #111827 !important;
 }
 
-#loginScreen .auth-brand-mark {
+#loginScreen .auth-brand-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 31px;
-  height: 31px;
-  border-radius: 10px;
-  background: #111827 !important;
-  color: #ffffff !important;
-  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 5px 12px rgba(16, 24, 39, 0.14);
 }
 
 #loginScreen .auth-brand-name {
@@ -3161,4 +3161,110 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   #loginScreen.is-registering .auth-form {
     gap: 10px !important;
   }
+}
+
+#loginScreen.is-phone-verification .auth-shell {
+  justify-content: center !important;
+  padding-top: 0 !important;
+}
+
+#loginScreen.is-phone-verification .auth-brand {
+  display: flex;
+}
+
+#loginScreen.is-phone-verification .auth-card-bottom-rule {
+  display: none;
+}
+
+#loginScreen.is-phone-verification .auth-form {
+  gap: 16px !important;
+}
+
+#loginScreen .auth-verification-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+#loginScreen .auth-verification-heading > .material-symbols-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #f1f4f8 !important;
+  color: #131312 !important;
+  font-size: 22px;
+}
+
+#loginScreen .auth-verification-heading h2 {
+  margin: 2px 0 0;
+  color: #111827 !important;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+#loginScreen .auth-verification-heading p {
+  max-width: 290px;
+  margin: 0;
+  color: #64748b !important;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#loginScreen .auth-field-help {
+  color: #64748b !important;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+#loginScreen .auth-otp-input {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.28em;
+  text-align: center;
+}
+
+#loginScreen .auth-verification-feedback {
+  min-height: 0;
+  margin: -3px 0 0;
+  color: #64748b !important;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+#loginScreen .auth-verification-feedback:empty {
+  display: none;
+}
+
+#loginScreen .auth-verification-feedback[data-type="error"] {
+  color: #b4233b !important;
+}
+
+#loginScreen .auth-verification-feedback[data-type="success"] {
+  color: #166534 !important;
+}
+
+#loginScreen .auth-secondary-link {
+  align-self: center;
+  padding: 5px 8px;
+  border: 0 !important;
+  background: transparent !important;
+  color: #526176 !important;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#loginScreen .auth-secondary-link:hover {
+  color: #111827 !important;
+  text-decoration: underline;
 }

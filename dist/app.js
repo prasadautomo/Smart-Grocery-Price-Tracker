@@ -37,6 +37,20 @@
       .slice(0, 32) || 'user';
   }
 
+  function normalizePhoneNumber(value) {
+    const raw = String(value || '').trim();
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return '';
+    if (raw.startsWith('+') || digits.startsWith('62')) return `+${digits}`;
+    if (digits.startsWith('0')) return `+62${digits.slice(1)}`;
+    if (digits.startsWith('8')) return `+62${digits}`;
+    return `+${digits}`;
+  }
+
+  function isValidE164Phone(value) {
+    return /^\+[1-9]\d{7,14}$/.test(value);
+  }
+
   function getUserKey(baseKey) {
     const slug = (appState && appState.currentUser && appState.currentUser.slug)
       ? appState.currentUser.slug
@@ -271,6 +285,149 @@
     deviceId: 'dev_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now(),
     realtimeChannel: null
   };
+
+  const PHONE_VERIFY_PENDING_KEY = 'cartly_phone_verification_pending';
+  let authUserAwaitingPhoneVerification = null;
+  let routeAuthenticatedSupabaseUser = null;
+
+  function readPendingPhoneVerification(userId) {
+    try {
+      const pending = JSON.parse(sessionStorage.getItem(PHONE_VERIFY_PENDING_KEY) || 'null');
+      return pending?.userId === userId ? pending : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function readAnyPendingPhoneVerification() {
+    try {
+      return JSON.parse(sessionStorage.getItem(PHONE_VERIFY_PENDING_KEY) || 'null');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function savePendingVerification(details) {
+    try {
+      sessionStorage.setItem(PHONE_VERIFY_PENDING_KEY, JSON.stringify(details));
+    } catch (e) {}
+  }
+
+  function showAuthVerificationPanel(panelId, authUser) {
+    const loginScreen = document.getElementById('loginScreen');
+    const tabs = loginScreen?.querySelector('.auth-tabs');
+    const loginForm = document.getElementById('formUsernameLogin');
+    const registerForm = document.getElementById('formRegisterUser');
+    const phonePanel = document.getElementById('phoneVerificationPanel');
+    const emailPanel = document.getElementById('emailVerificationPanel');
+    const panel = document.getElementById(panelId);
+    if (!loginScreen || !panel) return;
+
+    loginScreen.classList.remove('hidden', 'is-registering');
+    loginScreen.classList.add('is-phone-verification');
+    loginScreen.style.display = '';
+    tabs?.classList.add('hidden');
+    loginForm?.classList.add('hidden');
+    loginForm?.setAttribute('aria-hidden', 'true');
+    registerForm?.classList.add('hidden');
+    registerForm?.setAttribute('aria-hidden', 'true');
+    [phonePanel, emailPanel].forEach((candidate) => {
+      candidate?.classList.add('hidden');
+      candidate?.setAttribute('aria-hidden', 'true');
+    });
+    panel.classList.remove('hidden');
+    panel.setAttribute('aria-hidden', 'false');
+  }
+
+  function showPhoneVerificationStep(authUser) {
+    authUserAwaitingPhoneVerification = authUser;
+    const panel = document.getElementById('phoneVerificationPanel');
+    const phoneInput = document.getElementById('authPhoneVerificationInput');
+    const otpField = document.getElementById('authPhoneOtpField');
+    const sendButton = document.getElementById('btnSendPhoneOtp');
+    const resendButton = document.getElementById('btnResendPhoneOtp');
+    const verifyButton = document.getElementById('btnVerifyPhoneOtp');
+    const feedback = document.getElementById('phoneVerificationFeedback');
+    const title = document.getElementById('phoneVerificationTitle');
+    const description = document.getElementById('phoneVerificationDescription');
+    if (!panel) return;
+    showAuthVerificationPanel('phoneVerificationPanel', authUser);
+
+    const pending = readPendingPhoneVerification(authUser.id);
+    const metaPhone = authUser.user_metadata?.phone || '';
+    const currentPhone = authUser.phone || '';
+    if (phoneInput) phoneInput.value = pending?.phone || normalizePhoneNumber(currentPhone || metaPhone);
+    if (phoneInput) phoneInput.readOnly = Boolean(pending);
+    if (title) title.textContent = pending?.mode === 'signup' ? 'Verifikasi nomor telepon' : 'Amankan akun dengan nomor telepon';
+    if (description) description.textContent = pending?.mode === 'signup'
+      ? 'Masukkan kode SMS yang dikirim untuk memverifikasi nomor Anda.'
+      : 'Masukkan nomor aktif yang dapat menerima SMS. Verifikasi nomor diperlukan sebelum membuka Cartly.';
+    if (pending) {
+      otpField?.classList.remove('hidden');
+      if (sendButton) sendButton.classList.add('hidden');
+      resendButton?.classList.remove('hidden');
+      verifyButton?.classList.remove('hidden');
+      if (feedback) {
+        feedback.dataset.type = 'success';
+        feedback.textContent = `Kode verifikasi sudah dikirim ke ${pending.phone}.`;
+      }
+    } else {
+      otpField?.classList.add('hidden');
+      if (sendButton) sendButton.classList.remove('hidden');
+      resendButton?.classList.add('hidden');
+      verifyButton?.classList.add('hidden');
+      if (phoneInput) phoneInput.readOnly = false;
+      if (feedback) feedback.textContent = '';
+    }
+  }
+
+  function showEmailVerificationStep(authUser) {
+    const pending = readPendingPhoneVerification(authUser.id);
+    const email = authUser.email || authUser.new_email || pending?.email || authUser.user_metadata?.email || '';
+    const emailInput = document.getElementById('authEmailVerificationInput');
+    const feedback = document.getElementById('emailVerificationFeedback');
+    const loginAlert = document.getElementById('loginFeedbackAlert');
+    loginAlert?.classList.add('hidden');
+    showAuthVerificationPanel('emailVerificationPanel', authUser);
+    if (emailInput && email) emailInput.value = email;
+    if (feedback && !feedback.textContent) {
+      feedback.dataset.type = 'success';
+      feedback.textContent = 'Buka tautan konfirmasi yang dikirim ke email Anda. Cartly akan terbuka setelah email terverifikasi.';
+    }
+  }
+
+  function resetPhoneVerificationStep() {
+    authUserAwaitingPhoneVerification = null;
+    try {
+      sessionStorage.removeItem(PHONE_VERIFY_PENDING_KEY);
+    } catch (e) {}
+    const loginScreen = document.getElementById('loginScreen');
+    const tabs = loginScreen?.querySelector('.auth-tabs');
+    const loginForm = document.getElementById('formUsernameLogin');
+    const registerForm = document.getElementById('formRegisterUser');
+    const panel = document.getElementById('phoneVerificationPanel');
+    const emailPanel = document.getElementById('emailVerificationPanel');
+    loginScreen?.classList.remove('is-phone-verification');
+    tabs?.classList.remove('hidden');
+    panel?.classList.add('hidden');
+    panel?.setAttribute('aria-hidden', 'true');
+    emailPanel?.classList.add('hidden');
+    emailPanel?.setAttribute('aria-hidden', 'true');
+    document.getElementById('authPhoneVerificationInput')?.removeAttribute('readonly');
+    if (document.getElementById('authPhoneVerificationInput')) document.getElementById('authPhoneVerificationInput').value = '';
+    if (document.getElementById('authPhoneOtpInput')) document.getElementById('authPhoneOtpInput').value = '';
+    if (document.getElementById('phoneVerificationFeedback')) document.getElementById('phoneVerificationFeedback').textContent = '';
+    if (document.getElementById('authEmailVerificationInput')) document.getElementById('authEmailVerificationInput').value = '';
+    if (document.getElementById('emailVerificationFeedback')) document.getElementById('emailVerificationFeedback').textContent = '';
+    loginForm?.classList.remove('hidden');
+    loginForm?.setAttribute('aria-hidden', 'false');
+    registerForm?.classList.add('hidden');
+    registerForm?.setAttribute('aria-hidden', 'true');
+    document.getElementById('tabLoginBtn')?.setAttribute('aria-selected', 'true');
+    document.getElementById('tabLoginBtn') && (document.getElementById('tabLoginBtn').tabIndex = 0);
+    document.getElementById('tabRegisterBtn')?.setAttribute('aria-selected', 'false');
+    document.getElementById('tabRegisterBtn') && (document.getElementById('tabRegisterBtn').tabIndex = -1);
+  }
 
   // Sound effects are disabled throughout Cartly.
   const AudioEngine = {
@@ -669,19 +826,10 @@
     if (appState.supabaseClient) return;
     if (appState.supabaseUrl && appState.supabaseKey && window.supabase) {
       try {
-        appState.supabaseClient = window.supabase.createClient(appState.supabaseUrl, appState.supabaseKey);
-        appState.isCloudConnected = true;
-        updateCloudStatusUI(true);
-        subscribeToRealtimeChanges();
-        startRealtimeHeartbeat();
-
-        appState.supabaseClient.auth.onAuthStateChange((event, session) => {
-          if (!session?.user || localStorage.getItem('sg_explicit_logout') === 'true') return;
-          if (event !== 'INITIAL_SESSION' && event !== 'SIGNED_IN' && event !== 'PASSWORD_RECOVERY') return;
-
-          const authUser = session.user;
+        function routeAuthenticatedUser(authUser, event) {
+          if (!authUser) return;
           const meta = authUser.user_metadata || {};
-          const email = authUser.email || '';
+          const email = authUser.email || authUser.new_email || meta.email || '';
           const username = meta.username || email.split('@')[0] || 'cartly_user';
           const displayName = meta.display_name || meta.full_name || meta.name || username;
           const userObj = {
@@ -697,19 +845,53 @@
           };
 
           if (event === 'PASSWORD_RECOVERY') {
-            appState.authRecoveryUser = userObj;
+            appState.authRecoveryUser = authUser;
             const recoveryModal = document.getElementById('modalForgotPasswordBackdrop');
             document.getElementById('formForgotStep1Email')?.classList.add('hidden');
             document.getElementById('formForgotStep2Reset')?.classList.remove('hidden');
-            document.getElementById('forgotModalDesc').textContent = 'Masukkan password baru untuk akun Anda.';
+            const description = document.getElementById('forgotModalDesc');
+            if (description) description.textContent = 'Masukkan password baru untuk akun Anda.';
             document.getElementById('inputForgotOtp')?.removeAttribute('required');
             document.getElementById('inputForgotOtp')?.closest('div')?.classList.add('hidden');
-            document.getElementById('forgotTargetEmailDisplay').textContent = email;
+            const targetEmail = document.getElementById('forgotTargetEmailDisplay');
+            if (targetEmail) targetEmail.textContent = email;
             recoveryModal?.classList.remove('hidden');
             return;
           }
 
-          if (appState.currentUser?.id !== authUser.id) loginAsUser(userObj, event === 'SIGNED_IN');
+          if (!authUser.phone_confirmed_at) {
+            appState.currentUser = null;
+            showPhoneVerificationStep(authUser);
+            return;
+          }
+
+          // A real inbox and a verified phone are both required before the app
+          // opens. Email confirmation is requested only after SMS verification.
+          if (!authUser.email_confirmed_at) {
+            appState.currentUser = null;
+            showEmailVerificationStep(authUser);
+            return;
+          }
+
+          resetPhoneVerificationStep();
+          if (appState.currentUser?.id !== authUser.id) {
+            loginAsUser(userObj, event === 'SIGNED_IN');
+          }
+        }
+
+        routeAuthenticatedSupabaseUser = routeAuthenticatedUser;
+
+        appState.supabaseClient = window.supabase.createClient(appState.supabaseUrl, appState.supabaseKey);
+        appState.isCloudConnected = true;
+        updateCloudStatusUI(true);
+        subscribeToRealtimeChanges();
+        startRealtimeHeartbeat();
+
+        appState.supabaseClient.auth.onAuthStateChange((event, session) => {
+          if (!session?.user || localStorage.getItem('sg_explicit_logout') === 'true') return;
+          if (!['INITIAL_SESSION', 'SIGNED_IN', 'PASSWORD_RECOVERY', 'USER_UPDATED'].includes(event)) return;
+          // Keep network requests outside Supabase's auth state callback.
+          window.setTimeout(() => routeAuthenticatedUser(session.user, event), 0);
         });
 
         // Read the persisted session as a second callback path, so a slow initial
@@ -721,21 +903,17 @@
           }
           const authUser = data?.session?.user;
           if (!authUser || localStorage.getItem('sg_explicit_logout') === 'true' || appState.currentUser?.id === authUser.id) return;
-          const meta = authUser.user_metadata || {};
-          const email = authUser.email || '';
-          const displayName = meta.display_name || meta.full_name || meta.name || email.split('@')[0] || 'Cartly';
-          loginAsUser({
-            id: authUser.id,
-            slug: getUserSlug(authUser.id),
-            username: meta.username || email.split('@')[0] || 'cartly_user',
-            displayName,
-            provider: authUser.app_metadata?.provider || 'email',
-            email,
-            avatarUrl: meta.avatar_url || meta.picture || '',
-            avatarText: (displayName[0] || 'U').toUpperCase(),
-            loginAt: Date.now()
-          }, false);
+          routeAuthenticatedUser(authUser, 'INITIAL_SESSION');
         }).catch(error => console.warn('Supabase session restore error:', error));
+
+        const pendingSignup = readAnyPendingPhoneVerification();
+        if (pendingSignup?.mode === 'signup' && pendingSignup.userId) {
+          showPhoneVerificationStep({
+            id: pendingSignup.userId,
+            phone: pendingSignup.phone,
+            user_metadata: { phone: pendingSignup.phone, email: pendingSignup.email, full_name: pendingSignup.fullName }
+          });
+        }
 
         const callbackError = new URLSearchParams(window.location.search).get('error_description');
         if (callbackError) {
@@ -4378,38 +4556,6 @@
     const btnToggleRegConfirmPwd = document.getElementById('btnToggleRegConfirmPwd');
 
 
-    // Email Verification Modal Elements
-    const modalEmailVerify = document.getElementById('modalEmailVerificationBackdrop');
-    const verifyTargetEmail = document.getElementById('verifyTargetEmail');
-    const verifySimulatedOtp = document.getElementById('verifySimulatedOtpDisplay');
-    const btnAutofillOtp = document.getElementById('btnAutofillOtp');
-    const formVerifyEmailOtp = document.getElementById('formVerifyEmailOtp');
-    const inputVerificationOtp = document.getElementById('inputVerificationOtp');
-    const verifyOtpFeedback = document.getElementById('verifyOtpFeedback');
-    const btnCancelVerifyModal = document.getElementById('btnCancelVerifyModal');
-    const btnResendOtp = document.getElementById('btnResendOtp');
-    const resendCountdownText = document.getElementById('resendCountdownText');
-
-    let pendingRegistration = null;
-    let resendTimerInterval = null;
-
-    function startOtpCountdown(seconds = 30) {
-      if (resendTimerInterval) clearInterval(resendTimerInterval);
-      if (btnResendOtp) btnResendOtp.disabled = true;
-      let left = seconds;
-      if (resendCountdownText) resendCountdownText.textContent = `(${left}s)`;
-      resendTimerInterval = setInterval(() => {
-        left--;
-        if (left <= 0) {
-          clearInterval(resendTimerInterval);
-          if (btnResendOtp) btnResendOtp.disabled = false;
-          if (resendCountdownText) resendCountdownText.textContent = '';
-        } else {
-          if (resendCountdownText) resendCountdownText.textContent = `(${left}s)`;
-        }
-      }, 1000);
-    }
-
     const btnProfileTrigger = document.getElementById('btnUserProfileTrigger');
     const modalProfile = document.getElementById('modalUserProfileBackdrop');
     const btnCloseProfile = document.getElementById('btnCloseUserProfileModal');
@@ -4554,6 +4700,177 @@
       });
     }
 
+    const phoneVerificationForm = document.getElementById('phoneVerificationPanel');
+    const phoneInput = document.getElementById('authPhoneVerificationInput');
+    const phoneOtpInput = document.getElementById('authPhoneOtpInput');
+    const phoneFeedback = document.getElementById('phoneVerificationFeedback');
+    const btnSendPhoneOtp = document.getElementById('btnSendPhoneOtp');
+    const btnResendPhoneOtp = document.getElementById('btnResendPhoneOtp');
+    const btnCancelPhoneVerification = document.getElementById('btnCancelPhoneVerification');
+
+    function setVerificationFeedback(element, message, type = 'success') {
+      if (!element) return;
+      element.dataset.type = type;
+      element.textContent = message;
+    }
+
+    if (btnSendPhoneOtp) btnSendPhoneOtp.addEventListener('click', async () => {
+      if (!appState.supabaseClient) initSupabaseClient();
+      const authUser = authUserAwaitingPhoneVerification;
+      const phone = normalizePhoneNumber(phoneInput?.value);
+      if (!isValidE164Phone(phone)) {
+        setVerificationFeedback(phoneFeedback, 'Masukkan nomor telepon yang valid, contoh 081234567890.', 'error');
+        phoneInput?.focus();
+        return;
+      }
+      if (!authUser || !appState.supabaseClient) {
+        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
+        return;
+      }
+      const { data, error } = await appState.supabaseClient.auth.updateUser({ phone });
+      if (error) {
+        setVerificationFeedback(phoneFeedback, error.message || 'Kode SMS gagal dikirim.', 'error');
+        return;
+      }
+      const pending = {
+        userId: authUser.id,
+        phone,
+        email: authUser.email || authUser.user_metadata?.email || '',
+        fullName: authUser.user_metadata?.full_name || authUser.user_metadata?.name || '',
+        mode: 'phone_change'
+      };
+      savePendingVerification(pending);
+      showPhoneVerificationStep(data.user || authUser);
+      setVerificationFeedback(phoneFeedback, `Kode verifikasi dikirim ke ${phone}.`, 'success');
+    });
+
+    if (btnResendPhoneOtp) btnResendPhoneOtp.addEventListener('click', async () => {
+      const authUser = authUserAwaitingPhoneVerification;
+      const pending = authUser ? readPendingPhoneVerification(authUser.id) : null;
+      if (!pending || !appState.supabaseClient) {
+        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
+        return;
+      }
+      const { error } = await appState.supabaseClient.auth.resend({
+        type: pending.mode === 'phone_change' ? 'phone_change' : 'sms',
+        phone: pending.phone
+      });
+      if (error) {
+        setVerificationFeedback(phoneFeedback, error.message || 'Kode SMS gagal dikirim ulang.', 'error');
+        return;
+      }
+      setVerificationFeedback(phoneFeedback, `Kode verifikasi baru dikirim ke ${pending.phone}.`, 'success');
+    });
+
+    if (phoneVerificationForm) phoneVerificationForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const authUser = authUserAwaitingPhoneVerification;
+      const pending = authUser ? readPendingPhoneVerification(authUser.id) : null;
+      const token = phoneOtpInput?.value.trim() || '';
+      if (!pending || !appState.supabaseClient) {
+        setVerificationFeedback(phoneFeedback, 'Sesi verifikasi tidak tersedia. Silakan masuk kembali.', 'error');
+        return;
+      }
+      if (!/^\d{6}$/.test(token)) {
+        setVerificationFeedback(phoneFeedback, 'Masukkan kode SMS 6 digit yang valid.', 'error');
+        phoneOtpInput?.focus();
+        return;
+      }
+
+      const otpType = pending.mode === 'phone_change' ? 'phone_change' : 'sms';
+      const { data, error } = await appState.supabaseClient.auth.verifyOtp({
+        phone: pending.phone,
+        token,
+        type: otpType
+      });
+      if (error) {
+        setVerificationFeedback(phoneFeedback, error.message || 'Kode verifikasi tidak cocok.', 'error');
+        return;
+      }
+
+      phoneOtpInput.value = '';
+      if (otpType === 'phone_change') {
+        try { sessionStorage.removeItem(PHONE_VERIFY_PENDING_KEY); } catch (e) {}
+        if (routeAuthenticatedSupabaseUser) routeAuthenticatedSupabaseUser(data.user, 'USER_UPDATED');
+        return;
+      }
+
+      const verifiedUser = data.user;
+      const email = pending.email || verifiedUser?.user_metadata?.email || '';
+      if (!verifiedUser || !email) {
+        setVerificationFeedback(phoneFeedback, 'Nomor sudah diverifikasi, tetapi alamat email pendaftaran tidak ditemukan. Hubungi pengelola aplikasi.', 'error');
+        return;
+      }
+      savePendingVerification({ ...pending, email, mode: 'email' });
+      const { data: emailData, error: emailError } = await appState.supabaseClient.auth.updateUser(
+        { email },
+        { emailRedirectTo: `${window.location.origin}${window.location.pathname}` }
+      );
+      showEmailVerificationStep(emailData?.user || verifiedUser);
+      setVerificationFeedback(
+        document.getElementById('emailVerificationFeedback'),
+        emailError
+          ? `Nomor terverifikasi, tetapi email belum terkirim: ${emailError.message}`
+          : `Nomor terverifikasi. Tautan konfirmasi dikirim ke ${email}.`,
+        emailError ? 'error' : 'success'
+      );
+    });
+
+    if (btnCancelPhoneVerification) btnCancelPhoneVerification.addEventListener('click', () => logoutUser());
+
+    const emailVerificationForm = document.getElementById('emailVerificationPanel');
+    const emailVerificationInput = document.getElementById('authEmailVerificationInput');
+    const emailVerificationFeedback = document.getElementById('emailVerificationFeedback');
+    const btnResendEmailVerification = document.getElementById('btnResendEmailVerification');
+    const btnCancelEmailVerification = document.getElementById('btnCancelEmailVerification');
+    if (emailVerificationForm) emailVerificationForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!appState.supabaseClient) initSupabaseClient();
+      const email = emailVerificationInput?.value.trim().toLowerCase() || '';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setVerificationFeedback(emailVerificationFeedback, 'Masukkan alamat email yang valid.', 'error');
+        emailVerificationInput?.focus();
+        return;
+      }
+      const { data, error } = await appState.supabaseClient.auth.updateUser(
+        { email },
+        { emailRedirectTo: `${window.location.origin}${window.location.pathname}` }
+      );
+      if (error) {
+        setVerificationFeedback(emailVerificationFeedback, error.message || 'Tautan konfirmasi gagal dikirim.', 'error');
+        return;
+      }
+      const authUser = data.user || authUserAwaitingPhoneVerification;
+      if (authUser) {
+        savePendingVerification({
+          ...(readPendingPhoneVerification(authUser.id) || {}),
+          userId: authUser.id,
+          email,
+          phone: authUser.phone || '',
+          mode: 'email'
+        });
+        showEmailVerificationStep(authUser);
+      }
+      setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi dikirim ke ${email}.`, 'success');
+    });
+
+    if (btnResendEmailVerification) btnResendEmailVerification.addEventListener('click', async () => {
+      if (!appState.supabaseClient) initSupabaseClient();
+      const email = emailVerificationInput?.value.trim().toLowerCase() || '';
+      if (!email) {
+        setVerificationFeedback(emailVerificationFeedback, 'Masukkan alamat email yang valid.', 'error');
+        emailVerificationInput?.focus();
+        return;
+      }
+      const { error } = await appState.supabaseClient.auth.resend({ type: 'email_change', email });
+      if (error) {
+        setVerificationFeedback(emailVerificationFeedback, error.message || 'Email konfirmasi gagal dikirim ulang.', 'error');
+        return;
+      }
+      setVerificationFeedback(emailVerificationFeedback, `Tautan konfirmasi baru dikirim ke ${email}.`, 'success');
+    });
+    if (btnCancelEmailVerification) btnCancelEmailVerification.addEventListener('click', () => logoutUser());
+
     // Sign in with a Supabase Auth email/password account.
     if (formLogin) {
       formLogin.addEventListener('submit', async (e) => {
@@ -4590,6 +4907,7 @@
         const rawUsername = inputRegUsername ? inputRegUsername.value.trim() : '';
         const rawEmail = inputRegEmail ? inputRegEmail.value.trim() : '';
         const rawPhone = inputRegPhone ? inputRegPhone.value.trim() : '';
+        const normalizedPhone = normalizePhoneNumber(rawPhone);
         const rawPassword = inputRegPassword ? inputRegPassword.value : '';
         const rawPasswordConfirm = inputRegPasswordConfirm ? inputRegPasswordConfirm.value : '';
 
@@ -4603,6 +4921,12 @@
         if (!rawEmail || !emailRegex.test(rawEmail)) {
           showToast('Masukkan alamat email yang valid!', 'warning');
           if (inputRegEmail) inputRegEmail.focus();
+          return;
+        }
+
+        if (!isValidE164Phone(normalizedPhone)) {
+          showToast('Masukkan nomor telepon aktif yang valid, contoh 081234567890.', 'warning');
+          if (inputRegPhone) inputRegPhone.focus();
           return;
         }
 
@@ -4627,11 +4951,17 @@
         }
         localStorage.removeItem('sg_explicit_logout');
         const { data, error } = await appState.supabaseClient.auth.signUp({
-          email: rawEmail.toLowerCase(),
+          phone: normalizedPhone,
           password: rawPassword,
           options: {
-            emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
-            data: { username: rawUsername, display_name: rawUsername, full_name: rawUsername, phone: rawPhone }
+            channel: 'sms',
+            data: {
+              username: rawUsername,
+              display_name: rawUsername,
+              full_name: rawUsername,
+              email: rawEmail.toLowerCase(),
+              phone: normalizedPhone
+            }
           }
         });
         if (error) {
@@ -4650,11 +4980,19 @@
         document.getElementById('regPasswordStrengthLabel')?.replaceChildren('Belum diisi');
 
         hideLoginAlert();
-        if (data.session) {
-          showToast(`Akun ${rawUsername} berhasil dibuat.`, 'success');
-        } else {
-          showToast('Akun berhasil dibuat. Periksa email untuk mengonfirmasi pendaftaran.', 'success');
+        if (!data.user) {
+          showToast('Pendaftaran belum dapat diproses. Coba lagi beberapa saat.', 'danger');
+          return;
         }
+        savePendingVerification({
+          userId: data.user.id,
+          phone: normalizedPhone,
+          email: rawEmail.toLowerCase(),
+          fullName: rawUsername,
+          mode: 'signup'
+        });
+        showPhoneVerificationStep(data.user);
+        showToast(`Kode verifikasi dikirim ke ${normalizedPhone}.`, 'success');
       });
     }
 
@@ -4676,7 +5014,7 @@
         const { data, error } = await appState.supabaseClient.auth.updateUser({ password });
         if (error) return showToast(error.message, 'danger');
         modalForgot?.classList.add('hidden');
-        if (data.user && appState.authRecoveryUser) loginAsUser(appState.authRecoveryUser, false);
+        if (data.user && routeAuthenticatedSupabaseUser) routeAuthenticatedSupabaseUser(data.user, 'USER_UPDATED');
         showToast('Password berhasil diperbarui.', 'success');
         inputForgotNewPassword.value = '';
         appState.authRecoveryUser = null;
@@ -4718,7 +5056,7 @@
         const { error } = await appState.supabaseClient.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: 'https://cartlybyprasada.vercel.app/',
+            redirectTo: `${window.location.origin}${window.location.pathname}`,
             queryParams: { prompt: 'select_account' }
           }
         });
@@ -4876,6 +5214,7 @@
     }
 
     appState.currentUser = null;
+    resetPhoneVerificationStep();
 
     const modalProfile = document.getElementById('modalUserProfileBackdrop');
     if (modalProfile) modalProfile.classList.add('hidden');

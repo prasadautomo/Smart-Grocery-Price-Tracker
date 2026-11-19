@@ -2684,11 +2684,11 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 }
 
 #loginScreen:not(.is-registering) .auth-shell {
-  padding-top: 104px !important;
+  padding-top: 0 !important;
 }
 
 #loginScreen .auth-brand {
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -2696,16 +2696,16 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #111827 !important;
 }
 
-#loginScreen .auth-brand-mark {
+#loginScreen .auth-brand-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 31px;
-  height: 31px;
-  border-radius: 10px;
-  background: #111827 !important;
-  color: #ffffff !important;
-  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 5px 12px rgba(16, 24, 39, 0.14);
 }
 
 #loginScreen .auth-brand-name {

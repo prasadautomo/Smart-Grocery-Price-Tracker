@@ -7,9 +7,10 @@
     name="viewport" />
   <meta content="mobile_tab" name="shell-type" />
   <title>Cartly - Smart Grocery &amp; Budget Companion</title>
+  <link rel="icon" href="public/pwa-icon.svg" type="image/svg+xml">
 
   <!-- PWA Settings -->
-  <link rel="manifest" href="manifest.json?v=5.4">
+  <link rel="manifest" href="manifest.json?v=5.5">
   <meta name="theme-color" content="#f4f7fb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -126,7 +127,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Base Stitch App Styling -->
-  <link rel="stylesheet" href="styles.css?v=7.8.0">
+  <link rel="stylesheet" href="styles.css?v=7.9.0">
 </head>
 
 <body class="bg-[#f4f7fb] font-body-md text-on-surface antialiased flex flex-col min-h-screen">
@@ -136,7 +137,7 @@
     class="hidden fixed inset-0 z-[100] bg-[#f4f7fb] flex flex-col justify-between overflow-y-auto">
     <div class="auth-shell">
       <div class="auth-brand" aria-label="Cartly">
-        <span class="auth-brand-mark material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+        <img class="auth-brand-logo" src="public/pwa-icon.svg" alt="" width="40" height="40">
         <span class="auth-brand-name">cartly</span>
       </div>
 
@@ -213,7 +214,7 @@
             <label for="inputRegPhone">NOMOR TELEPON</label>
             <div class="auth-input-wrap">
               <span class="material-symbols-outlined" aria-hidden="true">call</span>
-              <input class="auth-input" type="tel" id="inputRegPhone" placeholder="0812-xxxx-xxxx" autocomplete="tel">
+              <input class="auth-input" type="tel" id="inputRegPhone" placeholder="0812-xxxx-xxxx" required autocomplete="tel">
             </div>
           </div>
 
@@ -254,6 +255,70 @@
           </button>
         </form>
 
+        <form id="phoneVerificationPanel" class="auth-form auth-phone-verification hidden" aria-hidden="true">
+          <div class="auth-verification-heading">
+            <span class="material-symbols-outlined" aria-hidden="true">sms</span>
+            <h2 id="phoneVerificationTitle">Verifikasi nomor telepon</h2>
+            <p id="phoneVerificationDescription">Masukkan kode SMS yang dikirim untuk memverifikasi nomor Anda.</p>
+          </div>
+
+          <div class="auth-field">
+            <label for="authPhoneVerificationInput">NOMOR TELEPON AKTIF</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">call</span>
+              <input class="auth-input" type="tel" id="authPhoneVerificationInput" placeholder="0812-xxxx-xxxx" required autocomplete="tel">
+            </div>
+            <small class="auth-field-help">Masukkan nomor yang dapat menerima SMS. Nomor Indonesia akan diubah ke format +62.</small>
+          </div>
+
+          <div class="auth-field hidden" id="authPhoneOtpField">
+            <label for="authPhoneOtpInput">KODE VERIFIKASI SMS</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">password</span>
+              <input class="auth-input auth-otp-input" type="text" id="authPhoneOtpInput" inputmode="numeric" autocomplete="one-time-code" placeholder="6 digit kode" pattern="[0-9]{6}" minlength="6" maxlength="6">
+            </div>
+          </div>
+
+          <p id="phoneVerificationFeedback" class="auth-verification-feedback" role="status" aria-live="polite"></p>
+
+          <button type="button" id="btnSendPhoneOtp" class="auth-primary-button">
+            <span>Kirim Kode SMS</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnResendPhoneOtp" class="auth-secondary-link hidden">Kirim ulang kode</button>
+          <button type="submit" id="btnVerifyPhoneOtp" class="auth-primary-button hidden">
+            <span>Verifikasi &amp; Lanjutkan</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnCancelPhoneVerification" class="auth-secondary-link">Keluar dari akun</button>
+        </form>
+
+        <form id="emailVerificationPanel" class="auth-form auth-phone-verification hidden" aria-hidden="true">
+          <div class="auth-verification-heading">
+            <span class="material-symbols-outlined" aria-hidden="true">mark_email_unread</span>
+            <h2>Konfirmasi alamat email</h2>
+            <p>Tautan konfirmasi dikirim ke alamat email Anda. Cartly terbuka setelah tautan dibuka dan email berhasil diverifikasi.</p>
+          </div>
+
+          <div class="auth-field">
+            <label for="authEmailVerificationInput">ALAMAT EMAIL</label>
+            <div class="auth-input-wrap">
+              <span class="material-symbols-outlined" aria-hidden="true">mail</span>
+              <input class="auth-input" type="email" id="authEmailVerificationInput" placeholder="nama@email.com" required autocomplete="email">
+            </div>
+            <small class="auth-field-help">Alamat ini akan menjadi email untuk masuk ke akun Cartly.</small>
+          </div>
+
+          <p id="emailVerificationFeedback" class="auth-verification-feedback" role="status" aria-live="polite"></p>
+
+          <button type="submit" id="btnSendEmailVerification" class="auth-primary-button">
+            <span>Kirim tautan konfirmasi</span>
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </button>
+          <button type="button" id="btnResendEmailVerification" class="auth-secondary-link">Kirim ulang tautan</button>
+          <button type="button" id="btnCancelEmailVerification" class="auth-secondary-link">Keluar dari akun</button>
+        </form>
+
         <div class="auth-card-bottom-rule" aria-hidden="true"></div>
       </section>
     </div>
@@ -267,7 +332,10 @@
       <!-- Store, app name, and active date -->
       <div class="flex flex-col min-w-0 flex-1">
         <div class="flex items-center leading-none">
-          <span class="font-headline-sm text-[15px] font-black text-primary tracking-tight whitespace-nowrap">Cartly</span>
+          <span class="flex items-center gap-1.5 font-headline-sm text-[15px] font-black text-primary tracking-tight whitespace-nowrap">
+            <img src="public/pwa-icon.svg" alt="" width="18" height="18" class="h-[18px] w-[18px] rounded-[5px] object-cover">
+            <span>Cartly</span>
+          </span>
         </div>
 
         <!-- Line 2: Store Selector with Dropdown Arrow -->

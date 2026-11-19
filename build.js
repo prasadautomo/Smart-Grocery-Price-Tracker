@@ -74,6 +74,9 @@ if (fs.existsSync(publicDir)) {
       copyFile(src, dest);
     }
   }
+
+  // Keep the conventional public URL available too for references in HTML/manifest.
+  copyFile(path.join(publicDir, 'pwa-icon.svg'), path.join(distDir, 'public', 'pwa-icon.svg'));
 }
 
 // 3. Copy assets directory if any
