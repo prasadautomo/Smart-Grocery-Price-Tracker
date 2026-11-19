@@ -2614,3 +2614,11 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 #loginScreen #loginFeedbackAlert * {
   color: #263852 !important;
 }
+
+/* Neutral, readable text selection (remove the old mint highlight). */
+::selection,
+::selection * {
+  color: #ffffff !important;
+  background: #475569 !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
