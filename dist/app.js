@@ -1406,6 +1406,7 @@
     }
 
     const budgetLevel = getBudgetLevel(percentage);
+    if (progressBar) progressBar.dataset.budgetState = budgetLevel;
     if (budgetLevel === 'normal') {
       if (remainingText) {
         remainingText.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0c14] border border-[#334155]"><span class="text-slate-200 text-[11px] font-semibold">Sisa anggaran:</span><strong class="text-emerald-300 font-black text-[13px]">Rp ${formatNumber(remaining)}</strong></span>`;

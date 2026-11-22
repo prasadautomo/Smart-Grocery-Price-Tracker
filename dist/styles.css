@@ -2190,6 +2190,18 @@ textarea::placeholder {
   background: #e9f2ee !important;
 }
 
+#budgetHudCard #budgetProgressBar {
+  background-color: #16a34a !important;
+}
+
+#budgetHudCard #budgetProgressBar[data-budget-state="warning"] {
+  background-color: #f59e0b !important;
+}
+
+#budgetHudCard #budgetProgressBar[data-budget-state="over"] {
+  background-color: #dc2626 !important;
+}
+
 .cat-track-neo {
   background: #edf2f7 !important;
   border-color: #dfe7ef !important;
