@@ -5108,13 +5108,17 @@
 
     appState.currentUser = null;
     const modalProfile = document.getElementById('modalUserProfileBackdrop');
-    if (modalProfile) modalProfile.classList.add('hidden');
+    if (modalProfile) {
+      modalProfile.classList.add('hidden');
+      modalProfile.style.display = 'none';
+    }
 
     const loginScreen = document.getElementById('loginScreen');
     if (loginScreen) {
       loginScreen.classList.remove('hidden');
       loginScreen.style.display = '';
       renderSavedAccountsList();
+      loginScreen.scrollTop = 0;
     }
 
     updateHeaderUserUI();
