@@ -5016,6 +5016,9 @@
     // Render all components
     renderAll();
 
+    // Start every newly authenticated session on the shopping planner.
+    document.getElementById('navBtnBudget')?.click();
+
     // Immediately pull latest real-time cloud data (cart, planner, budget) and subscribe to user channel
     if (appState.supabaseClient) {
       subscribeToRealtimeChanges();

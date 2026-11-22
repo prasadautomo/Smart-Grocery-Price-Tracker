@@ -316,7 +316,7 @@
     <!-- ==========================================================================
          TAB 1: TROLI AKTIF (STITCH SCREEN 4)
          ========================================================================== -->
-    <section id="tabCart" class="tab-pane active flex flex-col w-full">
+    <section id="tabCart" class="tab-pane flex flex-col w-full hidden">
 
       <!-- Top Live Gauge Card (Tactile Segmented Radar Display) -->
       <section class="w-full mb-space-md" id="budgetHudCard">
@@ -485,7 +485,7 @@
          TAB 2: SHOPPING PLANNER (RENCANA KEBUTUHAN BELANJA SEBELUM KE TOKO)
          ========================================================================== -->
     <!-- ========================================================================== -->
-    <section id="tabBudget" class="tab-pane flex-col w-full gap-space-md hidden">
+    <section id="tabBudget" class="tab-pane active flex flex-col w-full gap-space-md">
 
       <!-- Form Tambah Rencana Kebutuhan Baru (Tanpa Harga) -->
       <div class="planner-form-card bg-surface-container-lowest rounded-2xl p-space-md shadow-sm border border-outline-variant/20">
@@ -639,7 +639,7 @@
 
       <!-- 1. Shopping Planner & Rencana -->
       <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
+        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 active text-emerald-400 font-bold cursor-pointer"
         id="navBtnBudget" data-tab="tabBudget">
         <div class="relative flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">checklist</span>
@@ -652,7 +652,7 @@
 
       <!-- 2. Troli Aktif -->
       <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 active text-emerald-400 font-bold cursor-pointer"
+        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
         id="navBtnCart" data-tab="tabCart">
         <div class="relative flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
