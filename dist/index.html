@@ -737,8 +737,8 @@
         <input type="hidden" id="modalItemId">
 
         <div>
-          <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">NAMA PRODUK *</label>
-          <input type="text" id="inputItemName" placeholder="Contoh: Minyak Goreng Sania 2L" required autocomplete="off"
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">NAMA PRODUK</label>
+          <input type="text" id="inputItemName" placeholder="Nama produk" required autocomplete="off"
             class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
           <div
             class="neo-autocomplete-dropdown hidden mt-1 bg-white rounded-xl shadow-lg border border-outline-variant/30 max-h-40 overflow-y-auto"
@@ -797,8 +797,7 @@
         </div>
 
         <div>
-          <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN (RP)
-            *</label>
+          <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">HARGA SATUAN (RP)</label>
           <input type="number" id="inputItemPrice" placeholder="18000" min="1" step="1" required inputmode="numeric"
             class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-numeric-md text-numeric-md font-bold focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
         </div>
@@ -810,12 +809,11 @@
               <span class="material-symbols-outlined text-[16px] text-secondary">percent</span>
               POTONGAN / DISKON TOKO
             </label>
-            <span class="text-[10.5px] text-on-surface-variant font-medium">Bisa ketik bebas (misal 10% + 10%)</span>
           </div>
 
           <!-- Input utama diskon -->
           <div class="relative">
-            <input type="text" id="inputItemDiscount" placeholder="Ketik diskon, contoh: 10% + 10% atau 25% atau 5000"
+            <input type="text" id="inputItemDiscount" placeholder="Diskon"
               class="w-full pl-3 pr-16 py-2.5 rounded-xl bg-[#0b0c14] text-white font-body-md text-body-md border border-[#222638] focus:outline-none focus:ring-2 focus:ring-secondary font-semibold">
             <button type="button" id="btnClearDiscountPill"
               class="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 rounded-lg text-[10px] font-bold text-red-400 hover:bg-red-950/50 cursor-pointer">
