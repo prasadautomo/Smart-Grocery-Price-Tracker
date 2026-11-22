@@ -3832,6 +3832,32 @@ body {
   opacity: 1;
 }
 
+#tabBudget .planner-auto-category {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  background: #f8fafc;
+  color: #526176;
+  font-size: 0.72rem;
+}
+
+#tabBudget .planner-auto-category .material-symbols-outlined {
+  color: #475569 !important;
+  font-size: 1rem;
+}
+
+#tabBudget .planner-auto-category strong {
+  margin-left: auto;
+  color: #172b46 !important;
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-align: right;
+}
+
 #tabBudget input:focus,
 #tabBudget select:focus {
   border-color: #334155 !important;

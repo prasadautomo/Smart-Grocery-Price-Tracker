@@ -2301,6 +2301,12 @@
     const formPlan = document.getElementById('formAddPlannerItem');
     if (formPlan) formPlan.addEventListener('submit', addPlannerItemFromForm);
 
+    const plannerNameInput = document.getElementById('inputPlannerName');
+    if (plannerNameInput) {
+      plannerNameInput.addEventListener('input', updatePlannerCategoryPreview);
+      updatePlannerCategoryPreview();
+    }
+
     const formShelf = document.getElementById('formShelfPriceModal');
     if (formShelf) formShelf.addEventListener('submit', applyShelfPriceModalSubmit);
 
@@ -4443,12 +4449,11 @@
   function addPlannerItemFromForm(e) {
     if (e) e.preventDefault();
     const nameInput = document.getElementById('inputPlannerName');
-    const catSelect = document.getElementById('selectPlannerCategory');
     const unitSelect = document.getElementById('selectPlannerUnit');
     const qtyInput = document.getElementById('inputPlannerQty');
 
     const name = nameInput.value.trim();
-    const category = catSelect.value;
+    const category = detectPlannerCategory(name);
     const unit = unitSelect.value;
     const qty = parseInt(qtyInput.value, 10) || 1;
 
@@ -4470,9 +4475,72 @@
 
     nameInput.value = '';
     qtyInput.value = '1';
+    updatePlannerCategoryPreview();
 
     AudioEngine.playTap();
     showToast(`"${name}" dicatat ke Rencana Belanja`, 'success');
+  }
+
+  function normalizePlannerProductName(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  function detectPlannerCategory(name) {
+    const normalizedName = normalizePlannerProductName(name);
+    if (!normalizedName) return 'Lainnya';
+
+    const supportedCategories = new Set([
+      'Bahan Pokok',
+      'Makanan & Minuman',
+      'Kebersihan',
+      'Dapur & Bumbu',
+      'Lainnya'
+    ]);
+    const normalizedMasterName = appState.masterItems.find(item =>
+      normalizePlannerProductName(item.name) === normalizedName && supportedCategories.has(item.category)
+    );
+    if (normalizedMasterName) return normalizedMasterName.category;
+
+    const tokens = new Set(normalizedName.split(' '));
+    const matches = keywords => keywords.some(keyword => {
+      const normalizedKeyword = normalizePlannerProductName(keyword);
+      return normalizedKeyword.includes(' ')
+        ? ` ${normalizedName} `.includes(` ${normalizedKeyword} `)
+        : tokens.has(normalizedKeyword);
+    });
+
+    if (matches([
+      'sabun', 'deterjen', 'detergen', 'shampoo', 'sampo', 'pasta gigi', 'sikat gigi',
+      'tisu', 'tissue', 'pembersih', 'pel', 'pewangi', 'disinfektan', 'pembalut', 'popok'
+    ])) return 'Kebersihan';
+
+    if (matches([
+      'garam', 'kecap', 'saus', 'sambal', 'bumbu', 'merica', 'lada', 'ketumbar',
+      'kaldu', 'penyedap', 'bawang', 'cabai', 'cabe', 'jahe', 'kunyit', 'lengkuas', 'serai'
+    ])) return 'Dapur & Bumbu';
+
+    if (matches([
+      'mie', 'mi', 'instan', 'biskuit', 'roti', 'camilan', 'snack', 'keripik',
+      'sarden', 'kopi', 'teh', 'minuman', 'jus', 'air mineral', 'sirup', 'cokelat'
+    ])) return 'Makanan & Minuman';
+
+    if (matches([
+      'beras', 'telur', 'minyak', 'tepung', 'terigu', 'gula', 'susu', 'margarin', 'mentega'
+    ])) return 'Bahan Pokok';
+
+    return 'Lainnya';
+  }
+
+  function updatePlannerCategoryPreview() {
+    const name = document.getElementById('inputPlannerName')?.value || '';
+    const categoryLabel = document.getElementById('plannerDetectedCategory');
+    if (!categoryLabel) return;
+    categoryLabel.textContent = name.trim() ? detectPlannerCategory(name) : 'Ketik nama barang';
   }
 
   window.deletePlannerItem = function (id) {

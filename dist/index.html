@@ -499,24 +499,18 @@
           <div>
             <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">NAMA BARANG
               KEBUTUHAN *</label>
-            <input type="text" id="inputPlannerName" placeholder="Contoh: Beras Ramos 5kg, Telur 1kg, Sabun Cuci"
+            <input type="text" id="inputPlannerName" placeholder="Nama barang"
               required
               class="w-full px-3 py-2 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-secondary">
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KATEGORI</label>
-              <select id="selectPlannerCategory"
-                class="w-full px-3 py-2 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm border border-outline-variant/30 focus:outline-none focus:ring-1 focus:ring-secondary">
-                <option value="Bahan Pokok">Bahan Pokok</option>
-                <option value="Makanan & Minuman">Makanan & Minuman</option>
-                <option value="Kebersihan">Kebersihan</option>
-                <option value="Dapur & Bumbu">Dapur & Bumbu</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-            </div>
-            <div>
+          <div class="planner-auto-category" aria-live="polite">
+            <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+            <span>Kategori otomatis</span>
+            <strong id="plannerDetectedCategory">Ketik nama barang</strong>
+          </div>
+
+          <div>
               <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KEMASAN /
                 SATUAN</label>
               <select id="selectPlannerUnit"
@@ -531,7 +525,6 @@
                 <option value="sachet">sachet</option>
                 <option value="dus">dus</option>
               </select>
-            </div>
           </div>
 
           <div class="flex items-center gap-3">
