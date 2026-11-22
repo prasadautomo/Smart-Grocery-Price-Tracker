@@ -4133,6 +4133,53 @@ body {
   outline-offset: 2px;
 }
 
+/* Make the shelf-price dialog actions equally sized and readable on phones. */
+#modalShelfPriceBackdrop .shelf-modal-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+#modalShelfPriceBackdrop #btnCancelShelfModal,
+#modalShelfPriceBackdrop #btnSubmitShelfModal {
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid #d4dde8 !important;
+  border-radius: 0.875rem !important;
+  font-weight: 750;
+  line-height: 1.25;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+#modalShelfPriceBackdrop #btnCancelShelfModal,
+#modalShelfPriceBackdrop #btnCancelShelfModal:hover,
+#modalShelfPriceBackdrop #btnCancelShelfModal:active,
+#modalShelfPriceBackdrop #btnCancelShelfModal:focus-visible {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #172b46 !important;
+  -webkit-text-fill-color: #172b46 !important;
+}
+
+#modalShelfPriceBackdrop #btnSubmitShelfModal,
+#modalShelfPriceBackdrop #btnSubmitShelfModal:hover,
+#modalShelfPriceBackdrop #btnSubmitShelfModal:active,
+#modalShelfPriceBackdrop #btnSubmitShelfModal:focus-visible,
+#modalShelfPriceBackdrop #btnSubmitShelfModal * {
+  background: #10283f !important;
+  border-color: #10283f !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+#modalShelfPriceBackdrop #btnCancelShelfModal:focus-visible,
+#modalShelfPriceBackdrop #btnSubmitShelfModal:focus-visible {
+  outline: 3px solid #78d9bd !important;
+  outline-offset: 2px;
+}
+
 @media (max-width: 420px) {
   #sectionPlannerShelfChecklist > div:first-child {
     padding: 0.875rem;
@@ -4152,5 +4199,16 @@ body {
     gap: 0.35rem;
     padding-inline: 0.65rem;
     font-size: 0.7rem;
+  }
+
+  #modalShelfPriceBackdrop .shelf-modal-actions {
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: 0.6rem;
+  }
+
+  #modalShelfPriceBackdrop #btnCancelShelfModal,
+  #modalShelfPriceBackdrop #btnSubmitShelfModal {
+    padding-inline: 0.65rem !important;
+    font-size: 0.875rem;
   }
 }
