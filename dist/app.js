@@ -1602,12 +1602,6 @@
                 <span>${discount.discountLabel}</span>
               </span>
             ` : ''}
-            ${hasDiscount && discount.formulaText && discount.formulaText.includes('Lapis') ? `
-              <div class="w-full text-[10.5px] font-mono text-purple-900 bg-purple-50/90 px-2.5 py-1.5 rounded-xl border border-purple-200 mt-1 flex items-start gap-1">
-                <span class="font-bold shrink-0">✨ Diskon Kompound:</span>
-                <span>${escapeHtml(discount.formulaText)}</span>
-              </div>
-            ` : ''}
           </div>
 
           <!-- Bottom Row: Tactile POS Stepper & Chunky Subtotal -->
@@ -1795,29 +1789,8 @@
     const qty = parseInt(inputItemQty.value, 10) || 1;
     const discountRaw = inputItemDiscount.value.trim();
 
-    // 1. Discount Preview
+    // 1. Discount calculation (kept for accurate line totals; details stay hidden)
     const disc = calculateDiscount(price, discountRaw);
-    const discPreview = document.getElementById('modalDiscountPreview');
-    const elFinalPrice = document.getElementById('modalDiscountFinalPrice');
-    const elSavedText = document.getElementById('modalDiscountSavedText');
-    const elBreakdown = document.getElementById('modalDiscountBreakdown');
-
-    if (disc.savedPerUnit > 0) {
-      if (discPreview) discPreview.classList.remove('hidden');
-      if (elFinalPrice) elFinalPrice.textContent = `Rp ${formatNumber(disc.finalUnitPrice)}`;
-      if (elSavedText) elSavedText.textContent = `Hemat Rp ${formatNumber(disc.savedPerUnit)}/item (${disc.discountLabel || 'Promo'})`;
-      if (elBreakdown) {
-        if (disc.formulaText && disc.formulaText.includes('Lapis')) {
-          elBreakdown.classList.remove('hidden');
-          elBreakdown.textContent = `Rincian: ${disc.formulaText}`;
-        } else {
-          elBreakdown.classList.add('hidden');
-        }
-      }
-    } else {
-      if (discPreview) discPreview.classList.add('hidden');
-    }
-
     // 2. Subtotal
     const lineTotal = disc.finalUnitPrice * qty;
     document.getElementById('modalLineTotal').textContent = `Rp ${formatNumber(lineTotal)}`;
