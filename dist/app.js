@@ -4316,8 +4316,8 @@
         let html = '';
         pendingItems.forEach(item => {
           html += `
-            <div class="p-3 bg-surface-container-low rounded-2xl flex items-center justify-between gap-2 border border-outline-variant/30">
-              <div class="flex-1 min-w-0">
+            <div class="planner-shelf-item p-3 bg-surface-container-low rounded-2xl flex items-center justify-between gap-2 border border-outline-variant/30">
+              <div class="planner-shelf-item-content flex-1 min-w-0">
                 <div class="flex items-center gap-1.5 mb-0.5">
                   <span class="text-[10px] font-bold uppercase px-2 py-0.2 rounded-full bg-surface-container text-secondary">
                     ${escapeHtml(item.category)}
@@ -4327,8 +4327,8 @@
                 <span class="font-body-sm text-[12px] text-on-surface-variant font-medium">Kebutuhan: <strong>${item.qty} ${escapeHtml(item.unit)}</strong></span>
               </div>
               <div class="flex items-center gap-1.5 shrink-0">
-                <button class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-[12px] font-bold flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer hover:bg-primary-container"
-                  onclick="window.openShelfPriceModal('${item.id}')" title="Ketik harga saat menemukan di rak">
+                <button type="button" class="planner-shelf-price-button px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-[12px] font-bold flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                  onclick="window.openShelfPriceModal('${item.id}')" title="Ketik harga saat menemukan di rak" aria-label="Input harga rak untuk ${escapeHtml(item.name)}">
                   <span class="material-symbols-outlined text-[15px]">price_change</span>
                   <span>Input Harga Rak</span>
                 </button>

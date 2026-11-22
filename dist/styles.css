@@ -4092,3 +4092,75 @@ body {
   -webkit-appearance: none;
   margin: 0;
 }
+
+/* Keep the home-planner cards compact and the shelf-price action readable in every state. */
+#sectionPlannerShelfChecklist #plannerPendingItemsList {
+  display: grid;
+  gap: 0.625rem;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-item {
+  align-items: center;
+  border-color: #d8e1eb;
+  border-radius: 1rem;
+  background: #f7f9fc;
+  padding: 0.8rem;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-item-content {
+  min-width: 0;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-price-button,
+#sectionPlannerShelfChecklist .planner-shelf-price-button:hover,
+#sectionPlannerShelfChecklist .planner-shelf-price-button:active,
+#sectionPlannerShelfChecklist .planner-shelf-price-button:focus,
+#sectionPlannerShelfChecklist .planner-shelf-price-button:focus-visible {
+  background: #10283f !important;
+  border: 1px solid #10283f !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-price-button {
+  min-height: 2.75rem;
+  justify-content: center;
+  padding-inline: 0.875rem;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-price-button * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+#sectionPlannerShelfChecklist .planner-shelf-price-button:focus-visible {
+  outline: 3px solid #78d9bd !important;
+  outline-offset: 2px;
+}
+
+@media (max-width: 420px) {
+  #sectionPlannerShelfChecklist > div:first-child {
+    padding: 0.875rem;
+  }
+
+  #sectionPlannerShelfChecklist h2 {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  #sectionPlannerShelfChecklist .planner-shelf-item {
+    gap: 0.5rem;
+    padding: 0.7rem;
+  }
+
+  #sectionPlannerShelfChecklist .planner-shelf-price-button {
+    gap: 0.35rem;
+    padding-inline: 0.65rem;
+    font-size: 0.7rem;
+  }
+}
