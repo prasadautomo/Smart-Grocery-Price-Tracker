@@ -601,60 +601,7 @@
       </div>
     </section>
 
-    <!-- ==========================================================================
-         TAB 5: KENDALI ANGGARAN & DOMPET (SAFETY CAP SRS F-05)
-         ========================================================================== -->
-    <section id="tabDompet" class="tab-pane flex-col w-full gap-space-md hidden">
 
-      <!-- Live Financial Radar Card (Macro Allocation & Meter) -->
-      <div class="w-full bg-[#0c0e17] text-white rounded-2xl p-space-md shadow-pos-key border-2 border-[#1e2438]">
-        <div class="flex items-center justify-between mb-3 border-b border-[#1c2234] pb-2.5">
-          <span class="text-[11px] font-mono font-bold text-white tracking-wider uppercase flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-emerald-400 text-[15px]">donut_large</span>
-            <span>Ringkasan Saldo Belanja</span>
-          </span>
-          <span class="font-mono text-xs font-black text-emerald-400" id="budgetHealthPercent">0% Terpakai</span>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 text-center mb-3.5">
-          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Batas Pagu</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-white" id="hudDompetLimitDisplay">Rp 350.000</strong>
-          </div>
-          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Isi Troli</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-emerald-400" id="budgetCurrentSpend">Rp 0</strong>
-          </div>
-          <div class="bg-[#11131c] rounded-xl p-2.5 border border-[#1e2338]">
-            <span class="block text-[10px] font-mono text-stone-400 font-bold uppercase mb-0.5">Sisa Saldo</span>
-            <strong class="font-mono text-xs sm:text-sm font-black text-emerald-400" id="budgetRemainingAmount">Rp 350.000</strong>
-          </div>
-        </div>
-
-        <!-- Meter Gauge Bar -->
-        <div class="space-y-1.5">
-          <div class="w-full h-3 bg-[#08090e] rounded-full overflow-hidden p-0.5 border border-[#1f2537]">
-            <div id="budgetHealthMeter" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section: Alokasi Belanja per Kategori -->
-      <div class="w-full bg-[#11131c] rounded-2xl p-space-md shadow-sm border border-[#1e2338] text-white">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-emerald-400 text-[20px]">pie_chart</span>
-            <h3 class="font-headline-sm text-base text-white font-bold tracking-tight">Alokasi Belanja per Kategori</h3>
-          </div>
-        </div>
-        <div id="categoryBreakdownList" class="space-y-3">
-          <!-- Rendered by JavaScript -->
-        </div>
-      </div>
-
-
-
-    </section>
 
   </main>
 
@@ -726,16 +673,7 @@
         <span class="font-label-sm text-[10px] mt-0.5 whitespace-nowrap uppercase tracking-wider font-extrabold">Struk</span>
       </button>
 
-      <!-- 5. Dompet & Anggaran Safety Cap (SRS F-05) -->
-      <button
-        class="dock-tab relative flex-1 flex flex-col items-center justify-center py-2 px-1 rounded-2xl transition-all duration-200 text-white font-bold cursor-pointer"
-        id="navBtnDompet" data-tab="tabDompet" title="Batas Dompet & Status Anggaran">
-        <div class="relative flex items-center justify-center">
-          <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
-          <span class="w-2 h-2 rounded-full bg-citrus absolute -top-0.5 -right-1" id="navBudgetDot"></span>
-        </div>
-        <span class="font-label-sm text-[10px] mt-0.5 whitespace-nowrap uppercase tracking-wider font-extrabold">Anggaran</span>
-      </button>
+
 
     </div>
   </nav>

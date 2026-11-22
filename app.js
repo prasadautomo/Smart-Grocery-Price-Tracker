@@ -1979,8 +1979,6 @@
 
         if (paneId === 'tabBudget') {
           renderShoppingPlannerSection();
-        } else if (paneId === 'tabDompet') {
-          renderDompetTab();
         } else if (paneId === 'tabHistory') {
           renderHistoryList();
         } else if (paneId === 'tabCart') {
