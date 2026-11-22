@@ -4449,12 +4449,11 @@
   function addPlannerItemFromForm(e) {
     if (e) e.preventDefault();
     const nameInput = document.getElementById('inputPlannerName');
-    const unitSelect = document.getElementById('selectPlannerUnit');
     const qtyInput = document.getElementById('inputPlannerQty');
 
     const name = nameInput.value.trim();
     const category = detectPlannerCategory(name);
-    const unit = unitSelect.value;
+    const unit = detectPlannerUnit(name);
     const qty = parseInt(qtyInput.value, 10) || 1;
 
     if (!name) return;
@@ -4536,11 +4535,56 @@
     return 'Lainnya';
   }
 
+  function detectPlannerUnit(name) {
+    const normalizedName = normalizePlannerProductName(name);
+    if (!normalizedName) return 'pcs';
+
+    const knownItem = appState.masterItems.find(item =>
+      normalizePlannerProductName(item.name) === normalizedName && String(item.unit || '').trim()
+    );
+    if (knownItem) return knownItem.unit;
+
+    const tokens = new Set(normalizedName.split(' '));
+    const has = (...words) => words.some(word => tokens.has(word));
+
+    if (has('karung', 'sak')) return 'karung';
+    if (has('pouch', 'refill')) return 'pouch';
+    if (has('botol', 'bottle')) return 'botol';
+    if (has('kaleng')) return 'kaleng';
+    if (has('sachet')) return 'sachet';
+    if (has('dus', 'karton', 'kardus')) return 'dus';
+    if (has('pack', 'pak', 'bungkus', 'bks')) return 'pack';
+    if (has('pcs', 'buah', 'butir', 'btr')) return 'pcs';
+    if (has('kg', 'kilogram')) return tokens.has('beras') ? 'pack' : 'kg';
+    if (has('gram', 'gr', 'g')) return tokens.has('beras') ? 'pack' : 'pack';
+
+    if (tokens.has('susu') && /\b\d+(?:[.,]\d+)?\s*(?:ml|milliliter|l|liter)\b/.test(normalizedName)) {
+      return 'kotak';
+    }
+    if (/\b\d+(?:[.,]\d+)?\s*(?:ml|milliliter)\b/.test(normalizedName)) {
+      return tokens.has('minyak') ? 'pouch' : 'botol';
+    }
+    if (/\b\d+(?:[.,]\d+)?\s*(?:l|liter)\b/.test(normalizedName)) {
+      return tokens.has('minyak') ? 'pouch' : 'botol';
+    }
+    if (tokens.has('telur')) return 'kg';
+    if (tokens.has('beras') || tokens.has('gula') || tokens.has('tepung')) return 'pack';
+    if (tokens.has('mie') || tokens.has('mi') || tokens.has('roti')) return 'pcs';
+    if (tokens.has('air') || tokens.has('sampo') || tokens.has('shampoo')) return 'botol';
+
+    const category = detectPlannerCategory(name);
+    if (category === 'Bahan Pokok' || category === 'Dapur & Bumbu') return 'pack';
+    if (category === 'Kebersihan') return 'pcs';
+    if (category === 'Makanan & Minuman') return 'pcs';
+    return 'pcs';
+  }
+
   function updatePlannerCategoryPreview() {
     const name = document.getElementById('inputPlannerName')?.value || '';
     const categoryLabel = document.getElementById('plannerDetectedCategory');
-    if (!categoryLabel) return;
-    categoryLabel.textContent = name.trim() ? detectPlannerCategory(name) : 'Ketik nama barang';
+    const unitLabel = document.getElementById('plannerDetectedUnit');
+    if (categoryLabel) categoryLabel.textContent = name.trim() ? detectPlannerCategory(name) : 'Ketik nama barang';
+    if (unitLabel) unitLabel.textContent = name.trim() ? detectPlannerUnit(name) : 'Ketik nama barang';
   }
 
   window.deletePlannerItem = function (id) {
