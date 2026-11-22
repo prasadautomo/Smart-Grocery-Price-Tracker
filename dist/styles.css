@@ -3164,34 +3164,9 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
 
 /* Scenario coverage: clear empty state, visible month-to-month price signals, and thumb-sized controls. */
 .cart-empty-state {
-  display: grid;
-  justify-items: center;
-  gap: 0.55rem;
-  padding: 2rem 1.25rem;
-  border: 1px dashed #cbd5e1;
-  border-radius: 1.25rem;
-  background: #ffffff;
-  color: #263852;
-  text-align: center;
-}
-.cart-empty-state > .material-symbols-outlined {
-  color: #64748b;
-  font-size: 2.25rem;
-}
-.cart-empty-state h3,
-.cart-empty-state p {
-  margin: 0;
-}
-.cart-empty-state h3 {
-  color: #17243a;
-  font-size: 1rem;
-  font-weight: 800;
-}
-.cart-empty-state p {
-  max-width: 26rem;
-  color: #526176;
-  font-size: 0.8rem;
-  line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0;
 }
 .cart-empty-action {
   min-height: 44px;

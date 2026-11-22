@@ -1499,10 +1499,7 @@
 
     if (appState.cart.length === 0) {
       container.innerHTML = `
-        <div class="cart-empty-state" role="status">
-          <span class="material-symbols-outlined" aria-hidden="true">shopping_basket</span>
-          <h3>Troli belanja masih kosong</h3>
-          <p>Tambahkan barang dari katalog atau catat barang yang Anda temukan di toko.</p>
+        <div class="cart-empty-state">
           <button type="button" class="cart-empty-action" onclick="document.getElementById('btnOpenAddModal')?.click()">Tambah barang</button>
         </div>
       `;
