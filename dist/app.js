@@ -1119,7 +1119,9 @@
           itemCount: Number(r.item_count) || 0,
           items: Array.isArray(r.items) ? r.items : [],
           paymentMethod: r.payment_method || '',
-          paymentStatus: r.payment_method && !/belum dibayar|catatan belanja/i.test(r.payment_method) ? 'paid' : 'unpaid'
+          paymentStatus: /simulasi|demo/i.test(r.payment_method || '')
+            ? 'simulated'
+            : r.payment_method && !/belum dibayar|catatan belanja/i.test(r.payment_method) ? 'paid' : 'unpaid'
         }));
         const cloudReceiptIds = new Set(cloudHistory.map(receipt => String(receipt.id)));
         appState.history = [
@@ -3613,7 +3615,7 @@
   // ==========================================================================
   // CARTLY CHECKOUT & PAYMENT RECORDING
   // ==========================================================================
-  let checkoutPaymentMethod = 'cash';
+  const checkoutPaymentMethod = 'qris';
   let checkoutPaymentSubmitted = false;
 
   function initAstroCheckoutModule() {
@@ -3621,15 +3623,6 @@
     document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
     document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', completeCheckoutAndDisplayReceipt);
-    document.querySelectorAll('.checkout-payment-method').forEach(button => {
-      button.addEventListener('click', () => selectCheckoutPaymentMethod(button.dataset.method));
-    });
-    document.getElementById('checkoutExactCash')?.addEventListener('click', () => {
-      const amountInput = document.getElementById('checkoutCashAmount');
-      if (amountInput) amountInput.value = String(calculateCurrentSubtotal());
-      updateCheckoutCashChange();
-    });
-    document.getElementById('checkoutCashAmount')?.addEventListener('input', updateCheckoutCashChange);
     document.getElementById('checkoutDigitalPaidConfirm')?.addEventListener('change', updateCheckoutPaymentButton);
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
       closeAstroCheckoutModal();
@@ -3656,7 +3649,6 @@
     const stageReceipt = document.getElementById('checkoutStageReceipt');
     if (!modal || !stagePayment || !stageReceipt) return;
     checkoutPaymentSubmitted = false;
-    checkoutPaymentMethod = 'cash';
     stagePayment.classList.remove('hidden');
     stageReceipt.classList.add('hidden');
     const storeLabel = document.getElementById('checkoutStoreLabel');
@@ -3670,62 +3662,27 @@
     }
     const subtotalEl = document.getElementById('checkoutPaymentSubtotal');
     const totalEl = document.getElementById('checkoutPaymentTotal');
-    const cashInput = document.getElementById('checkoutCashAmount');
     const digitalCheck = document.getElementById('checkoutDigitalPaidConfirm');
+    const demoAmount = document.getElementById('checkoutDemoAmount');
     if (subtotalEl) subtotalEl.textContent = `Rp ${formatNumber(total)}`;
     if (totalEl) totalEl.textContent = `Rp ${formatNumber(total)}`;
-    if (cashInput) cashInput.value = String(total);
+    if (demoAmount) demoAmount.textContent = formatNumber(total);
     if (digitalCheck) digitalCheck.checked = false;
-    selectCheckoutPaymentMethod('cash');
+    updateCheckoutPaymentButton();
     modal.classList.remove('hidden');
-  }
-
-  function selectCheckoutPaymentMethod(method) {
-    const allowedMethods = ['cash', 'qris'];
-    checkoutPaymentMethod = allowedMethods.includes(method) ? method : 'cash';
-    document.querySelectorAll('.checkout-payment-method').forEach(button => {
-      const selected = button.dataset.method === checkoutPaymentMethod;
-      button.setAttribute('aria-pressed', String(selected));
-      button.classList.toggle('border-emerald-500', selected);
-      button.classList.toggle('bg-emerald-950/40', selected);
-      button.classList.toggle('border-[#30384b]', !selected);
-      button.classList.toggle('bg-[#151a24]', !selected);
-    });
-    document.getElementById('checkoutCashPanel')?.classList.toggle('hidden', checkoutPaymentMethod !== 'cash');
-    document.getElementById('checkoutDigitalPanel')?.classList.toggle('hidden', checkoutPaymentMethod === 'cash');
-    updateCheckoutCashChange();
-    updateCheckoutPaymentButton();
-  }
-
-  function updateCheckoutCashChange() {
-    const total = calculateCurrentSubtotal();
-    const paid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
-    const changeEl = document.getElementById('checkoutCashChange');
-    if (changeEl) {
-      if (paid < total) {
-        changeEl.textContent = `Uang kurang: Rp ${formatNumber(total - paid)}`;
-        changeEl.className = 'text-xs font-semibold text-rose-300';
-      } else {
-        changeEl.textContent = `Kembalian: Rp ${formatNumber(paid - total)}`;
-        changeEl.className = 'text-xs font-semibold text-emerald-300';
-      }
-    }
-    updateCheckoutPaymentButton();
   }
 
   function updateCheckoutPaymentButton() {
     const button = document.getElementById('btnConfirmCheckoutPayment');
     if (!button) return;
-    const paid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
     const total = calculateCurrentSubtotal();
     const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
     const overBudget = total > appState.budgetLimit;
-    const canSubmit = getPurchasedCartItems().length > 0 && !overBudget &&
-      (checkoutPaymentMethod === 'cash' ? paid >= total : digitalConfirmed);
+    const canSubmit = getPurchasedCartItems().length > 0 && !overBudget && digitalConfirmed;
     button.disabled = checkoutPaymentSubmitted || !canSubmit;
     button.textContent = overBudget
       ? 'Anggaran terlampaui'
-      : checkoutPaymentMethod === 'cash' ? 'Konfirmasi pembayaran tunai' : 'Catat pembayaran selesai';
+      : 'Selesaikan simulasi';
   }
 
   function closeAstroCheckoutModal() {
@@ -3746,14 +3703,9 @@
       showToast(`Transaksi tidak dapat dilanjutkan. Kurangi belanja Rp ${formatNumber(total - appState.budgetLimit)} agar sesuai anggaran.`, 'warning');
       return;
     }
-    const cashPaid = Number(document.getElementById('checkoutCashAmount')?.value) || 0;
     const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    if (checkoutPaymentMethod === 'cash' && cashPaid < total) {
-      showToast(`Uang yang diterima kurang Rp ${formatNumber(total - cashPaid)}.`, 'warning');
-      return;
-    }
-    if (checkoutPaymentMethod !== 'cash' && !digitalConfirmed) {
-      showToast('Konfirmasi pembayaran digital terlebih dahulu.', 'warning');
+    if (!digitalConfirmed) {
+      showToast('Konfirmasi bahwa ini hanya simulasi terlebih dahulu.', 'warning');
       return;
     }
 
@@ -3800,7 +3752,7 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const paymentLabels = { cash: 'Tunai', qris: 'QRIS (konfirmasi manual)' };
+    const paymentLabels = { qris: 'QRIS Demo (simulasi)' };
     const receiptLabel = paymentLabels[checkoutPaymentMethod];
 
     // Populate Thermal Receipt Elements
@@ -3818,7 +3770,7 @@
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
     if (elMethod) elMethod.textContent = receiptLabel;
-    if (elStatus) elStatus.textContent = 'Lunas';
+    if (elStatus) elStatus.textContent = 'Simulasi';
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
@@ -3847,9 +3799,7 @@
       itemCount: receiptItems.length,
       items: receiptItems,
       paymentMethod: receiptLabel,
-      paymentStatus: 'paid',
-      cashReceived: checkoutPaymentMethod === 'cash' ? cashPaid : null,
-      cashChange: checkoutPaymentMethod === 'cash' ? cashPaid - grandTotal : null
+      paymentStatus: 'simulated'
     };
 
     appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
@@ -3897,7 +3847,7 @@
       });
     }
 
-    showToast('Pembayaran dicatat dan struk berhasil dibuat.', 'success');
+    showToast('Simulasi pembayaran dicatat dan struk demo berhasil dibuat.', 'success');
   }
 
   function copyThermalReceiptSummary() {
@@ -3906,7 +3856,8 @@
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
     const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
-    const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: Lunas (dicatat di Cartly)`;
+    const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Simulasi';
+    const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (dicatat di Cartly)`;
 
     navigator.clipboard?.writeText(text);
     AudioEngine.playTap();
@@ -4037,7 +3988,7 @@
           <div class="receipt-market-name">SUPERMARKET GROSIR</div>
           <small>Struk Belanja Mandiri • Cartly</small>
           <div class="receipt-meta-row font-mono text-[11px]">${escapeHtml(displayDate)}</div>
-          <div class="receipt-meta-row text-[11px]">Metode: ${escapeHtml(rcp.paymentMethod || 'Belum dicatat')} • ${rcp.paymentStatus === 'paid' || (rcp.paymentMethod && !/belum dibayar|catatan belanja/i.test(rcp.paymentMethod)) ? 'Lunas' : 'Belum dibayar'}</div>
+      <div class="receipt-meta-row text-[11px]">Metode: ${escapeHtml(rcp.paymentMethod || 'Belum dicatat')} • ${rcp.paymentStatus === 'simulated' || /simulasi|demo/i.test(rcp.paymentMethod || '') ? 'Simulasi' : rcp.paymentStatus === 'paid' || (rcp.paymentMethod && !/belum dibayar|catatan belanja/i.test(rcp.paymentMethod)) ? 'Lunas' : 'Belum dibayar'}</div>
         </div>
         <div class="receipt-lines-list max-h-60 overflow-y-auto my-2 pr-1">
           ${itemsHtml}

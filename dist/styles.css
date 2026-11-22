@@ -3994,34 +3994,16 @@ body {
   color: #526176 !important;
 }
 
-#modalAstroCheckout .checkout-payment-method[aria-pressed="true"] {
-  background-color: #131312 !important;
-  border-color: #131312 !important;
-  color: #ffffff !important;
+#modalAstroCheckout .checkout-payment-method[aria-current="true"] {
+  background-color: #ecfdf5 !important;
+  border-color: #86efac !important;
 }
 
-#modalAstroCheckout .checkout-payment-method[aria-pressed="true"] * {
-  color: #ffffff !important;
-}
-
-#modalAstroCheckout #checkoutCashPanel {
-  background-color: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-  color: #16243b !important;
-}
-
-#modalAstroCheckout #checkoutCashChange.text-rose-300 {
-  color: #b42318 !important;
-}
-
-#modalAstroCheckout #checkoutCashChange.text-emerald-300 {
-  color: #166534 !important;
-}
-
-#modalAstroCheckout #checkoutCashAmount {
-  background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
-  color: #16243b !important;
+#modalAstroCheckout .checkout-demo-qr {
+  display: block;
+  width: 10rem;
+  height: 10rem;
+  shape-rendering: crispEdges;
 }
 
 #modalAstroCheckout #checkoutDigitalPanel {
@@ -4033,11 +4015,6 @@ body {
 #modalAstroCheckout #checkoutDigitalPanel label,
 #modalAstroCheckout #checkoutDigitalPanel label * {
   color: #713f12 !important;
-}
-
-#modalAstroCheckout #checkoutExactCash {
-  background-color: #e2e8f0 !important;
-  color: #16243b !important;
 }
 
 #modalAstroCheckout #btnConfirmCheckoutPayment {
