@@ -3532,6 +3532,140 @@ body {
   border-color: #131312 !important;
 }
 
+/* Minimal, high-contrast shopping planner. */
+#tabBudget {
+  gap: 0.875rem !important;
+  color: #172b46 !important;
+}
+
+#tabBudget > .planner-form-card,
+#tabBudget > .planner-list-card {
+  padding: 1rem !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 1rem !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  color: #172b46 !important;
+}
+
+#tabBudget h3 {
+  color: #14263e !important;
+  font-size: 0.95rem !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.01em;
+}
+
+#tabBudget label {
+  color: #334155 !important;
+  font-size: 0.7rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.025em;
+}
+
+#tabBudget input,
+#tabBudget select {
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 0.75rem !important;
+  background: #ffffff !important;
+  color: #172b46 !important;
+  box-shadow: none !important;
+}
+
+#tabBudget input::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+#tabBudget input:focus,
+#tabBudget select:focus {
+  border-color: #334155 !important;
+  outline: 2px solid rgba(51, 65, 85, 0.15) !important;
+  outline-offset: 1px;
+}
+
+#tabBudget form button[type="submit"] {
+  min-height: 2.75rem;
+  border: 0 !important;
+  border-radius: 0.75rem !important;
+  background: #14263e !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+#tabBudget form button[type="submit"] * {
+  color: #ffffff !important;
+}
+
+#plannerActiveCountBadge {
+  border: 1px solid #cbd5e1 !important;
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+#shoppingPlannerFullList > .planner-list-item {
+  padding: 0.75rem !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem !important;
+  background: #f8fafc !important;
+  color: #172b46 !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+
+#shoppingPlannerFullList > .planner-list-item.is-complete {
+  background: #f1f7f4 !important;
+  border-color: #d6e7dc !important;
+}
+
+#shoppingPlannerFullList .planner-list-item h4 {
+  color: #172b46 !important;
+  font-weight: 750 !important;
+}
+
+#shoppingPlannerFullList .planner-list-item .text-on-surface-variant,
+#shoppingPlannerFullList .planner-list-item .font-body-sm {
+  color: #526176 !important;
+}
+
+#shoppingPlannerFullList .planner-status-badge {
+  border: 1px solid #d4dde7 !important;
+  background: #e9eef4 !important;
+  color: #334155 !important;
+}
+
+#shoppingPlannerFullList .planner-list-item button {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border-radius: 0.625rem !important;
+  color: #b42318 !important;
+}
+
+@media (max-width: 360px) {
+  #tabBudget > .planner-form-card,
+  #tabBudget > .planner-list-card {
+    padding: 0.8rem !important;
+  }
+
+  #tabBudget form > .flex.items-center.gap-3 {
+    gap: 0.6rem !important;
+  }
+
+  #tabBudget form > .flex.items-center.gap-3 > .w-32 {
+    width: 6rem;
+    flex: 0 0 6rem;
+  }
+
+  #shoppingPlannerFullList > .planner-list-item {
+    align-items: flex-start;
+  }
+
+  #shoppingPlannerFullList .planner-status-badge {
+    display: none;
+  }
+}
+
 /* Checkout uses a light surface: keep regular copy dark and selected controls white-on-charcoal. */
 #modalAstroCheckout #checkoutStagePayment {
   background-color: #ffffff !important;

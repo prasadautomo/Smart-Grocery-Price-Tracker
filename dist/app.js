@@ -4361,7 +4361,7 @@
           const isDone = item.isPurchased;
 
           html += `
-            <div class="p-3 bg-surface-container-low rounded-xl flex items-center justify-between gap-2 border border-outline-variant/30 ${isDone ? 'opacity-70 bg-surface-container' : ''}">
+            <div class="planner-list-item p-3 bg-surface-container-low rounded-xl flex items-center justify-between gap-2 border border-outline-variant/30 ${isDone ? 'is-complete opacity-70 bg-surface-container' : ''}">
               <div class="flex items-center gap-2 flex-1 min-w-0">
                 <span class="w-6 h-6 rounded-full ${isDone ? 'bg-secondary text-white' : 'bg-surface-container-highest text-outline'} flex items-center justify-center text-[13px] font-bold">
                   ${isDone ? '✓' : '•'}
@@ -4376,7 +4376,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-1 shrink-0">
-                <span class="font-label-sm text-[11px] font-bold px-2 py-0.5 rounded-full ${isDone ? 'bg-secondary-fixed/30 text-secondary' : 'bg-surface-container-highest text-outline'}">
+                <span class="planner-status-badge font-label-sm text-[11px] font-bold px-2 py-0.5 rounded-full ${isDone ? 'bg-secondary-fixed/30 text-secondary' : 'bg-surface-container-highest text-outline'}">
                   ${isDone ? 'Sudah di Troli' : 'Direncanakan'}
                 </span>
                 <button class="w-7 h-7 rounded-full text-error hover:bg-red-50 flex items-center justify-center cursor-pointer"
