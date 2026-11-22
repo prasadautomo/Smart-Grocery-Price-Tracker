@@ -3581,6 +3581,11 @@ body {
 }
 
 #cartItemsList .cart-quantity-control {
+  display: inline-flex !important;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
   gap: 0.25rem;
   padding: 0.2rem;
   border: 1px solid #dbe3ec !important;
@@ -3590,8 +3595,11 @@ body {
 }
 
 #cartItemsList .cart-quantity-control button {
-  width: 2.4rem;
-  height: 2.4rem;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  height: 2.75rem;
   border: 0 !important;
   border-radius: 0.55rem !important;
   background: #f1f5f9 !important;
@@ -3600,12 +3608,17 @@ body {
 }
 
 #cartItemsList .cart-quantity-control input {
-  width: 2.65rem;
-  min-height: 2.4rem;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border: 0 !important;
   background: #ffffff !important;
   color: #172b46 !important;
   font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  caret-color: #10283f;
 }
 
 #cartItemsList .cart-item-subtotal {
