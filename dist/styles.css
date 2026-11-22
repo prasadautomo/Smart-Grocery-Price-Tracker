@@ -3319,6 +3319,84 @@ body {
   opacity: 1;
 }
 
+/* Cartly checkout receipt: clean white thermal slip, with no barcode. */
+#checkoutStageReceipt .thermal-receipt-roll {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 1.25rem !important;
+  padding: 1.25rem !important;
+  background: #ffffff !important;
+  color: #19324d !important;
+  box-shadow: 0 12px 32px rgba(25, 50, 77, 0.12) !important;
+}
+
+#checkoutStageReceipt .thermal-receipt-roll::before,
+#checkoutStageReceipt .thermal-receipt-roll::after {
+  height: 0;
+  content: none;
+}
+
+#checkoutStageReceipt .thermal-receipt-roll * {
+  background-color: transparent !important;
+  color: #19324d !important;
+}
+
+#checkoutStageReceipt .thermal-receipt-roll > div:first-child {
+  padding-bottom: 0.9rem;
+  border-color: #d8e2ed !important;
+}
+
+#checkoutStageReceipt #receiptStoreHeader {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#checkoutStageReceipt #receiptTimestamp,
+#checkoutStageReceipt #receiptTrxId,
+#checkoutStageReceipt #receiptSystemLabel,
+#checkoutStageReceipt #receiptItemsBody div span span,
+#checkoutStageReceipt #receiptFooterNote {
+  color: #52677f !important;
+}
+
+#checkoutStageReceipt #receiptItemsBody,
+#checkoutStageReceipt #receiptItemsBody > div,
+#checkoutStageReceipt .thermal-receipt-roll .border-t,
+#checkoutStageReceipt .thermal-receipt-roll .border-y {
+  border-color: #d8e2ed !important;
+}
+
+#checkoutStageReceipt #receiptGrandTotal {
+  color: #111827 !important;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
+}
+
+#checkoutStageReceipt #receiptFooterNote {
+  margin: 0.25rem auto 0;
+  max-width: 28rem;
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  #checkoutStageReceipt .thermal-receipt-roll {
+    padding: 1rem !important;
+  }
+
+  #checkoutStageReceipt #receiptStoreHeader {
+    font-size: 0.85rem;
+  }
+
+  #checkoutStageReceipt #receiptItemsBody > div {
+    gap: 0.5rem;
+    font-size: 0.68rem;
+  }
+}
+
 /* Keep catalog prices and the floating total readable on narrow phone screens. */
 .astro-price-row {
   display: flex;
