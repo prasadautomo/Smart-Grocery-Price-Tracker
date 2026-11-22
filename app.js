@@ -1537,57 +1537,44 @@
         : 'Belum ada riwayat harga bulan lalu';
 
       html += `
-        <div class="neo-ticket-card ticket-perforation-left ${isChecked ? 'is-checked' : 'is-pending'}" data-id="${escapeHtml(item.id)}">
-          <!-- Top Row: Checkbox, Category, Barcode Strip & Quick Actions -->
-          <div class="flex items-center justify-between border-b border-stone-200/80 pb-2">
-            <div class="flex items-center gap-2">
+        <div class="neo-ticket-card cart-item-card ${isChecked ? 'is-checked' : 'is-pending'}" data-id="${escapeHtml(item.id)}">
+          <div class="cart-item-toolbar">
+            <div class="cart-item-toolbar-main">
               <button type="button" class="cart-check-btn ${isChecked ? 'checked' : ''}" aria-pressed="${isChecked}" onclick="window.toggleItemInCart('${item.id}')" title="${isChecked ? 'Barang masuk total dan transaksi' : 'Centang barang yang sudah dibeli'}">
                 <i data-lucide="check"></i>
               </button>
-              <div class="flex items-center gap-1.5">
-                <span class="cat-mono-tag">${escapeHtml(item.category)}</span>
-              </div>
+              <span class="cart-item-category">${escapeHtml(item.category)}</span>
             </div>
-            <div class="flex items-center gap-1.5">
-              ${isChecked ? `
-                <span class="rubber-stamp rubber-stamp-green text-[9px]">DI RAK ✓</span>
-              ` : `
-                <span class="rubber-stamp rubber-stamp-pending text-[9px]">PENDING</span>
-              `}
-              <div class="flex items-center gap-0.5 ml-1">
-                <button class="btn-ico-subtle" onclick="window.editCartItem('${item.id}')" title="Edit">
-                  <i data-lucide="edit-3"></i>
-                </button>
-                <button type="button" class="btn-ico-subtle trash" onclick="window.deleteCartItem('${escapeHtml(item.id)}')" title="Hapus">
-                  <i data-lucide="trash-2"></i>
-                </button>
-              </div>
+            <div class="cart-item-toolbar-actions">
+              <span class="cart-item-status ${isChecked ? 'is-checked' : 'is-pending'}">${isChecked ? 'Sudah dibeli' : 'Belum dibeli'}</span>
+              <button type="button" class="btn-ico-subtle" onclick="window.editCartItem('${item.id}')" title="Edit barang" aria-label="Edit barang">
+                <i data-lucide="edit-3"></i>
+              </button>
+              <button type="button" class="btn-ico-subtle trash" onclick="window.deleteCartItem('${escapeHtml(item.id)}')" title="Hapus barang" aria-label="Hapus barang">
+                <i data-lucide="trash-2"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Middle Row: Title, Spec & Status Rencana -->
-          <div class="flex items-start justify-between gap-2 pt-0.5">
-            <div>
-              <h4 class="card-item-title text-[15px] font-extrabold text-white leading-snug">${escapeHtml(item.name)}</h4>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="font-mono text-[11px] text-white font-semibold">Kemasan: ${escapeHtml(item.unit)}</span>
+          <div class="cart-item-heading">
+            <h4 class="card-item-title">${escapeHtml(item.name)}</h4>
+            <div class="cart-item-specs">
+                <span>Kemasan: ${escapeHtml(item.unit)}</span>
                 ${item.isPlanned !== false ? `
-                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    <i data-lucide="check-circle-2" class="w-2.5 h-2.5"></i>
+                  <span class="cart-item-plan-tag is-planned">
+                    <i data-lucide="check-circle-2"></i>
                     <span>Rencana</span>
                   </span>
                 ` : `
-                  <span class="inline-flex items-center gap-1 font-mono text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 border border-yellow-200" title="Di luar daftar rencana">
-                    <i data-lucide="alert-circle" class="w-2.5 h-2.5"></i>
+                  <span class="cart-item-plan-tag is-impulse" title="Di luar daftar rencana">
+                    <i data-lucide="alert-circle"></i>
                     <span>Impulsif</span>
                   </span>
                 `}
-              </div>
             </div>
           </div>
 
-          <!-- Pricing Flow & Badges Row -->
-          <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-dashed border-stone-200">
+          <div class="cart-item-pricing">
             <span class="unit-rate-mono">
               ${hasDiscount ? `<span class="strike text-stone-400">Rp ${formatNumber(item.price)}</span>` : ''}
               <strong>Rp ${formatNumber(discount.finalUnitPrice)}</strong><span class="text-stone-500">/${escapeHtml(item.unit)}</span>
@@ -1605,9 +1592,8 @@
             ` : ''}
           </div>
 
-          <!-- Bottom Row: Tactile POS Stepper & Chunky Subtotal -->
-          <div class="flex items-center justify-between pt-2 border-t border-[#222638] mt-1">
-            <div class="flex items-center gap-1.5 bg-[#0b0c14] p-1 rounded-xl border border-[#222638] shadow-pos-key">
+          <div class="cart-item-footer">
+            <div class="cart-quantity-control">
               <button type="button" class="w-11 h-11 rounded-lg bg-[#181d30] border border-[#262f4c] text-white font-black flex items-center justify-center hover:bg-[#202742] active:scale-95 cursor-pointer ${item.qty === 1 ? 'text-rose-400' : ''}" onclick="window.changeItemQty('${item.id}', -1)" title="${item.qty === 1 ? 'Hapus Barang' : 'Kurangi'}">
                 <i data-lucide="${item.qty === 1 ? 'trash-2' : 'minus'}"></i>
               </button>
@@ -1617,7 +1603,7 @@
               </button>
             </div>
 
-            <div class="text-right">
+            <div class="cart-item-subtotal">
               <div data-item-subtotal-label class="font-mono text-[9px] ${isChecked ? 'text-stone-500' : 'text-slate-500'} font-bold uppercase tracking-wider">${isChecked ? `Subtotal (${item.qty} ${escapeHtml(item.unit)})` : 'Belum dibeli'}</div>
               <div data-item-subtotal class="font-headline-md text-[18px] font-black ${isChecked ? 'text-emerald-700' : 'text-slate-400 line-through'} tracking-tight">Rp ${formatNumber(lineTotal)}</div>
               ${isChecked ? '' : '<div class="text-[9px] text-slate-500">Tidak masuk total</div>'}
