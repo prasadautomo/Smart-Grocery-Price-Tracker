@@ -3418,6 +3418,14 @@ body {
   font-weight: 900 !important;
 }
 
+#checkoutStageReceipt #receiptPaymentStatus.receipt-unpaid {
+  color: #b45309 !important;
+}
+
+#checkoutStageReceipt #receiptPaymentStatus.receipt-paid {
+  color: #047857 !important;
+}
+
 #checkoutStageReceipt #receiptFooterNote {
   margin: 0.25rem auto 0;
   max-width: 28rem;

@@ -3910,6 +3910,7 @@
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
     document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', () => {
       if (activeQrisPayment) checkQrisPaymentStatus();
+      else if (isQrisPreview) showQrisPreviewReceipt();
       else closeAstroCheckoutModal();
     });
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
@@ -3942,6 +3943,7 @@
     const stageReceipt = document.getElementById('checkoutStageReceipt');
     if (!modal || !stagePayment || !stageReceipt) return;
     checkoutPaymentSubmitted = false;
+    document.getElementById('btnViewHistoryFromReceipt')?.classList.remove('hidden');
     stagePayment.classList.remove('hidden');
     stageReceipt.classList.add('hidden');
     const storeLabel = document.getElementById('checkoutStoreLabel');
@@ -3976,7 +3978,7 @@
     button.disabled = checkoutPaymentSubmitted || qrisStatusPending;
     button.textContent = qrisStatusPending
       ? 'Memeriksa pembayaran...'
-      : activeQrisPayment ? 'Saya sudah membayar' : isQrisPreview ? 'Tutup pratinjau' : 'Tutup';
+      : activeQrisPayment ? 'Saya sudah membayar' : isQrisPreview ? 'Lihat struk pratinjau' : 'Tutup';
   }
 
   async function getQrisRequestHeaders() {
@@ -4055,12 +4057,10 @@
     }
 
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 264">
-        <rect width="264" height="264" fill="#ffffff"/>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 296">
+        <rect width="296" height="296" fill="#ffffff"/>
         ${modules.join('')}
         ${finderRects}
-        <rect x="87" y="116" width="90" height="32" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
-        <text x="132" y="137" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#334155">ILUSTRASI</text>
       </svg>
     `)}`;
   }
@@ -4073,7 +4073,7 @@
     const environmentLabel = document.getElementById('checkoutQrisEnvironment');
     if (image) {
       image.src = buildQrisPreviewImage();
-      image.alt = 'Ilustrasi QRIS, bukan kode pembayaran';
+      image.alt = 'Pratinjau QRIS, bukan kode pembayaran';
       image.classList.remove('hidden');
     }
     if (loading) loading.classList.add('hidden');
@@ -4084,6 +4084,93 @@
       environmentLabel.className = 'ml-auto rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-950';
     }
     setQrisPaymentMessage('Ilustrasi ini tidak dapat dipindai dan tidak memproses pembayaran.', 'preview');
+  }
+
+  function showQrisPreviewReceipt() {
+    if (!isQrisPreview || activeQrisPayment || checkoutPaymentSubmitted) return;
+    const purchasedItems = getPurchasedCartItems();
+    if (purchasedItems.length === 0) {
+      showToast('Tidak ada barang untuk ditampilkan pada struk pratinjau.', 'warning');
+      return;
+    }
+
+    const receiptItems = purchasedItems.map(item => {
+      const disc = calculateDiscount(item.price, item.discountRaw);
+      return {
+        name: item.name,
+        unit: item.unit,
+        qty: item.qty,
+        finalUnitPrice: disc.finalUnitPrice,
+        lineTotal: disc.finalUnitPrice * item.qty
+      };
+    });
+    const total = receiptItems.reduce((sum, item) => sum + item.lineTotal, 0);
+    const nowStr = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) + ' WIB';
+    const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Pelanggan';
+    const storeName = appState.activeStore || 'Belanja Cartly';
+
+    document.getElementById('checkoutStagePayment')?.classList.add('hidden');
+    document.getElementById('checkoutStageReceipt')?.classList.remove('hidden');
+    const title = document.getElementById('receiptStageTitle');
+    if (title) title.textContent = 'Struk Pratinjau';
+    const icon = document.getElementById('receiptStageIcon');
+    if (icon) {
+      icon.textContent = 'receipt_long';
+      icon.classList.remove('text-emerald-400');
+      icon.classList.add('text-amber-400');
+    }
+    const receiptType = document.getElementById('receiptTypeLabel');
+    if (receiptType) receiptType.textContent = 'Struk Belanja Digital Cartly · Pratinjau';
+
+    const elStore = document.getElementById('receiptStoreHeader');
+    const elTrx = document.getElementById('receiptTrxId');
+    const elTime = document.getElementById('receiptTimestamp');
+    const elCust = document.getElementById('receiptCustomerName');
+    const elCashier = document.getElementById('receiptSystemLabel');
+    const elMethod = document.getElementById('receiptPaymentMethodLabel');
+    const elStatus = document.getElementById('receiptPaymentStatus');
+    const elItemsBody = document.getElementById('receiptItemsBody');
+    const elSub = document.getElementById('receiptSubtotal');
+    const elVouch = document.getElementById('receiptVoucherDiscount');
+    const elGrand = document.getElementById('receiptGrandTotal');
+    const elFooter = document.getElementById('receiptFooterNote');
+
+    if (elStore) elStore.textContent = storeName.toUpperCase();
+    if (elTrx) elTrx.textContent = `PRATINJAU-${Date.now()}`;
+    if (elTime) elTime.textContent = nowStr;
+    if (elCust) elCust.textContent = customerName;
+    if (elCashier) elCashier.textContent = `Sistem Mandiri ${storeName}`;
+    if (elMethod) elMethod.textContent = 'QRIS (pratinjau)';
+    if (elStatus) {
+      elStatus.textContent = 'Belum dibayar';
+      elStatus.className = 'font-bold receipt-unpaid';
+    }
+    if (elItemsBody) {
+      elItemsBody.innerHTML = receiptItems.map(item => `
+        <div class="flex justify-between items-start text-[11px] leading-tight py-1 border-b border-[#222638] last:border-b-0">
+          <div class="flex-1 pr-2">
+            <span class="font-bold text-white">${escapeHtml(item.name)}</span>
+            <span class="block text-[10px] text-white/90 font-medium">${item.qty} ${escapeHtml(item.unit || 'unit')} @ Rp ${formatNumber(item.finalUnitPrice)}</span>
+          </div>
+          <strong class="font-mono text-white font-bold shrink-0">Rp ${formatNumber(item.lineTotal)}</strong>
+        </div>
+      `).join('');
+    }
+    if (elSub) elSub.textContent = `Rp ${formatNumber(total)}`;
+    if (elVouch) elVouch.textContent = 'Rp 0';
+    if (elGrand) elGrand.textContent = `Rp ${formatNumber(total)}`;
+    if (elFooter) elFooter.textContent = 'Struk pratinjau ini bukan bukti transaksi. Pembayaran belum dilakukan dan belum dicatat.';
+
+    document.getElementById('btnViewHistoryFromReceipt')?.classList.add('hidden');
+    const doneLabel = document.getElementById('btnDoneCheckoutLabel');
+    if (doneLabel) doneLabel.textContent = 'Kembali ke troli';
   }
 
   function renderQrisPayment(payment, message) {
@@ -4250,7 +4337,23 @@
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
     if (elMethod) elMethod.textContent = receiptLabel;
-    if (elStatus) elStatus.textContent = 'Lunas';
+    if (elStatus) {
+      elStatus.textContent = 'Lunas';
+      elStatus.className = 'font-bold receipt-paid';
+    }
+    const title = document.getElementById('receiptStageTitle');
+    if (title) title.textContent = 'Struk Belanja Siap';
+    const icon = document.getElementById('receiptStageIcon');
+    if (icon) {
+      icon.textContent = 'verified';
+      icon.classList.remove('text-amber-400');
+      icon.classList.add('text-emerald-400');
+    }
+    const receiptType = document.getElementById('receiptTypeLabel');
+    if (receiptType) receiptType.textContent = 'Struk Belanja Digital Cartly';
+    document.getElementById('btnViewHistoryFromReceipt')?.classList.remove('hidden');
+    const doneLabel = document.getElementById('btnDoneCheckoutLabel');
+    if (doneLabel) doneLabel.textContent = 'Mulai Belanja Lagi (Troli Baru)';
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
@@ -4341,7 +4444,8 @@
 
     const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
     const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Belum dibayar';
-    const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (dicatat di Cartly)`;
+    const recordNote = paymentStatus === 'Lunas' ? 'dicatat di Cartly' : 'belum dicatat sebagai transaksi';
+    const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (${recordNote})`;
 
     navigator.clipboard?.writeText(text);
     AudioEngine.playTap();
