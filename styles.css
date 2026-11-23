@@ -3186,6 +3186,10 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
+.modal-price-comparison {
+  display: block;
+  margin-top: 0.45rem;
+}
 .price-comparison.price-trend-up {
   color: #b42318 !important;
 }

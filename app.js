@@ -748,6 +748,29 @@
     };
   }
 
+  function getPreviousTransactionPrice(name) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    if (!normalizedName) return null;
+
+    const observations = appState.history.flatMap(receipt => {
+      const createdAt = receipt.createdAt;
+      const timestamp = Number.isFinite(Number(createdAt)) && Number(createdAt) > 0
+        ? Number(createdAt)
+        : Date.parse(createdAt || '') || Date.parse(receipt.date || '') || 0;
+
+      return (Array.isArray(receipt.items) ? receipt.items : []).map(item => ({
+        name: String(item.name || '').trim().toLocaleLowerCase('id-ID'),
+        price: Number(item.originalPrice ?? item.price ?? item.finalUnitPrice),
+        timestamp,
+        storeName: item.storeName || receipt.storeName || ''
+      }));
+    });
+
+    return observations
+      .filter(item => item.name === normalizedName && Number.isFinite(item.price) && item.price > 0)
+      .sort((a, b) => b.timestamp - a.timestamp)[0] || null;
+  }
+
   function comparePrices(currentPrice, previousPrice) {
     const current = Number(currentPrice);
     const previous = Number(previousPrice);
@@ -1726,6 +1749,7 @@
   const inputItemQty = document.getElementById('inputItemQty');
   const inputItemPrice = document.getElementById('inputItemPrice');
   const inputItemDiscount = document.getElementById('inputItemDiscount');
+  const modalPriceComparison = document.getElementById('modalPriceComparison');
   const autoSuggestContainer = document.getElementById('autoSuggestContainer');
 
   function openItemModal(itemId = null) {
@@ -1780,8 +1804,63 @@
     // 2. Subtotal
     const lineTotal = disc.finalUnitPrice * qty;
     document.getElementById('modalLineTotal').textContent = `Rp ${formatNumber(lineTotal)}`;
+    updateModalPriceComparison(price);
 
     if (window.lucide) lucide.createIcons();
+  }
+
+  function updateModalPriceComparison(currentPrice = Number(inputItemPrice.value)) {
+    if (!modalPriceComparison) return;
+
+    const name = inputItemName.value.trim();
+    if (!name || !Number.isFinite(currentPrice) || currentPrice <= 0) {
+      modalPriceComparison.textContent = '';
+      modalPriceComparison.className = 'price-comparison modal-price-comparison hidden';
+      return;
+    }
+
+    const previousTransaction = getPreviousTransactionPrice(name);
+    const previousMonthItem = appState.cart.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === name.toLocaleLowerCase('id-ID') &&
+      Number(item.lastMonthPrice) > 0
+    );
+    const monthlyComparison = getPriceComparison({
+      name,
+      price: currentPrice,
+      storeName: appState.activeStore,
+      priceDate: getShoppingDate(),
+      lastMonthPrice: previousMonthItem?.lastMonthPrice
+    });
+    const comparison = previousTransaction
+      ? {
+        ...comparePrices(currentPrice, previousTransaction.price),
+        previousPrice: previousTransaction.price,
+        source: 'transaksi terakhir',
+        storeName: previousTransaction.storeName
+      }
+      : monthlyComparison
+        ? { ...monthlyComparison, source: 'bulan lalu' }
+        : null;
+
+    if (!comparison) {
+      modalPriceComparison.textContent = '';
+      modalPriceComparison.className = 'price-comparison modal-price-comparison hidden';
+      return;
+    }
+
+    const amount = formatNumber(Math.abs(comparison.difference));
+    const previousPrice = formatNumber(comparison.previousPrice);
+    const differentStore = comparison.storeName &&
+      String(comparison.storeName).toLocaleLowerCase('id-ID') !== String(appState.activeStore || '').toLocaleLowerCase('id-ID');
+    const storeLabel = differentStore ? ` di ${comparison.storeName}` : '';
+    const message = comparison.direction === 'up'
+      ? `↗ Harga naik Rp ${amount} dari ${comparison.source}${storeLabel} (Rp ${previousPrice})`
+      : comparison.direction === 'down'
+        ? `↘ Harga turun Rp ${amount} dari ${comparison.source}${storeLabel} (Rp ${previousPrice})`
+        : `→ Harga sama dengan ${comparison.source}${storeLabel} (Rp ${previousPrice})`;
+
+    modalPriceComparison.className = `price-comparison modal-price-comparison price-trend-${comparison.direction}`;
+    modalPriceComparison.textContent = message;
   }
 
   // Autocomplete Suggestions
@@ -1813,6 +1892,7 @@
     autoSuggestContainer.innerHTML = html;
     autoSuggestContainer.classList.remove('hidden');
   });
+  inputItemName.addEventListener('input', () => updateModalPriceComparison());
 
   window.selectMasterSuggestion = function (name) {
     const item = appState.masterItems.find(m => m.name === name);
@@ -3717,6 +3797,7 @@
         qty: item.qty,
         originalPrice: item.price,
         finalUnitPrice: disc.finalUnitPrice,
+        storeName: item.storeName || appState.activeStore,
         lineTotal
       };
     });
@@ -3790,6 +3871,7 @@
       id: trxId,
       date: nowStr,
       createdAt: new Date().toISOString(),
+      storeName: appState.activeStore,
       budgetLimit: appState.budgetLimit,
       grandTotal,
       totalSaved: discount,
