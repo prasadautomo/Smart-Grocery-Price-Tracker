@@ -1864,6 +1864,7 @@
       inputItemQty.value = 1;
     }
 
+    applyPlannerProductClassification();
     updateModalLiveCalculations();
     modalItemBackdrop.classList.remove('hidden');
     inputItemName.focus();
@@ -2030,7 +2031,10 @@
   inputItemName.addEventListener('click', () => {
     if (autoSuggestContainer.classList.contains('hidden')) renderMasterSuggestions();
   });
-  inputItemName.addEventListener('input', () => renderMasterSuggestions());
+  inputItemName.addEventListener('input', () => {
+    renderMasterSuggestions();
+    applyPlannerProductClassification();
+  });
   inputItemName.addEventListener('keydown', event => {
     if (event.key === 'ArrowDown' && !autoSuggestContainer.classList.contains('hidden')) {
       const firstOption = autoSuggestContainer.querySelector('[data-master-name]');
@@ -2053,6 +2057,20 @@
     }
   });
   inputItemName.addEventListener('input', () => updateModalPriceComparison());
+
+  function applyPlannerProductClassification() {
+    const name = inputItemName.value.trim();
+    if (!name) return;
+
+    const category = detectPlannerCategory(name);
+    const unit = detectPlannerUnit(name);
+    if ([...selectItemCategory.options].some(option => option.value === category)) {
+      selectItemCategory.value = category;
+    }
+    if ([...selectItemUnit.options].some(option => option.value === unit)) {
+      selectItemUnit.value = unit;
+    }
+  }
 
   window.selectMasterSuggestion = function (name) {
     const item = getMasterSuggestionItem(name);
@@ -4882,14 +4900,14 @@
     const supportedCategories = new Set([
       'Bahan Pokok',
       'Makanan & Minuman',
+      'Makanan Ringan',
       'Kebersihan',
       'Dapur & Bumbu',
+      'Peralatan',
       'Lainnya'
     ]);
-    const normalizedMasterName = appState.masterItems.find(item =>
-      normalizePlannerProductName(item.name) === normalizedName && supportedCategories.has(item.category)
-    );
-    if (normalizedMasterName) return normalizedMasterName.category;
+    const knownItem = getMasterSuggestionItem(name);
+    if (knownItem && supportedCategories.has(knownItem.category)) return knownItem.category;
 
     const tokens = new Set(normalizedName.split(' '));
     const matches = keywords => keywords.some(keyword => {
@@ -4910,8 +4928,17 @@
     ])) return 'Dapur & Bumbu';
 
     if (matches([
-      'mie', 'mi', 'instan', 'biskuit', 'roti', 'camilan', 'snack', 'keripik',
-      'sarden', 'kopi', 'teh', 'minuman', 'jus', 'air mineral', 'sirup', 'cokelat'
+      'camilan', 'snack', 'keripik', 'biskuit', 'wafer', 'kacang', 'popcorn',
+      'permen', 'cokelat', 'kerupuk'
+    ])) return 'Makanan Ringan';
+
+    if (matches([
+      'wajan', 'panci', 'spatula', 'sendok', 'garpu', 'piring', 'gelas', 'pisau',
+      'talenan', 'kompor', 'baterai', 'lampu', 'aluminium foil', 'plastik wrap'
+    ])) return 'Peralatan';
+
+    if (matches([
+      'mie', 'mi', 'instan', 'roti', 'sarden', 'kopi', 'teh', 'minuman', 'jus', 'air mineral', 'sirup'
     ])) return 'Makanan & Minuman';
 
     if (matches([
@@ -4925,10 +4952,8 @@
     const normalizedName = normalizePlannerProductName(name);
     if (!normalizedName) return 'pcs';
 
-    const knownItem = appState.masterItems.find(item =>
-      normalizePlannerProductName(item.name) === normalizedName && String(item.unit || '').trim()
-    );
-    if (knownItem) return knownItem.unit;
+    const knownItem = getMasterSuggestionItem(name);
+    if (knownItem && String(knownItem.unit || '').trim()) return knownItem.unit;
 
     const tokens = new Set(normalizedName.split(' '));
     const has = (...words) => words.some(word => tokens.has(word));
@@ -4960,6 +4985,7 @@
 
     const category = detectPlannerCategory(name);
     if (category === 'Bahan Pokok' || category === 'Dapur & Bumbu') return 'pack';
+    if (category === 'Makanan Ringan') return 'pack';
     if (category === 'Kebersihan') return 'pcs';
     if (category === 'Makanan & Minuman') return 'pcs';
     return 'pcs';
