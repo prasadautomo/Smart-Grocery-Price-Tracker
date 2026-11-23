@@ -62,13 +62,13 @@
     { name: 'Sabun Pembersih Lantai 750ml', category: 'Kebersihan', unit: 'botol', lastPrice: 16000 },
     { name: 'Mie Instan Goreng Spesial', category: 'Makanan & Minuman', unit: 'pcs', lastPrice: 3100 },
     { name: 'Kecap Manis Refill 520ml', category: 'Dapur & Bumbu', unit: 'pouch', lastPrice: 17500 },
-    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan & Minuman', unit: 'kaleng', lastPrice: 32000 },
+    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan Ringan', unit: 'kaleng', lastPrice: 32000 },
     ...[
       ['Beras Putih 1kg', 'Bahan Pokok', 'pack'],
       ['Beras Putih 2,5kg', 'Bahan Pokok', 'pack'],
       ['Beras Premium 5kg', 'Bahan Pokok', 'karung/5kg'],
       ['Beras Pandan Wangi 5kg', 'Bahan Pokok', 'karung/5kg'],
-      ['Minyak Goreng 1L', 'Bahan Pokok', 'pouch'],
+      ['Minyak Goreng 1L', 'Bahan Pokok', 'pack'],
       ['Gula Pasir 1kg', 'Bahan Pokok', 'pack'],
       ['Tepung Terigu 1kg', 'Bahan Pokok', 'pack'],
       ['Tepung Tapioka 500g', 'Bahan Pokok', 'pack'],
@@ -85,7 +85,17 @@
       ['Mie Instan Kuah', 'Makanan & Minuman', 'pcs'],
       ['Mie Telur 200g', 'Makanan & Minuman', 'pack'],
       ['Roti Tawar', 'Makanan & Minuman', 'pack'],
-      ['Biskuit Sandwich', 'Makanan & Minuman', 'pack'],
+      ['Biskuit Sandwich', 'Makanan Ringan', 'pack'],
+      ['Snack Kemasan', 'Makanan Ringan', 'pack'],
+      ['Keripik Kentang 100g', 'Makanan Ringan', 'pack'],
+      ['Keripik Singkong 200g', 'Makanan Ringan', 'pack'],
+      ['Wafer Cokelat 150g', 'Makanan Ringan', 'pack'],
+      ['Kacang Panggang 100g', 'Makanan Ringan', 'pack'],
+      ['Camilan Rasa Keju 100g', 'Makanan Ringan', 'pack'],
+      ['Permen 100g', 'Makanan Ringan', 'pack'],
+      ['Popcorn 100g', 'Makanan Ringan', 'pack'],
+      ['Cokelat Batang 45g', 'Makanan Ringan', 'pack'],
+      ['Kerupuk 200g', 'Makanan Ringan', 'pack'],
       ['Sarden Kaleng 155g', 'Makanan & Minuman', 'kaleng'],
       ['Nugget Ayam 500g', 'Makanan & Minuman', 'pack'],
       ['Sosis Ayam 375g', 'Makanan & Minuman', 'pack'],
@@ -95,7 +105,7 @@
       ['Daging Sapi 500g', 'Bahan Pokok', 'pack'],
       ['Ikan Kembung 1kg', 'Bahan Pokok', 'kg'],
       ['Tahu Putih 10 Buah', 'Bahan Pokok', 'pack'],
-      ['Tempe 400g', 'Bahan Pokok', 'pcs'],
+      ['Tempe 400g', 'Bahan Pokok', 'pack'],
       ['Kentang 1kg', 'Bahan Pokok', 'kg'],
       ['Wortel 1kg', 'Bahan Pokok', 'kg'],
       ['Bawang Merah 500g', 'Bahan Pokok', 'pack'],
@@ -112,15 +122,15 @@
       ['Kecap Asin 150ml', 'Dapur & Bumbu', 'botol'],
       ['Saus Tomat 340ml', 'Dapur & Bumbu', 'botol'],
       ['Saus Sambal 340ml', 'Dapur & Bumbu', 'botol'],
-      ['Sambal Kemasan 200g', 'Dapur & Bumbu', 'botol'],
+      ['Sambal Kemasan 200g', 'Dapur & Bumbu', 'pack'],
       ['Santan Kelapa 200ml', 'Dapur & Bumbu', 'pouch'],
       ['Kaldu Ayam Bubuk 100g', 'Dapur & Bumbu', 'pack'],
       ['Lada Bubuk 50g', 'Dapur & Bumbu', 'pack'],
       ['Bumbu Rendang 50g', 'Dapur & Bumbu', 'sachet'],
       ['Sabun Cuci Piring 750ml', 'Kebersihan', 'botol'],
       ['Deterjen Bubuk 1kg', 'Kebersihan', 'pack'],
-      ['Deterjen Cair 1L', 'Kebersihan', 'pouch'],
-      ['Pelembut Pakaian 900ml', 'Kebersihan', 'pouch'],
+      ['Deterjen Cair 1L', 'Kebersihan', 'botol'],
+      ['Pelembut Pakaian 900ml', 'Kebersihan', 'botol'],
       ['Pemutih Pakaian 1L', 'Kebersihan', 'botol'],
       ['Sabun Mandi Batang', 'Kebersihan', 'pcs'],
       ['Sabun Mandi Cair 450ml', 'Kebersihan', 'botol'],
@@ -1940,10 +1950,26 @@
   }
 
   // Autocomplete Suggestions
+  function getMasterSuggestionItem(name) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    const savedItem = appState.masterItems.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    );
+    const defaultItem = DEFAULT_MASTER_ITEMS.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    );
+    if (!savedItem) return defaultItem || null;
+    return defaultItem
+      ? { ...savedItem, category: defaultItem.category, unit: defaultItem.unit }
+      : savedItem;
+  }
+
   function renderMasterSuggestions(query = inputItemName.value) {
     const normalizedQuery = String(query || '').trim().toLocaleLowerCase('id-ID');
     const seenNames = new Set();
-    const masterOptions = [...appState.masterItems, ...DEFAULT_MASTER_ITEMS];
+    const masterOptions = [...appState.masterItems, ...DEFAULT_MASTER_ITEMS]
+      .map(item => getMasterSuggestionItem(item.name))
+      .filter(Boolean);
     const allMatches = masterOptions.filter(item => {
       const normalizedName = String(item.name || '').trim().toLocaleLowerCase('id-ID');
       if (!normalizedName || seenNames.has(normalizedName) || !normalizedName.includes(normalizedQuery)) return false;
@@ -2002,7 +2028,7 @@
   inputItemName.addEventListener('input', () => updateModalPriceComparison());
 
   window.selectMasterSuggestion = function (name) {
-    const item = appState.masterItems.find(m => m.name === name) || DEFAULT_MASTER_ITEMS.find(m => m.name === name);
+    const item = getMasterSuggestionItem(name);
     if (!item) return;
 
     inputItemName.value = item.name;
