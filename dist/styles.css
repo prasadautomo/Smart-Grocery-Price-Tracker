@@ -4379,3 +4379,62 @@ body {
 #modalAstroCheckout #btnDoneAstroCheckout * {
   color: #16243b !important;
 }
+
+/* Make the bottom navigation easy to read on its white surface. */
+nav.fixed.bottom-0 {
+  border-top-color: #dce5ef !important;
+}
+
+#navBtnBudget:not(.active),
+#navBtnCart:not(.active),
+#navBtnHistory:not(.active),
+#navBtnBudget:not(.active) *,
+#navBtnCart:not(.active) *,
+#navBtnHistory:not(.active) * {
+  color: #526176 !important;
+  opacity: 1 !important;
+}
+
+#navBtnBudget.active,
+#navBtnCart.active,
+#navBtnHistory.active {
+  background: #dff7ed !important;
+  border: 1px solid #b9ead7 !important;
+  color: #16243b !important;
+  box-shadow: none !important;
+}
+
+#navBtnBudget.active *,
+#navBtnCart.active *,
+#navBtnHistory.active * {
+  color: #16243b !important;
+  opacity: 1 !important;
+}
+
+#navBtnBudget > span:last-child,
+#navBtnCart > span:last-child,
+#navBtnHistory > span:last-child {
+  font-size: 0.7rem !important;
+  font-weight: 850 !important;
+  line-height: 1.25;
+}
+
+#navBtnBudget #navPlannerBadge,
+#navBtnCart #navCartBadge {
+  background: #263852 !important;
+  border: 1px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+#navBtnBudget:hover:not(.active),
+#navBtnCart:hover:not(.active),
+#navBtnHistory:hover:not(.active) {
+  background: #f1f5f9 !important;
+}
+
+#navBtnBudget:focus-visible,
+#navBtnCart:focus-visible,
+#navBtnHistory:focus-visible {
+  outline: 2px solid #167653 !important;
+  outline-offset: 2px;
+}
