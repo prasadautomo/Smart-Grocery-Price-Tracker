@@ -68,13 +68,13 @@
       ['Beras Putih 2,5kg', 'Bahan Pokok', 'pack'],
       ['Beras Premium 5kg', 'Bahan Pokok', 'karung/5kg'],
       ['Beras Pandan Wangi 5kg', 'Bahan Pokok', 'karung/5kg'],
-      ['Minyak Goreng 1L', 'Bahan Pokok', 'pack'],
+      ['Minyak Goreng 1L', 'Bahan Pokok', 'pouch'],
       ['Gula Pasir 1kg', 'Bahan Pokok', 'pack'],
       ['Tepung Terigu 1kg', 'Bahan Pokok', 'pack'],
       ['Tepung Tapioka 500g', 'Bahan Pokok', 'pack'],
       ['Tepung Beras 500g', 'Bahan Pokok', 'pack'],
       ['Susu Kental Manis 370g', 'Makanan & Minuman', 'kaleng'],
-      ['Susu UHT Full Cream 1L', 'Makanan & Minuman', 'pack'],
+      ['Susu UHT Full Cream 1L', 'Makanan & Minuman', 'kotak'],
       ['Susu Bubuk 400g', 'Makanan & Minuman', 'pack'],
       ['Air Mineral 600ml', 'Makanan & Minuman', 'botol'],
       ['Air Mineral 1,5L', 'Makanan & Minuman', 'botol'],
@@ -219,7 +219,7 @@
     {
       id: 'astro-indomie-goreng-5',
       name: 'Indomie Goreng Spesial (Pack 5 Pcs)',
-      category: 'Bahan Pokok',
+      category: 'Makanan & Minuman',
       unit: 'Pack 5 pcs',
       price: 15500,
       originalPrice: 16500,
@@ -243,7 +243,7 @@
     {
       id: 'astro-ultra-fullcream-1l',
       name: 'Ultra Milk Full Cream UHT 1000ml',
-      category: 'Bahan Pokok',
+      category: 'Makanan & Minuman',
       unit: 'Kotak 1L',
       price: 21000,
       originalPrice: 22500,
@@ -1951,16 +1951,36 @@
   }
 
   // Autocomplete Suggestions
-  function getCatalogSuggestionUnit(unit) {
-    const normalizedUnit = String(unit || '').trim().toLocaleLowerCase('id-ID');
-    if (normalizedUnit.startsWith('karung')) return 'karung/5kg';
-    if (normalizedUnit.startsWith('pouch')) return 'pouch';
-    if (normalizedUnit.startsWith('pack')) return 'pack';
-    if (normalizedUnit.startsWith('kotak')) return 'kotak';
-    return normalizedUnit || 'pcs';
+  const PRODUCT_UNIT_VALUES = new Set([
+    'karung/5kg', 'karung', 'pcs', 'kg', 'liter', 'pack', 'kotak', 'pouch',
+    'botol', 'kaleng', 'sachet', 'dus', 'galon', 'ikat', 'sisir', 'roll'
+  ]);
+
+  function normalizeProductUnit(unit) {
+    const value = String(unit || '').trim().toLocaleLowerCase('id-ID');
+    if (PRODUCT_UNIT_VALUES.has(value)) return value;
+    if (/^karung\b/.test(value) || /^sak\b/.test(value)) return /5\s*kg\b/.test(value) ? 'karung/5kg' : 'karung';
+    if (/^(?:pack|pak|bungkus|bks)\b/.test(value)) return 'pack';
+    if (/^(?:pouch|refill)\b/.test(value)) return 'pouch';
+    if (/^(?:kotak|tetrapak|tetra pak)\b/.test(value)) return 'kotak';
+    if (/^(?:botol|bottle)\b/.test(value)) return 'botol';
+    if (/^(?:kaleng|can)\b/.test(value)) return 'kaleng';
+    if (/^(?:sachet|saset)\b/.test(value)) return 'sachet';
+    if (/^(?:dus|karton|kardus)\b/.test(value)) return 'dus';
+    if (/^galon\b/.test(value)) return 'galon';
+    if (/^(?:ikat|sisir|roll|gulungan)\b/.test(value)) {
+      if (/^gulungan\b/.test(value)) return 'roll';
+      return value.split(/\s+/)[0];
+    }
+    if (/^(?:pcs|piece|pieces|buah|butir|btr)\b/.test(value)) return 'pcs';
+    return '';
   }
 
-  function getMasterSuggestionItem(name) {
+  function getCatalogSuggestionUnit(unit) {
+    return normalizeProductUnit(unit);
+  }
+
+  function getCuratedProductItem(name) {
     const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
     const catalogItem = ASTRO_OFFICIAL_CATALOG.find(item =>
       String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
@@ -1973,17 +1993,25 @@
         lastPrice: Number(catalogItem.price)
       };
     }
+    return DEFAULT_MASTER_ITEMS.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    ) || null;
+  }
 
+  function getMasterSuggestionItem(name) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    const curatedItem = getCuratedProductItem(normalizedName);
     const savedItem = appState.masterItems.find(item =>
       String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
     );
-    const defaultItem = DEFAULT_MASTER_ITEMS.find(item =>
-      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
-    );
-    if (!savedItem) return defaultItem || null;
-    return defaultItem
-      ? { ...savedItem, category: defaultItem.category, unit: defaultItem.unit }
-      : savedItem;
+    if (!savedItem) return curatedItem;
+    if (!curatedItem) return savedItem;
+    return {
+      ...savedItem,
+      category: curatedItem.category,
+      unit: curatedItem.unit,
+      lastPrice: Number(savedItem.lastPrice) > 0 ? savedItem.lastPrice : curatedItem.lastPrice
+    };
   }
 
   function renderMasterSuggestions(query = inputItemName.value) {
@@ -1998,7 +2026,12 @@
     const masterOptions = [...catalogOptions, ...appState.masterItems, ...DEFAULT_MASTER_ITEMS]
       .map(item => getMasterSuggestionItem(item.name))
       .filter(Boolean);
-    const allMatches = masterOptions.filter(item => {
+    const classifiedOptions = masterOptions.map(item => ({
+      ...item,
+      category: detectPlannerCategory(item.name),
+      unit: detectPlannerUnit(item.name)
+    }));
+    const allMatches = classifiedOptions.filter(item => {
       const normalizedName = String(item.name || '').trim().toLocaleLowerCase('id-ID');
       if (!normalizedName || seenNames.has(normalizedName) || !normalizedName.includes(normalizedQuery)) return false;
       seenNames.add(normalizedName);
@@ -2014,7 +2047,7 @@
       <button type="button" class="auto-row-neo" data-master-name="${escapeHtml(item.name)}">
         <span>
           <strong>${escapeHtml(item.name)}</strong>
-          <small>${escapeHtml(item.category)} • ${escapeHtml(item.unit)}</small>
+          <small>${escapeHtml(item.category)} • ${escapeHtml(item.unit || 'pilih satuan')}</small>
         </span>
         <small class="auto-row-price">${Number(item.lastPrice) > 0 ? `Rp ${formatNumber(item.lastPrice)}` : 'Isi harga'}</small>
       </button>
@@ -2067,9 +2100,7 @@
     if ([...selectItemCategory.options].some(option => option.value === category)) {
       selectItemCategory.value = category;
     }
-    if ([...selectItemUnit.options].some(option => option.value === unit)) {
-      selectItemUnit.value = unit;
-    }
+    selectItemUnit.value = normalizeProductUnit(unit);
   }
 
   window.selectMasterSuggestion = function (name) {
@@ -2077,8 +2108,7 @@
     if (!item) return;
 
     inputItemName.value = item.name;
-    selectItemCategory.value = item.category;
-    selectItemUnit.value = item.unit;
+    applyPlannerProductClassification();
     inputItemPrice.value = Number(item.lastPrice) > 0 ? item.lastPrice : '';
     autoSuggestContainer.classList.add('hidden');
     inputItemName.focus({ preventScroll: true });
@@ -2563,6 +2593,7 @@
       plannerNameInput.addEventListener('input', updatePlannerCategoryPreview);
       updatePlannerCategoryPreview();
     }
+    document.getElementById('plannerManualUnit')?.addEventListener('change', updatePlannerCategoryPreview);
 
     const formShelf = document.getElementById('formShelfPriceModal');
     if (formShelf) formShelf.addEventListener('submit', applyShelfPriceModalSubmit);
@@ -4689,6 +4720,7 @@
   // SHOPPING PLANNER MODULE (MENCATAT SEBELUM KE SUPERMARKET)
   // ==========================================================================
   let currentShelfModalPlannerItem = null;
+  let lastPlannerUnitName = '';
 
   function renderShoppingPlannerSection() {
     // 1. Render di Tab 1 (Troli: #plannerPendingItemsList)
@@ -4857,10 +4889,18 @@
 
     const name = nameInput.value.trim();
     const category = detectPlannerCategory(name);
-    const unit = detectPlannerUnit(name);
+    const inferredUnit = detectPlannerUnit(name);
+    const manualUnit = document.getElementById('plannerManualUnit')?.value || '';
+    const unit = inferredUnit || manualUnit;
     const qty = parseInt(qtyInput.value, 10) || 1;
 
     if (!name) return;
+    if (!unit) {
+      showToast('Satuan belum bisa ditentukan dari nama. Tambahkan ukuran/kemasan atau pilih satuan.', 'warning');
+      document.getElementById('plannerManualUnitWrap')?.classList.remove('hidden');
+      document.getElementById('plannerManualUnit')?.focus();
+      return;
+    }
 
     const newPlan = {
       id: 'plan-' + Date.now(),
@@ -4878,6 +4918,7 @@
 
     nameInput.value = '';
     qtyInput.value = '1';
+    if (document.getElementById('plannerManualUnit')) document.getElementById('plannerManualUnit').value = '';
     updatePlannerCategoryPreview();
 
     AudioEngine.playTap();
@@ -4906,8 +4947,12 @@
       'Peralatan',
       'Lainnya'
     ]);
-    const knownItem = getMasterSuggestionItem(name);
-    if (knownItem && supportedCategories.has(knownItem.category)) return knownItem.category;
+    const curatedItem = getCuratedProductItem(name);
+    if (curatedItem && supportedCategories.has(curatedItem.category)) return curatedItem.category;
+    const savedItem = appState.masterItems.find(item =>
+      normalizePlannerProductName(item.name) === normalizedName
+    );
+    const savedCategory = supportedCategories.has(savedItem?.category) ? savedItem.category : '';
 
     const tokens = new Set(normalizedName.split(' '));
     const matches = keywords => keywords.some(keyword => {
@@ -4923,12 +4968,13 @@
     ])) return 'Kebersihan';
 
     if (matches([
-      'garam', 'kecap', 'saus', 'sambal', 'bumbu', 'merica', 'lada', 'ketumbar',
-      'kaldu', 'penyedap', 'bawang', 'cabai', 'cabe', 'jahe', 'kunyit', 'lengkuas', 'serai'
+      'garam', 'kecap', 'saus', 'sambal', 'santan', 'bumbu', 'merica', 'lada', 'ketumbar',
+      'kaldu', 'penyedap', 'lengkuas', 'serai', 'cokelat bubuk'
     ])) return 'Dapur & Bumbu';
 
+    if (matches(['kacang']) && matches(['panggang', 'goreng', 'asin', 'oven', 'snack', 'camilan'])) return 'Makanan Ringan';
     if (matches([
-      'camilan', 'snack', 'keripik', 'biskuit', 'wafer', 'kacang', 'popcorn',
+      'camilan', 'snack', 'keripik', 'biskuit', 'wafer', 'popcorn',
       'permen', 'cokelat', 'kerupuk'
     ])) return 'Makanan Ringan';
 
@@ -4938,65 +4984,137 @@
     ])) return 'Peralatan';
 
     if (matches([
-      'mie', 'mi', 'instan', 'roti', 'sarden', 'kopi', 'teh', 'minuman', 'jus', 'air mineral', 'sirup'
+      'mie', 'mi', 'instan', 'roti', 'sarden', 'kopi', 'teh', 'minuman', 'jus', 'air', 'sirup', 'susu'
     ])) return 'Makanan & Minuman';
 
     if (matches([
-      'beras', 'telur', 'minyak', 'tepung', 'terigu', 'gula', 'susu', 'margarin', 'mentega'
+      'beras', 'telur', 'minyak', 'tepung', 'terigu', 'gula', 'margarin', 'mentega',
+      'ayam', 'daging', 'ikan', 'kentang', 'wortel', 'tomat', 'bayam', 'pisang',
+      'apel', 'jeruk', 'sayur', 'buah', 'bawang', 'cabai', 'cabe', 'jahe', 'kunyit',
+      'kacang hijau', 'kacang merah', 'kacang tanah'
     ])) return 'Bahan Pokok';
 
-    return 'Lainnya';
+    return savedCategory || 'Lainnya';
+  }
+
+  function parsePlannerMeasurement(name) {
+    const match = String(name || '').match(/(?:^|[^\d])(\d+(?:[.,]\d+)?)\s*(kilograms?|kg|grams?|gr|g|milliliters?|ml|cc|liters?|litres?|ltr|l)\b/i);
+    if (!match) return null;
+
+    const rawAmount = match[1];
+    const rawUnit = match[2].toLocaleLowerCase('id-ID');
+    const isFractionalMajorUnit = /^0[.,][0-9]{3}$/.test(rawAmount) && /^(?:kg|kilogram|l|ltr|liter|litre)/.test(rawUnit);
+    const amount = /^[0-9]{1,3}[.,][0-9]{3}$/.test(rawAmount) && !isFractionalMajorUnit
+      ? Number(rawAmount.replace(/[.,]/g, ''))
+      : Number(rawAmount.replace(',', '.'));
+    if (!Number.isFinite(amount) || amount <= 0) return null;
+
+    if (/^(?:kg|kilogram)/.test(rawUnit)) return { dimension: 'mass', baseAmount: amount * 1000, baseUnit: 'g' };
+    if (/^(?:g|gr|gram)/.test(rawUnit)) return { dimension: 'mass', baseAmount: amount, baseUnit: 'g' };
+    if (/^(?:l|ltr|liter|litre)/.test(rawUnit)) return { dimension: 'volume', baseAmount: amount * 1000, baseUnit: 'ml' };
+    return { dimension: 'volume', baseAmount: amount, baseUnit: 'ml' };
   }
 
   function detectPlannerUnit(name) {
     const normalizedName = normalizePlannerProductName(name);
-    if (!normalizedName) return 'pcs';
+    if (!normalizedName) return '';
 
-    const knownItem = getMasterSuggestionItem(name);
-    if (knownItem && String(knownItem.unit || '').trim()) return knownItem.unit;
+    const curatedUnit = normalizeProductUnit(getCuratedProductItem(name)?.unit);
+    if (curatedUnit) return curatedUnit;
+    const savedProduct = appState.masterItems.find(item =>
+      normalizePlannerProductName(item.name) === normalizedName
+    );
+    const savedUnit = normalizeProductUnit(savedProduct?.unit);
 
+    const sourceName = String(name || '').toLocaleLowerCase('id-ID');
     const tokens = new Set(normalizedName.split(' '));
     const has = (...words) => words.some(word => tokens.has(word));
-
-    if (has('karung', 'sak')) return 'karung';
-    if (has('pouch', 'refill')) return 'pouch';
-    if (has('botol', 'bottle')) return 'botol';
-    if (has('kaleng')) return 'kaleng';
-    if (has('sachet')) return 'sachet';
-    if (has('dus', 'karton', 'kardus')) return 'dus';
-    if (has('pack', 'pak', 'bungkus', 'bks')) return 'pack';
-    if (has('pcs', 'buah', 'butir', 'btr')) return 'pcs';
-    if (has('kg', 'kilogram')) return tokens.has('beras') ? 'pack' : 'kg';
-    if (has('gram', 'gr', 'g')) return tokens.has('beras') ? 'pack' : 'pack';
-
-    if (tokens.has('susu') && /\b\d+(?:[.,]\d+)?\s*(?:ml|milliliter|l|liter)\b/.test(normalizedName)) {
-      return 'kotak';
-    }
-    if (/\b\d+(?:[.,]\d+)?\s*(?:ml|milliliter)\b/.test(normalizedName)) {
-      return tokens.has('minyak') ? 'pouch' : 'botol';
-    }
-    if (/\b\d+(?:[.,]\d+)?\s*(?:l|liter)\b/.test(normalizedName)) {
-      return tokens.has('minyak') ? 'pouch' : 'botol';
-    }
-    if (tokens.has('telur')) return 'kg';
-    if (tokens.has('beras') || tokens.has('gula') || tokens.has('tepung')) return 'pack';
-    if (tokens.has('mie') || tokens.has('mi') || tokens.has('roti')) return 'pcs';
-    if (tokens.has('air') || tokens.has('sampo') || tokens.has('shampoo')) return 'botol';
-
+    const hasPhrase = (...phrases) => phrases.some(phrase => {
+      const normalizedPhrase = normalizePlannerProductName(phrase);
+      return ` ${normalizedName} `.includes(` ${normalizedPhrase} `);
+    });
+    const measurement = parsePlannerMeasurement(name);
     const category = detectPlannerCategory(name);
-    if (category === 'Bahan Pokok' || category === 'Dapur & Bumbu') return 'pack';
+
+    // Kemasan yang tertulis eksplisit selalu menang atas perkiraan dari ukuran.
+    const explicitPackages = [
+      [/\b(?:karung|sak)\b/i, measurement?.baseAmount === 5000 ? 'karung/5kg' : 'karung'],
+      [/\b(?:dus|karton|kardus|ctn)\b/i, 'dus'],
+      [/\b(?:pack|pak|bungkus|bks|kemasan)\b/i, 'pack'],
+      [/\bgalon\b/i, 'galon'],
+      [/\b(?:pouch|refill)\b/i, 'pouch'],
+      [/\b(?:botol|bottle|btl)\b/i, 'botol'],
+      [/\bkaleng\b/i, 'kaleng'],
+      [/\b(?:sachet|saset)\b/i, 'sachet'],
+      [/\b(?:kotak|tetrapak|tetra pak|uht)\b/i, 'kotak'],
+      [/\b(?:roll|gulungan)\b/i, 'roll'],
+      [/\bikat\b/i, 'ikat'],
+      [/\bsisir\b/i, 'sisir']
+    ];
+    for (const [pattern, unit] of explicitPackages) {
+      if (pattern.test(sourceName)) return unit;
+    }
+
+    const countMatch = sourceName.match(/\b(\d+(?:[.,]\d+)?)\s*(pcs|pieces|buah|butir|btr)\b/i);
+    if (countMatch && has('telur', 'tahu', 'baterai') && Number(countMatch[1].replace(',', '.')) > 1) return 'pack';
+    if (/\b(?:pcs|pieces|buah|butir|btr)\b/i.test(sourceName)) {
+      return category === 'Makanan Ringan' ? 'pack' : 'pcs';
+    }
+    if (/\b(?:lembar|kantong)\b/i.test(sourceName)) return has('teh') ? 'dus' : 'pack';
+
+    if (measurement?.dimension === 'volume') {
+      if (has('air', 'mineral', 'water')) return measurement.baseAmount >= 10000 ? 'galon' : 'botol';
+      if (has('minyak', 'santan')) return 'pouch';
+      if (has('susu') && (has('uht') || measurement.baseAmount >= 1000)) return 'kotak';
+      if (has('susu') || category === 'Kebersihan' || category === 'Dapur & Bumbu' || category === 'Makanan & Minuman') return 'botol';
+      return savedUnit;
+    }
+
+    if (measurement?.dimension === 'mass') {
+      if (category === 'Makanan Ringan') return 'pack';
+      if (category === 'Bahan Pokok' && has('ayam', 'daging', 'ikan', 'telur', 'kentang', 'wortel', 'tomat', 'bayam', 'pisang', 'apel', 'jeruk', 'sayur', 'buah', 'bawang', 'cabai', 'cabe', 'jahe', 'kunyit')) {
+        return measurement.baseAmount >= 1000 ? 'kg' : 'pack';
+      }
+      if (category === 'Bahan Pokok' || category === 'Makanan & Minuman' || category === 'Dapur & Bumbu') return 'pack';
+      if (category === 'Kebersihan') {
+        if (hasPhrase('pasta gigi', 'sikat gigi', 'sabun mandi') || (has('sabun') && !has('cuci'))) return 'pcs';
+        return 'pack';
+      }
+      if (category === 'Peralatan') return 'pcs';
+      return savedUnit;
+    }
+
     if (category === 'Makanan Ringan') return 'pack';
-    if (category === 'Kebersihan') return 'pcs';
-    if (category === 'Makanan & Minuman') return 'pcs';
-    return 'pcs';
+    if (category === 'Peralatan') return 'pcs';
+    if (has('mie', 'mi')) return 'pcs';
+    if (hasPhrase('roti tawar', 'tisu wajah', 'tisu toilet', 'deterjen bubuk')) return 'pack';
+    if (has('air', 'sampo', 'shampoo')) return 'botol';
+    if (hasPhrase('pasta gigi', 'sikat gigi', 'sabun mandi')) return 'pcs';
+    if (has('deterjen', 'detergen') && !has('cair')) return 'pack';
+    if (has('sabun') && has('cair')) return 'botol';
+    return savedUnit;
   }
 
   function updatePlannerCategoryPreview() {
     const name = document.getElementById('inputPlannerName')?.value || '';
+    const trimmedName = name.trim();
+    const normalizedName = normalizePlannerProductName(trimmedName);
     const categoryLabel = document.getElementById('plannerDetectedCategory');
     const unitLabel = document.getElementById('plannerDetectedUnit');
-    if (categoryLabel) categoryLabel.textContent = name.trim() ? detectPlannerCategory(name) : 'Ketik nama barang';
-    if (unitLabel) unitLabel.textContent = name.trim() ? detectPlannerUnit(name) : 'Ketik nama barang';
+    const manualUnitWrap = document.getElementById('plannerManualUnitWrap');
+    const manualUnit = document.getElementById('plannerManualUnit');
+    if (normalizedName !== lastPlannerUnitName) {
+      if (manualUnit) manualUnit.value = '';
+      lastPlannerUnitName = normalizedName;
+    }
+
+    const detectedUnit = trimmedName ? detectPlannerUnit(trimmedName) : '';
+    if (categoryLabel) categoryLabel.textContent = trimmedName ? detectPlannerCategory(trimmedName) : 'Ketik nama barang';
+    if (unitLabel) unitLabel.textContent = !trimmedName
+      ? 'Ketik nama barang'
+      : detectedUnit || manualUnit?.value || 'Belum cukup informasi kemasan';
+    manualUnitWrap?.classList.toggle('hidden', !trimmedName || !!detectedUnit);
+    if (detectedUnit && manualUnit) manualUnit.value = '';
   }
 
   window.deletePlannerItem = function (id) {

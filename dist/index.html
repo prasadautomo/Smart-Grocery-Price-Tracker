@@ -514,6 +514,29 @@
             <strong id="plannerDetectedUnit">Ketik nama barang</strong>
           </div>
 
+          <div id="plannerManualUnitWrap" class="hidden">
+            <label for="plannerManualUnit" class="font-label-sm text-[11px] text-on-surface-variant font-bold block mb-1">PILIH SATUAN</label>
+            <select id="plannerManualUnit" class="w-full px-3 py-2 rounded-xl bg-white text-on-surface font-body-sm border border-outline-variant/30">
+              <option value="">Pilih kemasan atau satuan</option>
+              <option value="karung/5kg">karung/5kg</option>
+              <option value="karung">karung</option>
+              <option value="pcs">pcs (buah)</option>
+              <option value="kg">kg (kilogram)</option>
+              <option value="liter">liter</option>
+              <option value="pack">pack</option>
+              <option value="kotak">kotak</option>
+              <option value="pouch">pouch</option>
+              <option value="botol">botol</option>
+              <option value="kaleng">kaleng</option>
+              <option value="sachet">sachet</option>
+              <option value="dus">dus</option>
+              <option value="galon">galon</option>
+              <option value="ikat">ikat</option>
+              <option value="sisir">sisir</option>
+              <option value="roll">roll</option>
+            </select>
+          </div>
+
           <div class="flex items-center gap-3">
             <div class="w-32">
               <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">JUMLAH
@@ -740,7 +763,7 @@
           <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">NAMA PRODUK</label>
           <input type="text" id="inputItemName" placeholder="Pilih atau ketik nama produk" required autocomplete="off"
             class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary">
-          <small class="block mt-1 text-[11px] text-on-surface-variant">Kategori dan satuan otomatis mengikuti aturan Rencana. Pilih saran produk atau ketik nama sendiri.</small>
+          <small class="block mt-1 text-[11px] text-on-surface-variant">Kategori dan satuan memakai aturan Rencana. Jika kemasan belum bisa dipastikan dari nama/ukuran, pilih satuan secara manual.</small>
           <div
             class="neo-autocomplete-dropdown hidden mt-1 bg-white rounded-xl shadow-lg border border-outline-variant/30 max-h-40 overflow-y-auto"
             id="autoSuggestContainer"></div>
@@ -751,6 +774,7 @@
             <label class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KATEGORI</label>
             <select id="selectItemCategory" required
               class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary">
+              <option value="" disabled selected>Pilih kategori</option>
               <option value="Bahan Pokok">Bahan Pokok</option>
               <option value="Makanan & Minuman">Makanan & Minuman</option>
               <option value="Makanan Ringan">Makanan Ringan</option>
@@ -765,6 +789,7 @@
               class="font-label-sm text-label-sm text-on-surface-variant font-bold block mb-1">KEMASAN/SATUAN</label>
             <select id="selectItemUnit" required
               class="w-full px-3 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-secondary">
+              <option value="" disabled selected>Satuan belum dikenali — pilih</option>
               <option value="karung/5kg">karung/5kg</option>
               <option value="karung">karung</option>
               <option value="pcs">pcs (buah)</option>
