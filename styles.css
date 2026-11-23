@@ -3426,6 +3426,10 @@ body {
   color: #047857 !important;
 }
 
+#checkoutStageReceipt #receiptPaymentStatus.receipt-simulated {
+  color: #92400e !important;
+}
+
 #checkoutStageReceipt #receiptFooterNote {
   margin: 0.25rem auto 0;
   max-width: 28rem;
@@ -4049,6 +4053,15 @@ body {
 #modalAstroCheckout #checkoutDigitalPanel p,
 #modalAstroCheckout #checkoutDigitalPanel label,
 #modalAstroCheckout #checkoutDigitalPanel label * {
+  color: #713f12 !important;
+}
+
+#modalAstroCheckout #checkoutDigitalPanel .checkout-qris-total,
+#modalAstroCheckout #checkoutDigitalPanel .checkout-qris-total * {
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutDigitalPanel #checkoutPaymentMessage {
   color: #713f12 !important;
 }
 

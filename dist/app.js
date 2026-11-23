@@ -3910,7 +3910,7 @@
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
     document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', () => {
       if (activeQrisPayment) checkQrisPaymentStatus();
-      else if (isQrisPreview) showQrisPreviewReceipt();
+      else if (isQrisPreview) completeQrisPreviewCheckout();
       else closeAstroCheckoutModal();
     });
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
@@ -3978,7 +3978,7 @@
     button.disabled = checkoutPaymentSubmitted || qrisStatusPending;
     button.textContent = qrisStatusPending
       ? 'Memeriksa pembayaran...'
-      : activeQrisPayment ? 'Saya sudah membayar' : isQrisPreview ? 'Lihat struk pratinjau' : 'Tutup';
+      : activeQrisPayment ? 'Saya sudah membayar' : isQrisPreview ? 'Bayar simulasi & simpan struk' : 'Tutup';
   }
 
   async function getQrisRequestHeaders() {
@@ -4083,10 +4083,10 @@
       environmentLabel.textContent = 'PRATINJAU';
       environmentLabel.className = 'ml-auto rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-950';
     }
-    setQrisPaymentMessage('Ilustrasi ini tidak dapat dipindai dan tidak memproses pembayaran.', 'preview');
+    setQrisPaymentMessage('QRIS pratinjau tidak diproses. Tombol di bawah langsung menyimpan struk simulasi.', 'preview');
   }
 
-  function showQrisPreviewReceipt() {
+  function completeQrisPreviewCheckout() {
     if (!isQrisPreview || activeQrisPayment || checkoutPaymentSubmitted) return;
     const purchasedItems = getPurchasedCartItems();
     if (purchasedItems.length === 0) {
@@ -4098,9 +4098,12 @@
       const disc = calculateDiscount(item.price, item.discountRaw);
       return {
         name: item.name,
+        category: item.category,
         unit: item.unit,
         qty: item.qty,
+        originalPrice: item.price,
         finalUnitPrice: disc.finalUnitPrice,
+        storeName: item.storeName || appState.activeStore,
         lineTotal: disc.finalUnitPrice * item.qty
       };
     });
@@ -4115,11 +4118,19 @@
     }) + ' WIB';
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Pelanggan';
     const storeName = appState.activeStore || 'Belanja Cartly';
+    const transactionId = `SIM-${Date.now()}`;
+
+    receiptItems.forEach(item => {
+      updateMasterDatabaseItem(item.name, item.category, item.unit, item.originalPrice);
+    });
+    checkoutPaymentSubmitted = true;
+    clearTimeout(qrisPollingTimer);
+    updateCheckoutPaymentButton();
 
     document.getElementById('checkoutStagePayment')?.classList.add('hidden');
     document.getElementById('checkoutStageReceipt')?.classList.remove('hidden');
     const title = document.getElementById('receiptStageTitle');
-    if (title) title.textContent = 'Struk Pratinjau';
+    if (title) title.textContent = 'Struk Simulasi Tersimpan';
     const icon = document.getElementById('receiptStageIcon');
     if (icon) {
       icon.textContent = 'receipt_long';
@@ -4127,7 +4138,7 @@
       icon.classList.add('text-amber-400');
     }
     const receiptType = document.getElementById('receiptTypeLabel');
-    if (receiptType) receiptType.textContent = 'Struk Belanja Digital Cartly · Pratinjau';
+    if (receiptType) receiptType.textContent = 'Struk Belanja Digital Cartly · Simulasi';
 
     const elStore = document.getElementById('receiptStoreHeader');
     const elTrx = document.getElementById('receiptTrxId');
@@ -4143,14 +4154,14 @@
     const elFooter = document.getElementById('receiptFooterNote');
 
     if (elStore) elStore.textContent = storeName.toUpperCase();
-    if (elTrx) elTrx.textContent = `PRATINJAU-${Date.now()}`;
+    if (elTrx) elTrx.textContent = transactionId;
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
     if (elCashier) elCashier.textContent = `Sistem Mandiri ${storeName}`;
-    if (elMethod) elMethod.textContent = 'QRIS (pratinjau)';
+    if (elMethod) elMethod.textContent = 'Pembayaran simulasi (QRIS pratinjau)';
     if (elStatus) {
-      elStatus.textContent = 'Belum dibayar';
-      elStatus.className = 'font-bold receipt-unpaid';
+      elStatus.textContent = 'Simulasi selesai';
+      elStatus.className = 'font-bold receipt-simulated';
     }
     if (elItemsBody) {
       elItemsBody.innerHTML = receiptItems.map(item => `
@@ -4166,11 +4177,61 @@
     if (elSub) elSub.textContent = `Rp ${formatNumber(total)}`;
     if (elVouch) elVouch.textContent = 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(total)}`;
-    if (elFooter) elFooter.textContent = 'Struk pratinjau ini bukan bukti transaksi. Pembayaran belum dilakukan dan belum dicatat.';
+    if (elFooter) elFooter.textContent = 'Struk sudah disimpan sebagai transaksi simulasi. QRIS pratinjau ini tidak memproses pembayaran asli.';
 
-    document.getElementById('btnViewHistoryFromReceipt')?.classList.add('hidden');
+    const newReceipt = {
+      id: transactionId,
+      date: nowStr,
+      createdAt: new Date().toISOString(),
+      storeName: appState.activeStore,
+      budgetLimit: appState.budgetLimit,
+      grandTotal: total,
+      totalSaved: 0,
+      itemCount: receiptItems.length,
+      items: receiptItems,
+      paymentMethod: 'QRIS (Simulasi)',
+      paymentStatus: 'simulated'
+    };
+    appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
+    saveHistory();
+    renderHistoryList();
+
+    const purchasedIds = new Set(purchasedItems.map(item => String(item.id)));
+    appState.cart = appState.cart.filter(item => !purchasedIds.has(String(item.id)));
+    clearPendingQrisPayment();
+    activeQrisPayment = null;
+    saveCart();
+    saveMaster();
+    renderCart();
+    renderAstroCatalog();
+
+    if (appState.supabaseClient && appState.currentUser?.id) {
+      appState.supabaseClient.from('receipts').upsert({
+        id: newReceipt.id,
+        owner_id: appState.currentUser.id,
+        date_label: newReceipt.date,
+        budget_limit: newReceipt.budgetLimit,
+        grand_total: newReceipt.grandTotal,
+        total_saved: newReceipt.totalSaved,
+        item_count: newReceipt.itemCount,
+        items: newReceipt.items,
+        payment_method: newReceipt.paymentMethod,
+        created_at: newReceipt.createdAt
+      }, { onConflict: 'owner_id,id' }).then(({ error }) => {
+        if (error) {
+          console.error('Receipt sync failed:', error);
+          showToast('Struk tersimpan di perangkat, tetapi sinkronisasi cloud gagal.', 'warning');
+        }
+      }).catch(error => {
+        console.error('Receipt sync failed:', error);
+        showToast('Struk tersimpan di perangkat, tetapi koneksi cloud gagal.', 'warning');
+      });
+    }
+
+    document.getElementById('btnViewHistoryFromReceipt')?.classList.remove('hidden');
     const doneLabel = document.getElementById('btnDoneCheckoutLabel');
-    if (doneLabel) doneLabel.textContent = 'Kembali ke troli';
+    if (doneLabel) doneLabel.textContent = 'Mulai Belanja Lagi (Troli Baru)';
+    showToast('Struk simulasi berhasil disimpan ke riwayat.', 'success');
   }
 
   function renderQrisPayment(payment, message) {
@@ -4444,7 +4505,11 @@
 
     const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
     const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Belum dibayar';
-    const recordNote = paymentStatus === 'Lunas' ? 'dicatat di Cartly' : 'belum dicatat sebagai transaksi';
+    const recordNote = paymentStatus === 'Lunas'
+      ? 'dicatat sebagai pembayaran terkonfirmasi'
+      : paymentStatus === 'Simulasi selesai'
+        ? 'disimpan sebagai transaksi simulasi'
+        : 'belum dicatat sebagai transaksi';
     const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (${recordNote})`;
 
     navigator.clipboard?.writeText(text);
