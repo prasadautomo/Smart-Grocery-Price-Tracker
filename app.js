@@ -62,7 +62,83 @@
     { name: 'Sabun Pembersih Lantai 750ml', category: 'Kebersihan', unit: 'botol', lastPrice: 16000 },
     { name: 'Mie Instan Goreng Spesial', category: 'Makanan & Minuman', unit: 'pcs', lastPrice: 3100 },
     { name: 'Kecap Manis Refill 520ml', category: 'Dapur & Bumbu', unit: 'pouch', lastPrice: 17500 },
-    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan & Minuman', unit: 'kaleng', lastPrice: 32000 }
+    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan & Minuman', unit: 'kaleng', lastPrice: 32000 },
+    ...[
+      ['Beras Putih 1kg', 'Bahan Pokok', 'pack'],
+      ['Beras Putih 2,5kg', 'Bahan Pokok', 'pack'],
+      ['Beras Premium 5kg', 'Bahan Pokok', 'karung/5kg'],
+      ['Beras Pandan Wangi 5kg', 'Bahan Pokok', 'karung/5kg'],
+      ['Minyak Goreng 1L', 'Bahan Pokok', 'pouch'],
+      ['Gula Pasir 1kg', 'Bahan Pokok', 'pack'],
+      ['Tepung Terigu 1kg', 'Bahan Pokok', 'pack'],
+      ['Tepung Tapioka 500g', 'Bahan Pokok', 'pack'],
+      ['Tepung Beras 500g', 'Bahan Pokok', 'pack'],
+      ['Susu Kental Manis 370g', 'Makanan & Minuman', 'kaleng'],
+      ['Susu UHT Full Cream 1L', 'Makanan & Minuman', 'pack'],
+      ['Susu Bubuk 400g', 'Makanan & Minuman', 'pack'],
+      ['Air Mineral 600ml', 'Makanan & Minuman', 'botol'],
+      ['Air Mineral 1,5L', 'Makanan & Minuman', 'botol'],
+      ['Air Galon 19L', 'Makanan & Minuman', 'galon'],
+      ['Teh Celup 25 Kantong', 'Makanan & Minuman', 'dus'],
+      ['Kopi Bubuk 200g', 'Makanan & Minuman', 'pack'],
+      ['Kopi Instan Sachet', 'Makanan & Minuman', 'sachet'],
+      ['Mie Instan Kuah', 'Makanan & Minuman', 'pcs'],
+      ['Mie Telur 200g', 'Makanan & Minuman', 'pack'],
+      ['Roti Tawar', 'Makanan & Minuman', 'pack'],
+      ['Biskuit Sandwich', 'Makanan & Minuman', 'pack'],
+      ['Sarden Kaleng 155g', 'Makanan & Minuman', 'kaleng'],
+      ['Nugget Ayam 500g', 'Makanan & Minuman', 'pack'],
+      ['Sosis Ayam 375g', 'Makanan & Minuman', 'pack'],
+      ['Telur Ayam Kampung 10 Butir', 'Bahan Pokok', 'pack'],
+      ['Daging Ayam Potong 1kg', 'Bahan Pokok', 'kg'],
+      ['Dada Ayam Fillet 500g', 'Bahan Pokok', 'pack'],
+      ['Daging Sapi 500g', 'Bahan Pokok', 'pack'],
+      ['Ikan Kembung 1kg', 'Bahan Pokok', 'kg'],
+      ['Tahu Putih 10 Buah', 'Bahan Pokok', 'pack'],
+      ['Tempe 400g', 'Bahan Pokok', 'pcs'],
+      ['Kentang 1kg', 'Bahan Pokok', 'kg'],
+      ['Wortel 1kg', 'Bahan Pokok', 'kg'],
+      ['Bawang Merah 500g', 'Bahan Pokok', 'pack'],
+      ['Bawang Putih 500g', 'Bahan Pokok', 'pack'],
+      ['Cabai Merah 250g', 'Bahan Pokok', 'pack'],
+      ['Tomat 500g', 'Bahan Pokok', 'pack'],
+      ['Bayam 1 Ikat', 'Bahan Pokok', 'ikat'],
+      ['Pisang 1 Sisir', 'Bahan Pokok', 'sisir'],
+      ['Apel 1kg', 'Bahan Pokok', 'kg'],
+      ['Jeruk 1kg', 'Bahan Pokok', 'kg'],
+      ['Margarin 200g', 'Dapur & Bumbu', 'pack'],
+      ['Mentega 200g', 'Dapur & Bumbu', 'pack'],
+      ['Kecap Manis 600ml', 'Dapur & Bumbu', 'botol'],
+      ['Kecap Asin 150ml', 'Dapur & Bumbu', 'botol'],
+      ['Saus Tomat 340ml', 'Dapur & Bumbu', 'botol'],
+      ['Saus Sambal 340ml', 'Dapur & Bumbu', 'botol'],
+      ['Sambal Kemasan 200g', 'Dapur & Bumbu', 'botol'],
+      ['Santan Kelapa 200ml', 'Dapur & Bumbu', 'pouch'],
+      ['Kaldu Ayam Bubuk 100g', 'Dapur & Bumbu', 'pack'],
+      ['Lada Bubuk 50g', 'Dapur & Bumbu', 'pack'],
+      ['Bumbu Rendang 50g', 'Dapur & Bumbu', 'sachet'],
+      ['Sabun Cuci Piring 750ml', 'Kebersihan', 'botol'],
+      ['Deterjen Bubuk 1kg', 'Kebersihan', 'pack'],
+      ['Deterjen Cair 1L', 'Kebersihan', 'pouch'],
+      ['Pelembut Pakaian 900ml', 'Kebersihan', 'pouch'],
+      ['Pemutih Pakaian 1L', 'Kebersihan', 'botol'],
+      ['Sabun Mandi Batang', 'Kebersihan', 'pcs'],
+      ['Sabun Mandi Cair 450ml', 'Kebersihan', 'botol'],
+      ['Sampo 340ml', 'Kebersihan', 'botol'],
+      ['Kondisioner 170ml', 'Kebersihan', 'botol'],
+      ['Pasta Gigi 120g', 'Kebersihan', 'pcs'],
+      ['Sikat Gigi', 'Kebersihan', 'pcs'],
+      ['Tisu Wajah 250 Lembar', 'Kebersihan', 'pack'],
+      ['Tisu Toilet 10 Gulung', 'Kebersihan', 'pack'],
+      ['Pembersih Lantai 800ml', 'Kebersihan', 'botol'],
+      ['Pembersih Kaca 500ml', 'Kebersihan', 'botol'],
+      ['Spons Cuci Piring', 'Kebersihan', 'pcs'],
+      ['Kantong Sampah 60x100cm', 'Kebersihan', 'pack'],
+      ['Baterai AA 2 Buah', 'Peralatan', 'pack'],
+      ['Lampu LED 9 Watt', 'Peralatan', 'pcs'],
+      ['Plastik Wrap 30m', 'Peralatan', 'roll'],
+      ['Aluminium Foil 5m', 'Peralatan', 'roll']
+    ].map(([name, category, unit]) => ({ name, category, unit, lastPrice: 0 }))
   ];
 
   // ==========================================================================
@@ -1864,38 +1940,69 @@
   }
 
   // Autocomplete Suggestions
-  inputItemName.addEventListener('input', () => {
-    const val = inputItemName.value.trim().toLowerCase();
-    if (val.length < 1) {
-      autoSuggestContainer.classList.add('hidden');
-      return;
-    }
-
-    const matches = appState.masterItems.filter(m => m.name.toLowerCase().includes(val));
-    if (matches.length === 0) {
-      autoSuggestContainer.classList.add('hidden');
-      return;
-    }
-
-    let html = '';
-    matches.forEach(m => {
-      html += `
-        <div class="auto-row-neo" onclick="window.selectMasterSuggestion('${escapeHtml(m.name)}')">
-          <div>
-            <strong>${escapeHtml(m.name)}</strong>
-            <small style="display:block; color:var(--text-muted); font-size:0.65rem;">${escapeHtml(m.category)} • ${escapeHtml(m.unit)}</small>
-          </div>
-        </div>
-      `;
+  function renderMasterSuggestions(query = inputItemName.value) {
+    const normalizedQuery = String(query || '').trim().toLocaleLowerCase('id-ID');
+    const seenNames = new Set();
+    const masterOptions = [...appState.masterItems, ...DEFAULT_MASTER_ITEMS];
+    const allMatches = masterOptions.filter(item => {
+      const normalizedName = String(item.name || '').trim().toLocaleLowerCase('id-ID');
+      if (!normalizedName || seenNames.has(normalizedName) || !normalizedName.includes(normalizedQuery)) return false;
+      seenNames.add(normalizedName);
+      return true;
     });
+    const matches = allMatches.slice(0, 100);
+    const matchCount = `${matches.length}${allMatches.length > matches.length ? '+' : ''}`;
 
-    autoSuggestContainer.innerHTML = html;
+    const heading = normalizedQuery
+      ? `Hasil pencarian (${matchCount})`
+      : `Pilih produk umum (${matchCount})`;
+    const options = matches.map(item => `
+      <button type="button" class="auto-row-neo" data-master-name="${escapeHtml(item.name)}">
+        <span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <small>${escapeHtml(item.category)} • ${escapeHtml(item.unit)}</small>
+        </span>
+        <small class="auto-row-price">${Number(item.lastPrice) > 0 ? `Rp ${formatNumber(item.lastPrice)}` : 'Isi harga'}</small>
+      </button>
+    `).join('');
+
+    autoSuggestContainer.innerHTML = `
+      <div class="auto-suggest-heading">${heading}</div>
+      ${options || '<div class="auto-suggest-empty">Produk belum ada di daftar. Nama baru tetap bisa dipakai.</div>'}
+    `;
     autoSuggestContainer.classList.remove('hidden');
+  }
+
+  inputItemName.addEventListener('focus', () => renderMasterSuggestions());
+  inputItemName.addEventListener('click', () => {
+    if (autoSuggestContainer.classList.contains('hidden')) renderMasterSuggestions();
+  });
+  inputItemName.addEventListener('input', () => renderMasterSuggestions());
+  inputItemName.addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown' && !autoSuggestContainer.classList.contains('hidden')) {
+      const firstOption = autoSuggestContainer.querySelector('[data-master-name]');
+      if (firstOption) {
+        event.preventDefault();
+        firstOption.focus();
+      }
+    } else if (event.key === 'Escape') {
+      autoSuggestContainer.classList.add('hidden');
+    }
+  });
+  autoSuggestContainer.addEventListener('click', event => {
+    const option = event.target.closest('[data-master-name]');
+    if (option) window.selectMasterSuggestion(option.dataset.masterName);
+  });
+  document.addEventListener('click', event => {
+    if (!modalItemBackdrop.contains(event.target)) return;
+    if (!inputItemName.contains(event.target) && !autoSuggestContainer.contains(event.target)) {
+      autoSuggestContainer.classList.add('hidden');
+    }
   });
   inputItemName.addEventListener('input', () => updateModalPriceComparison());
 
   window.selectMasterSuggestion = function (name) {
-    const item = appState.masterItems.find(m => m.name === name);
+    const item = appState.masterItems.find(m => m.name === name) || DEFAULT_MASTER_ITEMS.find(m => m.name === name);
     if (!item) return;
 
     inputItemName.value = item.name;
@@ -1904,6 +2011,8 @@
     if (!inputItemPrice.value && item.lastPrice > 0) {
       inputItemPrice.value = item.lastPrice;
     }
+    autoSuggestContainer.classList.add('hidden');
+    inputItemName.focus({ preventScroll: true });
     autoSuggestContainer.classList.add('hidden');
     updateModalLiveCalculations();
     AudioEngine.playTap();
