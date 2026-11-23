@@ -1950,8 +1950,29 @@
   }
 
   // Autocomplete Suggestions
+  function getCatalogSuggestionUnit(unit) {
+    const normalizedUnit = String(unit || '').trim().toLocaleLowerCase('id-ID');
+    if (normalizedUnit.startsWith('karung')) return 'karung/5kg';
+    if (normalizedUnit.startsWith('pouch')) return 'pouch';
+    if (normalizedUnit.startsWith('pack')) return 'pack';
+    if (normalizedUnit.startsWith('kotak')) return 'kotak';
+    return normalizedUnit || 'pcs';
+  }
+
   function getMasterSuggestionItem(name) {
     const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    const catalogItem = ASTRO_OFFICIAL_CATALOG.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    );
+    if (catalogItem) {
+      return {
+        name: catalogItem.name,
+        category: catalogItem.category,
+        unit: getCatalogSuggestionUnit(catalogItem.unit),
+        lastPrice: Number(catalogItem.price)
+      };
+    }
+
     const savedItem = appState.masterItems.find(item =>
       String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
     );
@@ -1967,7 +1988,13 @@
   function renderMasterSuggestions(query = inputItemName.value) {
     const normalizedQuery = String(query || '').trim().toLocaleLowerCase('id-ID');
     const seenNames = new Set();
-    const masterOptions = [...appState.masterItems, ...DEFAULT_MASTER_ITEMS]
+    const catalogOptions = ASTRO_OFFICIAL_CATALOG.map(item => ({
+      name: item.name,
+      category: item.category,
+      unit: getCatalogSuggestionUnit(item.unit),
+      lastPrice: Number(item.price)
+    }));
+    const masterOptions = [...catalogOptions, ...appState.masterItems, ...DEFAULT_MASTER_ITEMS]
       .map(item => getMasterSuggestionItem(item.name))
       .filter(Boolean);
     const allMatches = masterOptions.filter(item => {
@@ -1981,7 +2008,7 @@
 
     const heading = normalizedQuery
       ? `Hasil pencarian (${matchCount})`
-      : `Pilih produk umum (${matchCount})`;
+      : `Pilih produk (${matchCount})`;
     const options = matches.map(item => `
       <button type="button" class="auto-row-neo" data-master-name="${escapeHtml(item.name)}">
         <span>
@@ -2034,9 +2061,7 @@
     inputItemName.value = item.name;
     selectItemCategory.value = item.category;
     selectItemUnit.value = item.unit;
-    if (!inputItemPrice.value && item.lastPrice > 0) {
-      inputItemPrice.value = item.lastPrice;
-    }
+    inputItemPrice.value = Number(item.lastPrice) > 0 ? item.lastPrice : '';
     autoSuggestContainer.classList.add('hidden');
     inputItemName.focus({ preventScroll: true });
     autoSuggestContainer.classList.add('hidden');
