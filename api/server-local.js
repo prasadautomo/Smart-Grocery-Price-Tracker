@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createBasketInsight } from './insights-core.js';
+import { createQrisPayment, getQrisPaymentStatus, PaymentError } from './midtrans-core.js';
 
 const execFileAsync = promisify(execFile);
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -250,6 +251,40 @@ const server = http.createServer(async (req, res) => {
     } catch (error) {
       const statusCode = error.statusCode || (error instanceof TypeError || error instanceof RangeError ? 400 : 500);
       sendJson(res, statusCode, { error: error.message || 'Gagal memproses analitik keranjang.' });
+    }
+    return;
+  }
+
+  if (url.pathname === '/api/payments/qris/create') {
+    if (req.method !== 'POST') {
+      sendJson(res, 405, { error: 'Metode permintaan tidak didukung.' }, { Allow: 'POST' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req);
+      const payment = await createQrisPayment(payload, req.headers.authorization, req.headers['x-supabase-anon-key']);
+      sendJson(res, 201, payment);
+    } catch (error) {
+      sendJson(res, error instanceof PaymentError ? error.statusCode : 500, {
+        error: error instanceof PaymentError ? error.message : 'QRIS belum dapat dibuat.'
+      });
+    }
+    return;
+  }
+
+  if (url.pathname === '/api/payments/qris/status') {
+    if (req.method !== 'POST') {
+      sendJson(res, 405, { error: 'Metode permintaan tidak didukung.' }, { Allow: 'POST' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req);
+      const status = await getQrisPaymentStatus(payload, req.headers.authorization, req.headers['x-supabase-anon-key']);
+      sendJson(res, 200, status);
+    } catch (error) {
+      sendJson(res, error instanceof PaymentError ? error.statusCode : 500, {
+        error: error instanceof PaymentError ? error.message : 'Status QRIS belum dapat diperiksa.'
+      });
     }
     return;
   }

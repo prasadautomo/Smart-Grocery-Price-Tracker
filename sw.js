@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cartly-shell-v1';
+const CACHE_NAME = 'cartly-shell-v2';
 const APP_SHELL = [
   './index.html',
   './styles.css',

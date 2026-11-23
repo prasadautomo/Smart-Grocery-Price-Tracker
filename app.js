@@ -3390,11 +3390,6 @@
     const qrisLabel = document.getElementById('checkoutQrisLabel');
     if (qrisLabel) qrisLabel.textContent = `QRIS ${storeName}`;
 
-    const qrisImg = document.getElementById('checkoutQrisImage');
-    if (qrisImg) {
-      qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(storeName + '-QRIS-PAYMENT')}`;
-    }
-
     // 5. POS Animation & Receipts
     const posBadge = document.getElementById('posRegisterBadge');
     if (posBadge) posBadge.textContent = `Kasir ${storeName}`;
@@ -3406,7 +3401,7 @@
     if (receiptSystem) receiptSystem.textContent = `Sistem Mandiri ${storeName}`;
 
     const receiptFooter = document.getElementById('receiptFooterNote');
-    if (receiptFooter) receiptFooter.textContent = `Catatan belanja Cartly di ${storeName}. Struk ini bukan bukti pembayaran.`;
+    if (receiptFooter) receiptFooter.textContent = `Pembayaran QRIS di ${storeName} dikonfirmasi melalui penyedia pembayaran.`;
 
     // 6. Update selection in store modal
     renderStoreButtonsList();
@@ -3827,15 +3822,22 @@
   // ==========================================================================
   // CARTLY CHECKOUT & PAYMENT RECORDING
   // ==========================================================================
-  const checkoutPaymentMethod = 'qris';
+  const QRIS_STATUS_POLL_MS = 5000;
+  const QRIS_PENDING_KEY = 'pending_qris_payment';
+  let activeQrisPayment = null;
   let checkoutPaymentSubmitted = false;
+  let qrisCreatePending = false;
+  let qrisStatusPending = false;
+  let qrisPollingTimer = null;
 
   function initAstroCheckoutModule() {
     document.getElementById('btnClosePaymentView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
-    document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', completeCheckoutAndDisplayReceipt);
-    document.getElementById('checkoutDigitalPaidConfirm')?.addEventListener('change', updateCheckoutPaymentButton);
+    document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', () => {
+      if (activeQrisPayment) checkQrisPaymentStatus();
+      else startQrisPayment();
+    });
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
       closeAstroCheckoutModal();
       document.getElementById('navBtnCart')?.click();
@@ -3846,14 +3848,19 @@
     });
   }
   function openAstroCheckoutModal() {
-    const purchasedItems = getPurchasedCartItems();
-    if (purchasedItems.length === 0) {
+    const restoredPayment = activeQrisPayment || loadPendingQrisPayment();
+    const purchasedItems = restoredPayment?.itemsSnapshot || getPurchasedCartItems();
+    if (!restoredPayment && purchasedItems.length === 0) {
       showToast('Centang barang yang sudah dibeli sebelum melanjutkan pembayaran.', 'warning');
       return;
     }
-    const total = calculateCurrentSubtotal();
-    if (total > appState.budgetLimit) {
+    const total = Number(restoredPayment?.amount ?? calculateCurrentSubtotal());
+    if (!restoredPayment && total > appState.budgetLimit) {
       showToast(`Total belanja melebihi batas Rp ${formatNumber(appState.budgetLimit)}. Kurangi barang sebelum membayar.`, 'warning');
+      return;
+    }
+    if (!restoredPayment && total < 1) {
+      showToast('Total pembayaran harus lebih dari Rp 0.', 'warning');
       return;
     }
     const modal = document.getElementById('modalAstroCheckout');
@@ -3874,12 +3881,15 @@
     }
     const subtotalEl = document.getElementById('checkoutPaymentSubtotal');
     const totalEl = document.getElementById('checkoutPaymentTotal');
-    const digitalCheck = document.getElementById('checkoutDigitalPaidConfirm');
-    const demoAmount = document.getElementById('checkoutDemoAmount');
     if (subtotalEl) subtotalEl.textContent = `Rp ${formatNumber(total)}`;
     if (totalEl) totalEl.textContent = `Rp ${formatNumber(total)}`;
-    if (demoAmount) demoAmount.textContent = formatNumber(total);
-    if (digitalCheck) digitalCheck.checked = false;
+    if (!activeQrisPayment && restoredPayment) activeQrisPayment = restoredPayment;
+    if (activeQrisPayment) {
+      renderQrisPayment(activeQrisPayment, 'QRIS siap dipindai. Menunggu pembayaran.');
+      scheduleQrisStatusCheck();
+    } else {
+      startQrisPayment(purchasedItems);
+    }
     updateCheckoutPaymentButton();
     modal.classList.remove('hidden');
   }
@@ -3887,14 +3897,214 @@
   function updateCheckoutPaymentButton() {
     const button = document.getElementById('btnConfirmCheckoutPayment');
     if (!button) return;
+    button.disabled = checkoutPaymentSubmitted || qrisCreatePending || qrisStatusPending;
+    button.textContent = qrisCreatePending
+      ? 'Menyiapkan QRIS...'
+      : qrisStatusPending
+        ? 'Memeriksa pembayaran...'
+        : activeQrisPayment ? 'Saya sudah membayar' : 'Coba siapkan QRIS lagi';
+  }
+
+  async function getQrisRequestHeaders() {
+    const auth = appState.supabaseClient?.auth;
+    if (!auth) throw new Error('Silakan masuk ke akun sebelum membayar.');
+    const { data, error } = await auth.getSession();
+    const accessToken = data?.session?.access_token;
+    if (error || !accessToken) throw new Error('Sesi akun berakhir. Silakan masuk kembali.');
+    return {
+      Authorization: `Bearer ${accessToken}`,
+      'x-supabase-anon-key': appState.supabaseKey
+    };
+  }
+
+  function getQrisPendingStorageKey() {
+    return getUserKey(QRIS_PENDING_KEY);
+  }
+
+  function loadPendingQrisPayment() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(getQrisPendingStorageKey()) || 'null');
+      const currentUserId = String(appState.currentUser?.id || '');
+      const imageUrl = new URL(saved?.qrImageUrl || '');
+      if (
+        saved?.userId === currentUserId && saved.paymentToken && saved.orderId &&
+        Number.isSafeInteger(Number(saved.amount)) && Number(saved.amount) > 0 &&
+        ['api.midtrans.com', 'api.sandbox.midtrans.com'].includes(imageUrl.hostname) &&
+        imageUrl.protocol === 'https:' && Array.isArray(saved.itemsSnapshot)
+      ) return saved;
+    } catch { }
+    return null;
+  }
+
+  function savePendingQrisPayment(payment) {
+    try {
+      localStorage.setItem(getQrisPendingStorageKey(), JSON.stringify(payment));
+    } catch (error) {
+      console.warn('Could not save pending QRIS payment:', error);
+    }
+  }
+
+  function clearPendingQrisPayment() {
+    try {
+      localStorage.removeItem(getQrisPendingStorageKey());
+    } catch { }
+  }
+
+  function setQrisPaymentMessage(message, state = 'pending') {
+    const status = document.getElementById('checkoutPaymentMessage');
+    if (!status) return;
+    status.textContent = message;
+    status.className = `qris-payment-message is-${state}`;
+  }
+
+  function renderQrisPayment(payment, message) {
+    const image = document.getElementById('checkoutQrisImage');
+    const loading = document.getElementById('checkoutQrisLoading');
+    const amount = document.getElementById('checkoutQrisAmount');
+    const expiry = document.getElementById('checkoutQrisExpiry');
+    const environmentLabel = document.getElementById('checkoutQrisEnvironment');
+    if (image) {
+      image.src = payment.qrImageUrl;
+      image.classList.remove('hidden');
+    }
+    if (loading) loading.classList.add('hidden');
+    if (amount) amount.textContent = formatNumber(payment.amount);
+    if (environmentLabel) {
+      environmentLabel.textContent = payment.environment === 'sandbox' ? 'LINGKUNGAN UJI' : 'PEMBAYARAN AKTIF';
+      environmentLabel.className = payment.environment === 'sandbox'
+        ? 'ml-auto rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-950'
+        : 'ml-auto rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-950';
+    }
+    if (expiry) {
+      const expiryDate = payment.expiresAt ? new Date(payment.expiresAt) : null;
+      expiry.textContent = expiryDate && !Number.isNaN(expiryDate.getTime())
+        ? `Berlaku sampai ${expiryDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`
+        : '';
+    }
+    setQrisPaymentMessage(message, 'pending');
+  }
+
+  async function startQrisPayment(items = getPurchasedCartItems()) {
+    if (qrisCreatePending || activeQrisPayment) return;
+    if (!items.length) {
+      setQrisPaymentMessage('Tidak ada barang terpilih untuk dibayar.', 'error');
+      return;
+    }
+
     const total = calculateCurrentSubtotal();
-    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    const overBudget = total > appState.budgetLimit;
-    const canSubmit = getPurchasedCartItems().length > 0 && !overBudget && digitalConfirmed;
-    button.disabled = checkoutPaymentSubmitted || !canSubmit;
-    button.textContent = overBudget
-      ? 'Anggaran terlampaui'
-      : 'Selesaikan simulasi';
+    if (!Number.isSafeInteger(total) || total < 1 || total > appState.budgetLimit) {
+      setQrisPaymentMessage('Total pembayaran tidak valid atau melebihi anggaran.', 'error');
+      return;
+    }
+
+    qrisCreatePending = true;
+    updateCheckoutPaymentButton();
+    const image = document.getElementById('checkoutQrisImage');
+    const loading = document.getElementById('checkoutQrisLoading');
+    if (image) {
+      image.src = '';
+      image.classList.add('hidden');
+    }
+    if (loading) {
+      loading.textContent = 'Menyiapkan QRIS pembayaran...';
+      loading.classList.remove('hidden');
+    }
+    setQrisPaymentMessage('Menghubungkan ke penyedia pembayaran...', 'pending');
+
+    try {
+      const headers = await getQrisRequestHeaders();
+      const itemsPayload = items.map(item => ({
+        id: String(item.id || ''),
+        name: item.name,
+        price: calculateDiscount(item.price, item.discountRaw).finalUnitPrice,
+        quantity: Number(item.qty)
+      }));
+      const response = await fetch('/api/payments/qris/create', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, items: itemsPayload })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'QRIS belum dapat dibuat.');
+
+      activeQrisPayment = {
+        ...result,
+        userId: String(appState.currentUser?.id || ''),
+        itemsSnapshot: items.map(item => ({ ...item }))
+      };
+      savePendingQrisPayment(activeQrisPayment);
+      renderQrisPayment(activeQrisPayment, 'Pindai QRIS dengan aplikasi pembayaran, lalu selesaikan pembayaran.');
+      scheduleQrisStatusCheck();
+    } catch (error) {
+      if (loading) {
+        loading.textContent = 'Kode QRIS belum tersedia.';
+        loading.classList.remove('hidden');
+      }
+      setQrisPaymentMessage(error.message || 'QRIS belum dapat dibuat. Coba lagi.', 'error');
+    } finally {
+      qrisCreatePending = false;
+      updateCheckoutPaymentButton();
+    }
+  }
+
+  function scheduleQrisStatusCheck() {
+    if (!activeQrisPayment || checkoutPaymentSubmitted) return;
+    clearTimeout(qrisPollingTimer);
+    qrisPollingTimer = setTimeout(checkQrisPaymentStatus, QRIS_STATUS_POLL_MS);
+  }
+
+  async function checkQrisPaymentStatus() {
+    const payment = activeQrisPayment;
+    if (!payment || qrisStatusPending || checkoutPaymentSubmitted) return;
+    qrisStatusPending = true;
+    updateCheckoutPaymentButton();
+
+    try {
+      const headers = await getQrisRequestHeaders();
+      const response = await fetch('/api/payments/qris/status', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: payment.orderId,
+          amount: String(payment.amount),
+          paymentToken: payment.paymentToken
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Status pembayaran belum dapat diperiksa.');
+
+      if (result.orderId !== payment.orderId || Number(result.amount) !== Number(payment.amount)) {
+        throw new Error('Rincian pembayaran QRIS tidak cocok.');
+      }
+      if (result.status === 'paid') {
+        completeCheckoutAndDisplayReceipt(result);
+        return;
+      }
+      if (result.status === 'expired' || result.status === 'failed') {
+        clearTimeout(qrisPollingTimer);
+        clearPendingQrisPayment();
+        activeQrisPayment = null;
+        const image = document.getElementById('checkoutQrisImage');
+        const loading = document.getElementById('checkoutQrisLoading');
+        if (image) {
+          image.src = '';
+          image.classList.add('hidden');
+        }
+        if (loading) {
+          loading.textContent = 'QRIS kedaluwarsa. Buat kode baru untuk melanjutkan.';
+          loading.classList.remove('hidden');
+        }
+        setQrisPaymentMessage('Pembayaran belum diterima. Buat QRIS baru untuk mencoba kembali.', 'error');
+        return;
+      }
+      setQrisPaymentMessage('Menunggu pembayaran QRIS. Status akan diperiksa otomatis.', 'pending');
+    } catch (error) {
+      setQrisPaymentMessage(error.message || 'Status pembayaran belum dapat diperiksa. Mencoba kembali otomatis.', 'error');
+    } finally {
+      qrisStatusPending = false;
+      updateCheckoutPaymentButton();
+      if (activeQrisPayment && !checkoutPaymentSubmitted) scheduleQrisStatusCheck();
+    }
   }
 
   function closeAstroCheckoutModal() {
@@ -3902,24 +4112,15 @@
     if (modal) modal.classList.add('hidden');
   }
 
-  function completeCheckoutAndDisplayReceipt() {
-    const purchasedItems = getPurchasedCartItems();
-    if (checkoutPaymentSubmitted) return;
-    if (purchasedItems.length === 0) {
-      showToast('Centang barang yang sudah dibeli sebelum menyelesaikan transaksi.', 'warning');
-      return;
-    }
-    const total = calculateCurrentSubtotal();
-    if (total > appState.budgetLimit) {
-      updateCheckoutPaymentButton();
-      showToast(`Transaksi tidak dapat dilanjutkan. Kurangi belanja Rp ${formatNumber(total - appState.budgetLimit)} agar sesuai anggaran.`, 'warning');
-      return;
-    }
-    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    if (!digitalConfirmed) {
-      showToast('Konfirmasi bahwa ini hanya simulasi terlebih dahulu.', 'warning');
-      return;
-    }
+  function completeCheckoutAndDisplayReceipt(paymentStatus) {
+    const payment = activeQrisPayment;
+    if (
+      checkoutPaymentSubmitted || !payment || paymentStatus?.status !== 'paid' ||
+      paymentStatus.orderId !== payment.orderId || Number(paymentStatus.amount) !== Number(payment.amount)
+    ) return;
+    const purchasedItems = payment.itemsSnapshot;
+    if (!Array.isArray(purchasedItems) || purchasedItems.length === 0) return;
+    const total = Number(payment.amount);
 
     const receiptItems = purchasedItems.map(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
@@ -3942,6 +4143,7 @@
     }
 
     checkoutPaymentSubmitted = true;
+    clearTimeout(qrisPollingTimer);
     updateCheckoutPaymentButton();
 
     document.getElementById('checkoutStagePayment')?.classList.add('hidden');
@@ -3952,8 +4154,7 @@
     const discount = 0;
     const grandTotal = subtotal;
 
-    const storePrefix = (appState.activeStore || 'CARTLY').split(/[\s-]+/)[0].toUpperCase();
-    const trxId = `${storePrefix}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const trxId = payment.orderId;
     const nowStr = new Date().toLocaleDateString('id-ID', {
       weekday: 'long',
       year: 'numeric',
@@ -3965,8 +4166,7 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const paymentLabels = { qris: 'QRIS Demo (simulasi)' };
-    const receiptLabel = paymentLabels[checkoutPaymentMethod];
+    const receiptLabel = 'QRIS (Midtrans)';
 
     // Populate Thermal Receipt Elements
     const elTrx = document.getElementById('receiptTrxId');
@@ -3983,7 +4183,7 @@
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
     if (elMethod) elMethod.textContent = receiptLabel;
-    if (elStatus) elStatus.textContent = 'Simulasi';
+    if (elStatus) elStatus.textContent = 'Lunas';
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
@@ -4013,14 +4213,17 @@
       itemCount: receiptItems.length,
       items: receiptItems,
       paymentMethod: receiptLabel,
-      paymentStatus: 'simulated'
+      paymentStatus: 'paid'
     };
 
     appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
     saveHistory();
     renderHistoryList();
-    const purchasedIds = new Set(purchasedItems.map(item => item.id));
-    appState.cart = appState.cart.filter(item => !purchasedIds.has(item.id));
+    const purchasedIds = new Set(purchasedItems.map(item => String(item.id)));
+    appState.cart = appState.cart.filter(item => !purchasedIds.has(String(item.id)));
+
+    clearPendingQrisPayment();
+    activeQrisPayment = null;
 
     saveCart();
     saveMaster();
@@ -4061,7 +4264,7 @@
       });
     }
 
-    showToast('Simulasi pembayaran dicatat dan struk demo berhasil dibuat.', 'success');
+    showToast('Pembayaran QRIS berhasil dikonfirmasi.', 'success');
   }
 
   function copyThermalReceiptSummary() {
@@ -4070,7 +4273,7 @@
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
     const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
-    const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Simulasi';
+    const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Belum dibayar';
     const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (dicatat di Cartly)`;
 
     navigator.clipboard?.writeText(text);

@@ -62,7 +62,93 @@
     { name: 'Sabun Pembersih Lantai 750ml', category: 'Kebersihan', unit: 'botol', lastPrice: 16000 },
     { name: 'Mie Instan Goreng Spesial', category: 'Makanan & Minuman', unit: 'pcs', lastPrice: 3100 },
     { name: 'Kecap Manis Refill 520ml', category: 'Dapur & Bumbu', unit: 'pouch', lastPrice: 17500 },
-    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan & Minuman', unit: 'kaleng', lastPrice: 32000 }
+    { name: 'Biskuit Cokelat Kaleng', category: 'Makanan Ringan', unit: 'kaleng', lastPrice: 32000 },
+    ...[
+      ['Beras Putih 1kg', 'Bahan Pokok', 'pack'],
+      ['Beras Putih 2,5kg', 'Bahan Pokok', 'pack'],
+      ['Beras Premium 5kg', 'Bahan Pokok', 'karung/5kg'],
+      ['Beras Pandan Wangi 5kg', 'Bahan Pokok', 'karung/5kg'],
+      ['Minyak Goreng 1L', 'Bahan Pokok', 'pack'],
+      ['Gula Pasir 1kg', 'Bahan Pokok', 'pack'],
+      ['Tepung Terigu 1kg', 'Bahan Pokok', 'pack'],
+      ['Tepung Tapioka 500g', 'Bahan Pokok', 'pack'],
+      ['Tepung Beras 500g', 'Bahan Pokok', 'pack'],
+      ['Susu Kental Manis 370g', 'Makanan & Minuman', 'kaleng'],
+      ['Susu UHT Full Cream 1L', 'Makanan & Minuman', 'pack'],
+      ['Susu Bubuk 400g', 'Makanan & Minuman', 'pack'],
+      ['Air Mineral 600ml', 'Makanan & Minuman', 'botol'],
+      ['Air Mineral 1,5L', 'Makanan & Minuman', 'botol'],
+      ['Air Galon 19L', 'Makanan & Minuman', 'galon'],
+      ['Teh Celup 25 Kantong', 'Makanan & Minuman', 'dus'],
+      ['Kopi Bubuk 200g', 'Makanan & Minuman', 'pack'],
+      ['Kopi Instan Sachet', 'Makanan & Minuman', 'sachet'],
+      ['Mie Instan Kuah', 'Makanan & Minuman', 'pcs'],
+      ['Mie Telur 200g', 'Makanan & Minuman', 'pack'],
+      ['Roti Tawar', 'Makanan & Minuman', 'pack'],
+      ['Biskuit Sandwich', 'Makanan Ringan', 'pack'],
+      ['Snack Kemasan', 'Makanan Ringan', 'pack'],
+      ['Keripik Kentang 100g', 'Makanan Ringan', 'pack'],
+      ['Keripik Singkong 200g', 'Makanan Ringan', 'pack'],
+      ['Wafer Cokelat 150g', 'Makanan Ringan', 'pack'],
+      ['Kacang Panggang 100g', 'Makanan Ringan', 'pack'],
+      ['Camilan Rasa Keju 100g', 'Makanan Ringan', 'pack'],
+      ['Permen 100g', 'Makanan Ringan', 'pack'],
+      ['Popcorn 100g', 'Makanan Ringan', 'pack'],
+      ['Cokelat Batang 45g', 'Makanan Ringan', 'pack'],
+      ['Kerupuk 200g', 'Makanan Ringan', 'pack'],
+      ['Sarden Kaleng 155g', 'Makanan & Minuman', 'kaleng'],
+      ['Nugget Ayam 500g', 'Makanan & Minuman', 'pack'],
+      ['Sosis Ayam 375g', 'Makanan & Minuman', 'pack'],
+      ['Telur Ayam Kampung 10 Butir', 'Bahan Pokok', 'pack'],
+      ['Daging Ayam Potong 1kg', 'Bahan Pokok', 'kg'],
+      ['Dada Ayam Fillet 500g', 'Bahan Pokok', 'pack'],
+      ['Daging Sapi 500g', 'Bahan Pokok', 'pack'],
+      ['Ikan Kembung 1kg', 'Bahan Pokok', 'kg'],
+      ['Tahu Putih 10 Buah', 'Bahan Pokok', 'pack'],
+      ['Tempe 400g', 'Bahan Pokok', 'pack'],
+      ['Kentang 1kg', 'Bahan Pokok', 'kg'],
+      ['Wortel 1kg', 'Bahan Pokok', 'kg'],
+      ['Bawang Merah 500g', 'Bahan Pokok', 'pack'],
+      ['Bawang Putih 500g', 'Bahan Pokok', 'pack'],
+      ['Cabai Merah 250g', 'Bahan Pokok', 'pack'],
+      ['Tomat 500g', 'Bahan Pokok', 'pack'],
+      ['Bayam 1 Ikat', 'Bahan Pokok', 'ikat'],
+      ['Pisang 1 Sisir', 'Bahan Pokok', 'sisir'],
+      ['Apel 1kg', 'Bahan Pokok', 'kg'],
+      ['Jeruk 1kg', 'Bahan Pokok', 'kg'],
+      ['Margarin 200g', 'Dapur & Bumbu', 'pack'],
+      ['Mentega 200g', 'Dapur & Bumbu', 'pack'],
+      ['Kecap Manis 600ml', 'Dapur & Bumbu', 'botol'],
+      ['Kecap Asin 150ml', 'Dapur & Bumbu', 'botol'],
+      ['Saus Tomat 340ml', 'Dapur & Bumbu', 'botol'],
+      ['Saus Sambal 340ml', 'Dapur & Bumbu', 'botol'],
+      ['Sambal Kemasan 200g', 'Dapur & Bumbu', 'pack'],
+      ['Santan Kelapa 200ml', 'Dapur & Bumbu', 'pouch'],
+      ['Kaldu Ayam Bubuk 100g', 'Dapur & Bumbu', 'pack'],
+      ['Lada Bubuk 50g', 'Dapur & Bumbu', 'pack'],
+      ['Bumbu Rendang 50g', 'Dapur & Bumbu', 'sachet'],
+      ['Sabun Cuci Piring 750ml', 'Kebersihan', 'botol'],
+      ['Deterjen Bubuk 1kg', 'Kebersihan', 'pack'],
+      ['Deterjen Cair 1L', 'Kebersihan', 'botol'],
+      ['Pelembut Pakaian 900ml', 'Kebersihan', 'botol'],
+      ['Pemutih Pakaian 1L', 'Kebersihan', 'botol'],
+      ['Sabun Mandi Batang', 'Kebersihan', 'pcs'],
+      ['Sabun Mandi Cair 450ml', 'Kebersihan', 'botol'],
+      ['Sampo 340ml', 'Kebersihan', 'botol'],
+      ['Kondisioner 170ml', 'Kebersihan', 'botol'],
+      ['Pasta Gigi 120g', 'Kebersihan', 'pcs'],
+      ['Sikat Gigi', 'Kebersihan', 'pcs'],
+      ['Tisu Wajah 250 Lembar', 'Kebersihan', 'pack'],
+      ['Tisu Toilet 10 Gulung', 'Kebersihan', 'pack'],
+      ['Pembersih Lantai 800ml', 'Kebersihan', 'botol'],
+      ['Pembersih Kaca 500ml', 'Kebersihan', 'botol'],
+      ['Spons Cuci Piring', 'Kebersihan', 'pcs'],
+      ['Kantong Sampah 60x100cm', 'Kebersihan', 'pack'],
+      ['Baterai AA 2 Buah', 'Peralatan', 'pack'],
+      ['Lampu LED 9 Watt', 'Peralatan', 'pcs'],
+      ['Plastik Wrap 30m', 'Peralatan', 'roll'],
+      ['Aluminium Foil 5m', 'Peralatan', 'roll']
+    ].map(([name, category, unit]) => ({ name, category, unit, lastPrice: 0 }))
   ];
 
   // ==========================================================================
@@ -746,6 +832,29 @@
       previousPrice,
       storeName: savedObservation?.storeName || storeName
     };
+  }
+
+  function getPreviousTransactionPrice(name) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    if (!normalizedName) return null;
+
+    const observations = appState.history.flatMap(receipt => {
+      const createdAt = receipt.createdAt;
+      const timestamp = Number.isFinite(Number(createdAt)) && Number(createdAt) > 0
+        ? Number(createdAt)
+        : Date.parse(createdAt || '') || Date.parse(receipt.date || '') || 0;
+
+      return (Array.isArray(receipt.items) ? receipt.items : []).map(item => ({
+        name: String(item.name || '').trim().toLocaleLowerCase('id-ID'),
+        price: Number(item.originalPrice ?? item.price ?? item.finalUnitPrice),
+        timestamp,
+        storeName: item.storeName || receipt.storeName || ''
+      }));
+    });
+
+    return observations
+      .filter(item => item.name === normalizedName && Number.isFinite(item.price) && item.price > 0)
+      .sort((a, b) => b.timestamp - a.timestamp)[0] || null;
   }
 
   function comparePrices(currentPrice, previousPrice) {
@@ -1726,6 +1835,7 @@
   const inputItemQty = document.getElementById('inputItemQty');
   const inputItemPrice = document.getElementById('inputItemPrice');
   const inputItemDiscount = document.getElementById('inputItemDiscount');
+  const modalPriceComparison = document.getElementById('modalPriceComparison');
   const autoSuggestContainer = document.getElementById('autoSuggestContainer');
 
   function openItemModal(itemId = null) {
@@ -1780,42 +1890,145 @@
     // 2. Subtotal
     const lineTotal = disc.finalUnitPrice * qty;
     document.getElementById('modalLineTotal').textContent = `Rp ${formatNumber(lineTotal)}`;
+    updateModalPriceComparison(price);
 
     if (window.lucide) lucide.createIcons();
   }
 
-  // Autocomplete Suggestions
-  inputItemName.addEventListener('input', () => {
-    const val = inputItemName.value.trim().toLowerCase();
-    if (val.length < 1) {
-      autoSuggestContainer.classList.add('hidden');
+  function updateModalPriceComparison(currentPrice = Number(inputItemPrice.value)) {
+    if (!modalPriceComparison) return;
+
+    const name = inputItemName.value.trim();
+    if (!name || !Number.isFinite(currentPrice) || currentPrice <= 0) {
+      modalPriceComparison.textContent = '';
+      modalPriceComparison.className = 'price-comparison modal-price-comparison hidden';
       return;
     }
 
-    const matches = appState.masterItems.filter(m => m.name.toLowerCase().includes(val));
-    if (matches.length === 0) {
-      autoSuggestContainer.classList.add('hidden');
-      return;
-    }
-
-    let html = '';
-    matches.forEach(m => {
-      html += `
-        <div class="auto-row-neo" onclick="window.selectMasterSuggestion('${escapeHtml(m.name)}')">
-          <div>
-            <strong>${escapeHtml(m.name)}</strong>
-            <small style="display:block; color:var(--text-muted); font-size:0.65rem;">${escapeHtml(m.category)} • ${escapeHtml(m.unit)}</small>
-          </div>
-        </div>
-      `;
+    const previousTransaction = getPreviousTransactionPrice(name);
+    const previousMonthItem = appState.cart.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === name.toLocaleLowerCase('id-ID') &&
+      Number(item.lastMonthPrice) > 0
+    );
+    const monthlyComparison = getPriceComparison({
+      name,
+      price: currentPrice,
+      storeName: appState.activeStore,
+      priceDate: getShoppingDate(),
+      lastMonthPrice: previousMonthItem?.lastMonthPrice
     });
+    const comparison = previousTransaction
+      ? {
+        ...comparePrices(currentPrice, previousTransaction.price),
+        previousPrice: previousTransaction.price,
+        source: 'transaksi terakhir',
+        storeName: previousTransaction.storeName
+      }
+      : monthlyComparison
+        ? { ...monthlyComparison, source: 'bulan lalu' }
+        : null;
 
-    autoSuggestContainer.innerHTML = html;
+    if (!comparison) {
+      modalPriceComparison.textContent = '';
+      modalPriceComparison.className = 'price-comparison modal-price-comparison hidden';
+      return;
+    }
+
+    const amount = formatNumber(Math.abs(comparison.difference));
+    const previousPrice = formatNumber(comparison.previousPrice);
+    const differentStore = comparison.storeName &&
+      String(comparison.storeName).toLocaleLowerCase('id-ID') !== String(appState.activeStore || '').toLocaleLowerCase('id-ID');
+    const storeLabel = differentStore ? ` di ${comparison.storeName}` : '';
+    const message = comparison.direction === 'up'
+      ? `↗ Harga naik Rp ${amount} dari ${comparison.source}${storeLabel} (Rp ${previousPrice})`
+      : comparison.direction === 'down'
+        ? `↘ Harga turun Rp ${amount} dari ${comparison.source}${storeLabel} (Rp ${previousPrice})`
+        : `→ Harga sama dengan ${comparison.source}${storeLabel} (Rp ${previousPrice})`;
+
+    modalPriceComparison.className = `price-comparison modal-price-comparison price-trend-${comparison.direction}`;
+    modalPriceComparison.textContent = message;
+  }
+
+  // Autocomplete Suggestions
+  function getMasterSuggestionItem(name) {
+    const normalizedName = String(name || '').trim().toLocaleLowerCase('id-ID');
+    const savedItem = appState.masterItems.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    );
+    const defaultItem = DEFAULT_MASTER_ITEMS.find(item =>
+      String(item.name || '').trim().toLocaleLowerCase('id-ID') === normalizedName
+    );
+    if (!savedItem) return defaultItem || null;
+    return defaultItem
+      ? { ...savedItem, category: defaultItem.category, unit: defaultItem.unit }
+      : savedItem;
+  }
+
+  function renderMasterSuggestions(query = inputItemName.value) {
+    const normalizedQuery = String(query || '').trim().toLocaleLowerCase('id-ID');
+    const seenNames = new Set();
+    const masterOptions = [...appState.masterItems, ...DEFAULT_MASTER_ITEMS]
+      .map(item => getMasterSuggestionItem(item.name))
+      .filter(Boolean);
+    const allMatches = masterOptions.filter(item => {
+      const normalizedName = String(item.name || '').trim().toLocaleLowerCase('id-ID');
+      if (!normalizedName || seenNames.has(normalizedName) || !normalizedName.includes(normalizedQuery)) return false;
+      seenNames.add(normalizedName);
+      return true;
+    });
+    const matches = allMatches.slice(0, 100);
+    const matchCount = `${matches.length}${allMatches.length > matches.length ? '+' : ''}`;
+
+    const heading = normalizedQuery
+      ? `Hasil pencarian (${matchCount})`
+      : `Pilih produk umum (${matchCount})`;
+    const options = matches.map(item => `
+      <button type="button" class="auto-row-neo" data-master-name="${escapeHtml(item.name)}">
+        <span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <small>${escapeHtml(item.category)} • ${escapeHtml(item.unit)}</small>
+        </span>
+        <small class="auto-row-price">${Number(item.lastPrice) > 0 ? `Rp ${formatNumber(item.lastPrice)}` : 'Isi harga'}</small>
+      </button>
+    `).join('');
+
+    autoSuggestContainer.innerHTML = `
+      <div class="auto-suggest-heading">${heading}</div>
+      ${options || '<div class="auto-suggest-empty">Produk belum ada di daftar. Nama baru tetap bisa dipakai.</div>'}
+    `;
     autoSuggestContainer.classList.remove('hidden');
+  }
+
+  inputItemName.addEventListener('focus', () => renderMasterSuggestions());
+  inputItemName.addEventListener('click', () => {
+    if (autoSuggestContainer.classList.contains('hidden')) renderMasterSuggestions();
   });
+  inputItemName.addEventListener('input', () => renderMasterSuggestions());
+  inputItemName.addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown' && !autoSuggestContainer.classList.contains('hidden')) {
+      const firstOption = autoSuggestContainer.querySelector('[data-master-name]');
+      if (firstOption) {
+        event.preventDefault();
+        firstOption.focus();
+      }
+    } else if (event.key === 'Escape') {
+      autoSuggestContainer.classList.add('hidden');
+    }
+  });
+  autoSuggestContainer.addEventListener('click', event => {
+    const option = event.target.closest('[data-master-name]');
+    if (option) window.selectMasterSuggestion(option.dataset.masterName);
+  });
+  document.addEventListener('click', event => {
+    if (!modalItemBackdrop.contains(event.target)) return;
+    if (!inputItemName.contains(event.target) && !autoSuggestContainer.contains(event.target)) {
+      autoSuggestContainer.classList.add('hidden');
+    }
+  });
+  inputItemName.addEventListener('input', () => updateModalPriceComparison());
 
   window.selectMasterSuggestion = function (name) {
-    const item = appState.masterItems.find(m => m.name === name);
+    const item = getMasterSuggestionItem(name);
     if (!item) return;
 
     inputItemName.value = item.name;
@@ -1824,6 +2037,8 @@
     if (!inputItemPrice.value && item.lastPrice > 0) {
       inputItemPrice.value = item.lastPrice;
     }
+    autoSuggestContainer.classList.add('hidden');
+    inputItemName.focus({ preventScroll: true });
     autoSuggestContainer.classList.add('hidden');
     updateModalLiveCalculations();
     AudioEngine.playTap();
@@ -3175,11 +3390,6 @@
     const qrisLabel = document.getElementById('checkoutQrisLabel');
     if (qrisLabel) qrisLabel.textContent = `QRIS ${storeName}`;
 
-    const qrisImg = document.getElementById('checkoutQrisImage');
-    if (qrisImg) {
-      qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(storeName + '-QRIS-PAYMENT')}`;
-    }
-
     // 5. POS Animation & Receipts
     const posBadge = document.getElementById('posRegisterBadge');
     if (posBadge) posBadge.textContent = `Kasir ${storeName}`;
@@ -3191,7 +3401,7 @@
     if (receiptSystem) receiptSystem.textContent = `Sistem Mandiri ${storeName}`;
 
     const receiptFooter = document.getElementById('receiptFooterNote');
-    if (receiptFooter) receiptFooter.textContent = `Catatan belanja Cartly di ${storeName}. Struk ini bukan bukti pembayaran.`;
+    if (receiptFooter) receiptFooter.textContent = `Pembayaran QRIS di ${storeName} dikonfirmasi melalui penyedia pembayaran.`;
 
     // 6. Update selection in store modal
     renderStoreButtonsList();
@@ -3612,15 +3822,22 @@
   // ==========================================================================
   // CARTLY CHECKOUT & PAYMENT RECORDING
   // ==========================================================================
-  const checkoutPaymentMethod = 'qris';
+  const QRIS_STATUS_POLL_MS = 5000;
+  const QRIS_PENDING_KEY = 'pending_qris_payment';
+  let activeQrisPayment = null;
   let checkoutPaymentSubmitted = false;
+  let qrisCreatePending = false;
+  let qrisStatusPending = false;
+  let qrisPollingTimer = null;
 
   function initAstroCheckoutModule() {
     document.getElementById('btnClosePaymentView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCloseReceiptView')?.addEventListener('click', closeAstroCheckoutModal);
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
-    document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', completeCheckoutAndDisplayReceipt);
-    document.getElementById('checkoutDigitalPaidConfirm')?.addEventListener('change', updateCheckoutPaymentButton);
+    document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', () => {
+      if (activeQrisPayment) checkQrisPaymentStatus();
+      else startQrisPayment();
+    });
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
       closeAstroCheckoutModal();
       document.getElementById('navBtnCart')?.click();
@@ -3631,14 +3848,19 @@
     });
   }
   function openAstroCheckoutModal() {
-    const purchasedItems = getPurchasedCartItems();
-    if (purchasedItems.length === 0) {
+    const restoredPayment = activeQrisPayment || loadPendingQrisPayment();
+    const purchasedItems = restoredPayment?.itemsSnapshot || getPurchasedCartItems();
+    if (!restoredPayment && purchasedItems.length === 0) {
       showToast('Centang barang yang sudah dibeli sebelum melanjutkan pembayaran.', 'warning');
       return;
     }
-    const total = calculateCurrentSubtotal();
-    if (total > appState.budgetLimit) {
+    const total = Number(restoredPayment?.amount ?? calculateCurrentSubtotal());
+    if (!restoredPayment && total > appState.budgetLimit) {
       showToast(`Total belanja melebihi batas Rp ${formatNumber(appState.budgetLimit)}. Kurangi barang sebelum membayar.`, 'warning');
+      return;
+    }
+    if (!restoredPayment && total < 1) {
+      showToast('Total pembayaran harus lebih dari Rp 0.', 'warning');
       return;
     }
     const modal = document.getElementById('modalAstroCheckout');
@@ -3659,12 +3881,15 @@
     }
     const subtotalEl = document.getElementById('checkoutPaymentSubtotal');
     const totalEl = document.getElementById('checkoutPaymentTotal');
-    const digitalCheck = document.getElementById('checkoutDigitalPaidConfirm');
-    const demoAmount = document.getElementById('checkoutDemoAmount');
     if (subtotalEl) subtotalEl.textContent = `Rp ${formatNumber(total)}`;
     if (totalEl) totalEl.textContent = `Rp ${formatNumber(total)}`;
-    if (demoAmount) demoAmount.textContent = formatNumber(total);
-    if (digitalCheck) digitalCheck.checked = false;
+    if (!activeQrisPayment && restoredPayment) activeQrisPayment = restoredPayment;
+    if (activeQrisPayment) {
+      renderQrisPayment(activeQrisPayment, 'QRIS siap dipindai. Menunggu pembayaran.');
+      scheduleQrisStatusCheck();
+    } else {
+      startQrisPayment(purchasedItems);
+    }
     updateCheckoutPaymentButton();
     modal.classList.remove('hidden');
   }
@@ -3672,14 +3897,214 @@
   function updateCheckoutPaymentButton() {
     const button = document.getElementById('btnConfirmCheckoutPayment');
     if (!button) return;
+    button.disabled = checkoutPaymentSubmitted || qrisCreatePending || qrisStatusPending;
+    button.textContent = qrisCreatePending
+      ? 'Menyiapkan QRIS...'
+      : qrisStatusPending
+        ? 'Memeriksa pembayaran...'
+        : activeQrisPayment ? 'Saya sudah membayar' : 'Coba siapkan QRIS lagi';
+  }
+
+  async function getQrisRequestHeaders() {
+    const auth = appState.supabaseClient?.auth;
+    if (!auth) throw new Error('Silakan masuk ke akun sebelum membayar.');
+    const { data, error } = await auth.getSession();
+    const accessToken = data?.session?.access_token;
+    if (error || !accessToken) throw new Error('Sesi akun berakhir. Silakan masuk kembali.');
+    return {
+      Authorization: `Bearer ${accessToken}`,
+      'x-supabase-anon-key': appState.supabaseKey
+    };
+  }
+
+  function getQrisPendingStorageKey() {
+    return getUserKey(QRIS_PENDING_KEY);
+  }
+
+  function loadPendingQrisPayment() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(getQrisPendingStorageKey()) || 'null');
+      const currentUserId = String(appState.currentUser?.id || '');
+      const imageUrl = new URL(saved?.qrImageUrl || '');
+      if (
+        saved?.userId === currentUserId && saved.paymentToken && saved.orderId &&
+        Number.isSafeInteger(Number(saved.amount)) && Number(saved.amount) > 0 &&
+        ['api.midtrans.com', 'api.sandbox.midtrans.com'].includes(imageUrl.hostname) &&
+        imageUrl.protocol === 'https:' && Array.isArray(saved.itemsSnapshot)
+      ) return saved;
+    } catch { }
+    return null;
+  }
+
+  function savePendingQrisPayment(payment) {
+    try {
+      localStorage.setItem(getQrisPendingStorageKey(), JSON.stringify(payment));
+    } catch (error) {
+      console.warn('Could not save pending QRIS payment:', error);
+    }
+  }
+
+  function clearPendingQrisPayment() {
+    try {
+      localStorage.removeItem(getQrisPendingStorageKey());
+    } catch { }
+  }
+
+  function setQrisPaymentMessage(message, state = 'pending') {
+    const status = document.getElementById('checkoutPaymentMessage');
+    if (!status) return;
+    status.textContent = message;
+    status.className = `qris-payment-message is-${state}`;
+  }
+
+  function renderQrisPayment(payment, message) {
+    const image = document.getElementById('checkoutQrisImage');
+    const loading = document.getElementById('checkoutQrisLoading');
+    const amount = document.getElementById('checkoutQrisAmount');
+    const expiry = document.getElementById('checkoutQrisExpiry');
+    const environmentLabel = document.getElementById('checkoutQrisEnvironment');
+    if (image) {
+      image.src = payment.qrImageUrl;
+      image.classList.remove('hidden');
+    }
+    if (loading) loading.classList.add('hidden');
+    if (amount) amount.textContent = formatNumber(payment.amount);
+    if (environmentLabel) {
+      environmentLabel.textContent = payment.environment === 'sandbox' ? 'LINGKUNGAN UJI' : 'PEMBAYARAN AKTIF';
+      environmentLabel.className = payment.environment === 'sandbox'
+        ? 'ml-auto rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-950'
+        : 'ml-auto rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-950';
+    }
+    if (expiry) {
+      const expiryDate = payment.expiresAt ? new Date(payment.expiresAt) : null;
+      expiry.textContent = expiryDate && !Number.isNaN(expiryDate.getTime())
+        ? `Berlaku sampai ${expiryDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB`
+        : '';
+    }
+    setQrisPaymentMessage(message, 'pending');
+  }
+
+  async function startQrisPayment(items = getPurchasedCartItems()) {
+    if (qrisCreatePending || activeQrisPayment) return;
+    if (!items.length) {
+      setQrisPaymentMessage('Tidak ada barang terpilih untuk dibayar.', 'error');
+      return;
+    }
+
     const total = calculateCurrentSubtotal();
-    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    const overBudget = total > appState.budgetLimit;
-    const canSubmit = getPurchasedCartItems().length > 0 && !overBudget && digitalConfirmed;
-    button.disabled = checkoutPaymentSubmitted || !canSubmit;
-    button.textContent = overBudget
-      ? 'Anggaran terlampaui'
-      : 'Selesaikan simulasi';
+    if (!Number.isSafeInteger(total) || total < 1 || total > appState.budgetLimit) {
+      setQrisPaymentMessage('Total pembayaran tidak valid atau melebihi anggaran.', 'error');
+      return;
+    }
+
+    qrisCreatePending = true;
+    updateCheckoutPaymentButton();
+    const image = document.getElementById('checkoutQrisImage');
+    const loading = document.getElementById('checkoutQrisLoading');
+    if (image) {
+      image.src = '';
+      image.classList.add('hidden');
+    }
+    if (loading) {
+      loading.textContent = 'Menyiapkan QRIS pembayaran...';
+      loading.classList.remove('hidden');
+    }
+    setQrisPaymentMessage('Menghubungkan ke penyedia pembayaran...', 'pending');
+
+    try {
+      const headers = await getQrisRequestHeaders();
+      const itemsPayload = items.map(item => ({
+        id: String(item.id || ''),
+        name: item.name,
+        price: calculateDiscount(item.price, item.discountRaw).finalUnitPrice,
+        quantity: Number(item.qty)
+      }));
+      const response = await fetch('/api/payments/qris/create', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, items: itemsPayload })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'QRIS belum dapat dibuat.');
+
+      activeQrisPayment = {
+        ...result,
+        userId: String(appState.currentUser?.id || ''),
+        itemsSnapshot: items.map(item => ({ ...item }))
+      };
+      savePendingQrisPayment(activeQrisPayment);
+      renderQrisPayment(activeQrisPayment, 'Pindai QRIS dengan aplikasi pembayaran, lalu selesaikan pembayaran.');
+      scheduleQrisStatusCheck();
+    } catch (error) {
+      if (loading) {
+        loading.textContent = 'Kode QRIS belum tersedia.';
+        loading.classList.remove('hidden');
+      }
+      setQrisPaymentMessage(error.message || 'QRIS belum dapat dibuat. Coba lagi.', 'error');
+    } finally {
+      qrisCreatePending = false;
+      updateCheckoutPaymentButton();
+    }
+  }
+
+  function scheduleQrisStatusCheck() {
+    if (!activeQrisPayment || checkoutPaymentSubmitted) return;
+    clearTimeout(qrisPollingTimer);
+    qrisPollingTimer = setTimeout(checkQrisPaymentStatus, QRIS_STATUS_POLL_MS);
+  }
+
+  async function checkQrisPaymentStatus() {
+    const payment = activeQrisPayment;
+    if (!payment || qrisStatusPending || checkoutPaymentSubmitted) return;
+    qrisStatusPending = true;
+    updateCheckoutPaymentButton();
+
+    try {
+      const headers = await getQrisRequestHeaders();
+      const response = await fetch('/api/payments/qris/status', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: payment.orderId,
+          amount: String(payment.amount),
+          paymentToken: payment.paymentToken
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Status pembayaran belum dapat diperiksa.');
+
+      if (result.orderId !== payment.orderId || Number(result.amount) !== Number(payment.amount)) {
+        throw new Error('Rincian pembayaran QRIS tidak cocok.');
+      }
+      if (result.status === 'paid') {
+        completeCheckoutAndDisplayReceipt(result);
+        return;
+      }
+      if (result.status === 'expired' || result.status === 'failed') {
+        clearTimeout(qrisPollingTimer);
+        clearPendingQrisPayment();
+        activeQrisPayment = null;
+        const image = document.getElementById('checkoutQrisImage');
+        const loading = document.getElementById('checkoutQrisLoading');
+        if (image) {
+          image.src = '';
+          image.classList.add('hidden');
+        }
+        if (loading) {
+          loading.textContent = 'QRIS kedaluwarsa. Buat kode baru untuk melanjutkan.';
+          loading.classList.remove('hidden');
+        }
+        setQrisPaymentMessage('Pembayaran belum diterima. Buat QRIS baru untuk mencoba kembali.', 'error');
+        return;
+      }
+      setQrisPaymentMessage('Menunggu pembayaran QRIS. Status akan diperiksa otomatis.', 'pending');
+    } catch (error) {
+      setQrisPaymentMessage(error.message || 'Status pembayaran belum dapat diperiksa. Mencoba kembali otomatis.', 'error');
+    } finally {
+      qrisStatusPending = false;
+      updateCheckoutPaymentButton();
+      if (activeQrisPayment && !checkoutPaymentSubmitted) scheduleQrisStatusCheck();
+    }
   }
 
   function closeAstroCheckoutModal() {
@@ -3687,24 +4112,15 @@
     if (modal) modal.classList.add('hidden');
   }
 
-  function completeCheckoutAndDisplayReceipt() {
-    const purchasedItems = getPurchasedCartItems();
-    if (checkoutPaymentSubmitted) return;
-    if (purchasedItems.length === 0) {
-      showToast('Centang barang yang sudah dibeli sebelum menyelesaikan transaksi.', 'warning');
-      return;
-    }
-    const total = calculateCurrentSubtotal();
-    if (total > appState.budgetLimit) {
-      updateCheckoutPaymentButton();
-      showToast(`Transaksi tidak dapat dilanjutkan. Kurangi belanja Rp ${formatNumber(total - appState.budgetLimit)} agar sesuai anggaran.`, 'warning');
-      return;
-    }
-    const digitalConfirmed = document.getElementById('checkoutDigitalPaidConfirm')?.checked === true;
-    if (!digitalConfirmed) {
-      showToast('Konfirmasi bahwa ini hanya simulasi terlebih dahulu.', 'warning');
-      return;
-    }
+  function completeCheckoutAndDisplayReceipt(paymentStatus) {
+    const payment = activeQrisPayment;
+    if (
+      checkoutPaymentSubmitted || !payment || paymentStatus?.status !== 'paid' ||
+      paymentStatus.orderId !== payment.orderId || Number(paymentStatus.amount) !== Number(payment.amount)
+    ) return;
+    const purchasedItems = payment.itemsSnapshot;
+    if (!Array.isArray(purchasedItems) || purchasedItems.length === 0) return;
+    const total = Number(payment.amount);
 
     const receiptItems = purchasedItems.map(item => {
       const disc = calculateDiscount(item.price, item.discountRaw);
@@ -3717,6 +4133,7 @@
         qty: item.qty,
         originalPrice: item.price,
         finalUnitPrice: disc.finalUnitPrice,
+        storeName: item.storeName || appState.activeStore,
         lineTotal
       };
     });
@@ -3726,6 +4143,7 @@
     }
 
     checkoutPaymentSubmitted = true;
+    clearTimeout(qrisPollingTimer);
     updateCheckoutPaymentButton();
 
     document.getElementById('checkoutStagePayment')?.classList.add('hidden');
@@ -3736,8 +4154,7 @@
     const discount = 0;
     const grandTotal = subtotal;
 
-    const storePrefix = (appState.activeStore || 'CARTLY').split(/[\s-]+/)[0].toUpperCase();
-    const trxId = `${storePrefix}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const trxId = payment.orderId;
     const nowStr = new Date().toLocaleDateString('id-ID', {
       weekday: 'long',
       year: 'numeric',
@@ -3749,8 +4166,7 @@
 
     const customerName = appState.currentUser?.displayName || appState.currentUser?.username || 'Rian Pratama';
 
-    const paymentLabels = { qris: 'QRIS Demo (simulasi)' };
-    const receiptLabel = paymentLabels[checkoutPaymentMethod];
+    const receiptLabel = 'QRIS (Midtrans)';
 
     // Populate Thermal Receipt Elements
     const elTrx = document.getElementById('receiptTrxId');
@@ -3767,7 +4183,7 @@
     if (elTime) elTime.textContent = nowStr;
     if (elCust) elCust.textContent = customerName;
     if (elMethod) elMethod.textContent = receiptLabel;
-    if (elStatus) elStatus.textContent = 'Simulasi';
+    if (elStatus) elStatus.textContent = 'Lunas';
     if (elSub) elSub.textContent = `Rp ${formatNumber(subtotal)}`;
     if (elVouch) elVouch.textContent = discount > 0 ? `-Rp ${formatNumber(discount)}` : 'Rp 0';
     if (elGrand) elGrand.textContent = `Rp ${formatNumber(grandTotal)}`;
@@ -3790,20 +4206,24 @@
       id: trxId,
       date: nowStr,
       createdAt: new Date().toISOString(),
+      storeName: appState.activeStore,
       budgetLimit: appState.budgetLimit,
       grandTotal,
       totalSaved: discount,
       itemCount: receiptItems.length,
       items: receiptItems,
       paymentMethod: receiptLabel,
-      paymentStatus: 'simulated'
+      paymentStatus: 'paid'
     };
 
     appState.history = [newReceipt, ...appState.history.filter(receipt => receipt.id !== newReceipt.id)];
     saveHistory();
     renderHistoryList();
-    const purchasedIds = new Set(purchasedItems.map(item => item.id));
-    appState.cart = appState.cart.filter(item => !purchasedIds.has(item.id));
+    const purchasedIds = new Set(purchasedItems.map(item => String(item.id)));
+    appState.cart = appState.cart.filter(item => !purchasedIds.has(String(item.id)));
+
+    clearPendingQrisPayment();
+    activeQrisPayment = null;
 
     saveCart();
     saveMaster();
@@ -3844,7 +4264,7 @@
       });
     }
 
-    showToast('Simulasi pembayaran dicatat dan struk demo berhasil dibuat.', 'success');
+    showToast('Pembayaran QRIS berhasil dikonfirmasi.', 'success');
   }
 
   function copyThermalReceiptSummary() {
@@ -3853,7 +4273,7 @@
     const elGrand = document.getElementById('receiptGrandTotal')?.textContent || '';
 
     const method = document.getElementById('receiptPaymentMethodLabel')?.textContent || '';
-    const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Simulasi';
+    const paymentStatus = document.getElementById('receiptPaymentStatus')?.textContent || 'Belum dibayar';
     const text = `🧾 STRUK BELANJA ${(appState.activeStore || 'SUPERMARKET').toUpperCase()}\nNo. Transaksi: ${elTrx}\nPelanggan: ${elCust}\nTOTAL: ${elGrand}\nMetode: ${method}\nStatus: ${paymentStatus} (dicatat di Cartly)`;
 
     navigator.clipboard?.writeText(text);

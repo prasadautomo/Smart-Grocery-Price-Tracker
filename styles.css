@@ -3213,6 +3213,19 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #ffffff;
   font-weight: 800;
 }
+.qris-payment-message {
+  color: #334155;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.qris-payment-message.is-error {
+  color: #b42318;
+  font-weight: 700;
+}
+.qris-payment-message.is-success {
+  color: #087443;
+  font-weight: 700;
+}
 .price-comparison {
   flex: 1 1 100%;
   color: #526176 !important;
@@ -4016,16 +4029,9 @@ body {
   border-color: #86efac !important;
 }
 
-#modalAstroCheckout .checkout-demo-qr {
-  display: block;
-  width: 10rem;
-  height: 10rem;
-  shape-rendering: crispEdges;
-}
-
 #modalAstroCheckout #checkoutDigitalPanel {
-  background-color: #fffbeb !important;
-  border-color: #fbbf24 !important;
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
 }
 
 #modalAstroCheckout #checkoutDigitalPanel p,

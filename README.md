@@ -18,7 +18,7 @@ Gunakan Node.js 20 atau yang lebih baru:
 npm run dev
 ```
 
-Buka <http://127.0.0.1:3000>. Server pengembangan hanya mendengarkan komputer lokal. Server ini menyediakan aplikasi dan endpoint `/api/health`, `/api/insights`, serta `/api/scan-python`.
+Buka <http://127.0.0.1:3000>. Server pengembangan hanya mendengarkan komputer lokal. Server ini menyediakan aplikasi dan endpoint `/api/health`, `/api/insights`, `/api/scan-python`, serta `/api/payments/qris`.
 
 ## Pengaturan Supabase
 
@@ -30,6 +30,17 @@ Buka <http://127.0.0.1:3000>. Server pengembangan hanya mendengarkan komputer lo
 Untuk proyek yang sudah berjalan, jalankan ulang skema tersebut untuk melengkapi kolom profil dan metode pembayaran. Data lama tanpa pemilik tetap tersimpan, tetapi tidak diberikan kepada akun secara otomatis.
 
 Aplikasi memakai Supabase publishable key dari `app.js`; kunci ini memang untuk aplikasi browser. Jangan menaruh service-role key di sisi browser. Akses tabel tetap dilindungi kebijakan RLS.
+
+## Pembayaran QRIS Midtrans
+
+Checkout membuat QRIS dinamis melalui Midtrans dan memeriksa status transaksi dari backend. Akun merchant harus aktif untuk pembayaran QRIS/GoPay.
+
+Atur variabel berikut di **Vercel → Project Settings → Environment Variables**:
+
+- `MIDTRANS_SERVER_KEY`: Server Key merchant Midtrans, simpan sebagai rahasia server.
+- `MIDTRANS_IS_PRODUCTION`: isi `true` untuk pembayaran sungguhan. Gunakan `false` hanya saat menguji di lingkungan sandbox.
+
+Tanpa kedua pengaturan tersebut, QRIS tidak dibuat dan checkout tidak mencatat pembayaran. Antarmuka menandai pembayaran sandbox sebagai **LINGKUNGAN UJI**. Contoh nama variabel tersedia di [`.env.example`](./.env.example); jangan commit kunci merchant. Setelah mengubah variabel Vercel, deploy ulang agar fungsi pembayaran memakai konfigurasi baru.
 
 ## Build dan deploy
 

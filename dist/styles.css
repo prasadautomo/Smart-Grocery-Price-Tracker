@@ -1110,11 +1110,17 @@ body {
 
 /* Autocomplete suggestion item */
 .auto-row-neo {
+  width: 100%;
   padding: 10px 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   border-bottom: 1px solid rgba(17, 51, 34, 0.08);
+  background: #ffffff;
+  color: inherit;
+  text-align: left;
+  font: inherit;
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -1125,6 +1131,35 @@ body {
 
 .auto-row-neo:last-child {
   border-bottom: none;
+}
+.auto-row-neo small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+}
+.auto-row-neo .auto-row-price {
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 700;
+}
+.auto-suggest-heading,
+.auto-suggest-empty {
+  padding: 0.55rem 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.auto-suggest-heading {
+  position: sticky;
+  top: 0;
+  background: #f8faf9;
+  border-bottom: 1px solid rgba(17, 51, 34, 0.08);
+}
+.auto-suggest-empty {
+  text-transform: none;
+  font-weight: 500;
 }
 
 /* Empty box state for history */
@@ -3178,6 +3213,19 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #ffffff;
   font-weight: 800;
 }
+.qris-payment-message {
+  color: #334155;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.qris-payment-message.is-error {
+  color: #b42318;
+  font-weight: 700;
+}
+.qris-payment-message.is-success {
+  color: #087443;
+  font-weight: 700;
+}
 .price-comparison {
   flex: 1 1 100%;
   color: #526176 !important;
@@ -3185,6 +3233,10 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   font-weight: 700;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+.modal-price-comparison {
+  display: block;
+  margin-top: 0.45rem;
 }
 .price-comparison.price-trend-up {
   color: #b42318 !important;
@@ -3977,16 +4029,9 @@ body {
   border-color: #86efac !important;
 }
 
-#modalAstroCheckout .checkout-demo-qr {
-  display: block;
-  width: 10rem;
-  height: 10rem;
-  shape-rendering: crispEdges;
-}
-
 #modalAstroCheckout #checkoutDigitalPanel {
-  background-color: #fffbeb !important;
-  border-color: #fbbf24 !important;
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
 }
 
 #modalAstroCheckout #checkoutDigitalPanel p,
