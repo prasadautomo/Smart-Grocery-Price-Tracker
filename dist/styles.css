@@ -4260,3 +4260,122 @@ body {
     font-size: 0.875rem;
   }
 }
+
+/* Checkout and receipt follow Cartly's white, navy, and mint palette. */
+#modalAstroCheckout > div:first-child,
+#modalAstroCheckout #checkoutStagePayment,
+#modalAstroCheckout #checkoutStageReceipt {
+  background-color: #f3f6fa !important;
+  border-color: #dce5ef !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutPaymentHeader,
+#modalAstroCheckout #checkoutReceiptHeader {
+  background: #ffffff !important;
+  border-color: #e1e8f0 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #checkoutPaymentHeader h3,
+#modalAstroCheckout #checkoutPaymentHeader #checkoutStoreLabel,
+#modalAstroCheckout #checkoutReceiptHeader #receiptStageTitle {
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #btnClosePaymentView,
+#modalAstroCheckout #btnCloseReceiptView {
+  background: #f1f5f9 !important;
+  border: 1px solid #dce5ef !important;
+  color: #263852 !important;
+}
+
+#modalAstroCheckout #btnClosePaymentView *,
+#modalAstroCheckout #btnCloseReceiptView * {
+  color: #263852 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentItems > div,
+#modalAstroCheckout #checkoutPaymentItems > div * {
+  background-color: #ffffff !important;
+  border-color: #e1e8f0 !important;
+  color: #263852 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentItems > div {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #e1e8f0;
+  border-radius: 0.8rem;
+}
+
+#modalAstroCheckout #checkoutPaymentSummary {
+  background: #ffffff !important;
+  border-color: #dce5ef !important;
+  color: #263852 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentSummary > div:first-child,
+#modalAstroCheckout #checkoutPaymentSubtotal {
+  color: #526176 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentSummary > div:last-child,
+#modalAstroCheckout #checkoutPaymentTotal {
+  color: #16243b !important;
+}
+
+#modalAstroCheckout .checkout-payment-method[aria-current="true"] {
+  background: #e3f8ef !important;
+  border-color: #b9ead7 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout .checkout-payment-method .material-symbols-outlined {
+  color: #167653 !important;
+}
+
+#modalAstroCheckout #checkoutPaymentFooter,
+#modalAstroCheckout #checkoutReceiptFooter {
+  background: #ffffff !important;
+  border-color: #e1e8f0 !important;
+}
+
+#modalAstroCheckout #btnConfirmCheckoutPayment,
+#modalAstroCheckout #btnDoneAstroCheckout {
+  background: #e3f8ef !important;
+  border: 1px solid #b9ead7 !important;
+  color: #16243b !important;
+  box-shadow: 0 3px 0 #c9ecdd !important;
+}
+
+#modalAstroCheckout #btnConfirmCheckoutPayment:hover,
+#modalAstroCheckout #btnDoneAstroCheckout:hover {
+  background: #d2f2e4 !important;
+}
+
+#modalAstroCheckout #btnConfirmCheckoutPayment:disabled {
+  background: #e8edf3 !important;
+  border-color: #d4dde8 !important;
+  color: #687991 !important;
+  box-shadow: none !important;
+}
+
+#modalAstroCheckout #checkoutReceiptHeader #receiptStageIcon {
+  color: #167653 !important;
+}
+
+#modalAstroCheckout #btnCopyReceiptText,
+#modalAstroCheckout #btnViewHistoryFromReceipt {
+  background: #e3f8ef !important;
+  border-color: #b9ead7 !important;
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #btnCopyReceiptText *,
+#modalAstroCheckout #btnViewHistoryFromReceipt * {
+  color: #16243b !important;
+}
+
+#modalAstroCheckout #btnDoneAstroCheckout * {
+  color: #16243b !important;
+}
