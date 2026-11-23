@@ -31,16 +31,9 @@ Untuk proyek yang sudah berjalan, jalankan ulang skema tersebut untuk melengkapi
 
 Aplikasi memakai Supabase publishable key dari `app.js`; kunci ini memang untuk aplikasi browser. Jangan menaruh service-role key di sisi browser. Akses tabel tetap dilindungi kebijakan RLS.
 
-## Pembayaran QRIS Midtrans
+## Pratinjau QRIS
 
-Checkout membuat QRIS dinamis melalui Midtrans dan memeriksa status transaksi dari backend. Akun merchant harus aktif untuk pembayaran QRIS/GoPay.
-
-Atur variabel berikut di **Vercel → Project Settings → Environment Variables**:
-
-- `MIDTRANS_SERVER_KEY`: Server Key merchant Midtrans, simpan sebagai rahasia server.
-- `MIDTRANS_IS_PRODUCTION`: isi `true` untuk pembayaran sungguhan. Gunakan `false` hanya saat menguji di lingkungan sandbox.
-
-Tanpa kedua pengaturan tersebut, QRIS tidak dibuat dan checkout tidak mencatat pembayaran. Antarmuka menandai pembayaran sandbox sebagai **LINGKUNGAN UJI**. Contoh nama variabel tersedia di [`.env.example`](./.env.example); jangan commit kunci merchant. Setelah mengubah variabel Vercel, deploy ulang agar fungsi pembayaran memakai konfigurasi baru.
+Checkout menampilkan ilustrasi bergaya QRIS untuk melihat tampilan pembayaran tanpa akun merchant. Gambar ini dibuat lokal, ditandai **PRATINJAU**, tidak dapat dipindai, dan tidak memproses atau mencatat pembayaran. Fitur pratinjau tidak memerlukan pengaturan kunci Midtrans.
 
 ## Build dan deploy
 

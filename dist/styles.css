@@ -3226,6 +3226,10 @@ button[class*="bg-emerald"], button[class*="bg-green"], button.bg-citrus {
   color: #087443;
   font-weight: 700;
 }
+.qris-payment-message.is-preview {
+  color: #92400e;
+  font-weight: 700;
+}
 .price-comparison {
   flex: 1 1 100%;
   color: #526176 !important;

@@ -3850,8 +3850,8 @@
   const QRIS_STATUS_POLL_MS = 5000;
   const QRIS_PENDING_KEY = 'pending_qris_payment';
   let activeQrisPayment = null;
+  let isQrisPreview = false;
   let checkoutPaymentSubmitted = false;
-  let qrisCreatePending = false;
   let qrisStatusPending = false;
   let qrisPollingTimer = null;
 
@@ -3861,7 +3861,7 @@
     document.getElementById('btnCopyReceiptText')?.addEventListener('click', copyThermalReceiptSummary);
     document.getElementById('btnConfirmCheckoutPayment')?.addEventListener('click', () => {
       if (activeQrisPayment) checkQrisPaymentStatus();
-      else startQrisPayment();
+      else closeAstroCheckoutModal();
     });
     document.getElementById('btnDoneAstroCheckout')?.addEventListener('click', () => {
       closeAstroCheckoutModal();
@@ -3910,10 +3910,12 @@
     if (totalEl) totalEl.textContent = `Rp ${formatNumber(total)}`;
     if (!activeQrisPayment && restoredPayment) activeQrisPayment = restoredPayment;
     if (activeQrisPayment) {
+      isQrisPreview = false;
       renderQrisPayment(activeQrisPayment, 'QRIS siap dipindai. Menunggu pembayaran.');
       scheduleQrisStatusCheck();
     } else {
-      startQrisPayment(purchasedItems);
+      isQrisPreview = true;
+      renderQrisPreview(total);
     }
     updateCheckoutPaymentButton();
     modal.classList.remove('hidden');
@@ -3922,12 +3924,10 @@
   function updateCheckoutPaymentButton() {
     const button = document.getElementById('btnConfirmCheckoutPayment');
     if (!button) return;
-    button.disabled = checkoutPaymentSubmitted || qrisCreatePending || qrisStatusPending;
-    button.textContent = qrisCreatePending
-      ? 'Menyiapkan QRIS...'
-      : qrisStatusPending
-        ? 'Memeriksa pembayaran...'
-        : activeQrisPayment ? 'Saya sudah membayar' : 'Coba siapkan QRIS lagi';
+    button.disabled = checkoutPaymentSubmitted || qrisStatusPending;
+    button.textContent = qrisStatusPending
+      ? 'Memeriksa pembayaran...'
+      : activeQrisPayment ? 'Saya sudah membayar' : isQrisPreview ? 'Tutup pratinjau' : 'Tutup';
   }
 
   async function getQrisRequestHeaders() {
@@ -3982,6 +3982,61 @@
     status.className = `qris-payment-message is-${state}`;
   }
 
+  function buildQrisPreviewImage() {
+    const size = 29;
+    const cellSize = 8;
+    const padding = 4;
+    const offset = padding * cellSize;
+    const finders = [[0, 0], [size - 7, 0], [0, size - 7]];
+    const finderBounds = finders.map(([left, top]) => ({ left, top, right: left + 7, bottom: top + 7 }));
+    const finderRects = finders.map(([left, top]) => `
+      <rect x="${offset + left * cellSize}" y="${offset + top * cellSize}" width="${7 * cellSize}" height="${7 * cellSize}" fill="#111827"/>
+      <rect x="${offset + (left + 1) * cellSize}" y="${offset + (top + 1) * cellSize}" width="${5 * cellSize}" height="${5 * cellSize}" fill="#ffffff"/>
+      <rect x="${offset + (left + 2) * cellSize}" y="${offset + (top + 2) * cellSize}" width="${3 * cellSize}" height="${3 * cellSize}" fill="#111827"/>
+    `).join('');
+    const modules = [];
+
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        if (finderBounds.some(box => x >= box.left - 1 && x <= box.right && y >= box.top - 1 && y <= box.bottom)) continue;
+        if (((x * 17 + y * 31 + x * y * 7) % 13) < 6) {
+          modules.push(`<rect x="${offset + x * cellSize}" y="${offset + y * cellSize}" width="${cellSize}" height="${cellSize}" fill="#111827"/>`);
+        }
+      }
+    }
+
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264 264">
+        <rect width="264" height="264" fill="#ffffff"/>
+        ${modules.join('')}
+        ${finderRects}
+        <rect x="87" y="116" width="90" height="32" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="2"/>
+        <text x="132" y="137" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="700" fill="#334155">ILUSTRASI</text>
+      </svg>
+    `)}`;
+  }
+
+  function renderQrisPreview(amount) {
+    const image = document.getElementById('checkoutQrisImage');
+    const loading = document.getElementById('checkoutQrisLoading');
+    const amountEl = document.getElementById('checkoutQrisAmount');
+    const expiry = document.getElementById('checkoutQrisExpiry');
+    const environmentLabel = document.getElementById('checkoutQrisEnvironment');
+    if (image) {
+      image.src = buildQrisPreviewImage();
+      image.alt = 'Ilustrasi QRIS, bukan kode pembayaran';
+      image.classList.remove('hidden');
+    }
+    if (loading) loading.classList.add('hidden');
+    if (amountEl) amountEl.textContent = formatNumber(amount);
+    if (expiry) expiry.textContent = '';
+    if (environmentLabel) {
+      environmentLabel.textContent = 'PRATINJAU';
+      environmentLabel.className = 'ml-auto rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-950';
+    }
+    setQrisPaymentMessage('Ilustrasi ini tidak dapat dipindai dan tidak memproses pembayaran.', 'preview');
+  }
+
   function renderQrisPayment(payment, message) {
     const image = document.getElementById('checkoutQrisImage');
     const loading = document.getElementById('checkoutQrisLoading');
@@ -3990,6 +4045,7 @@
     const environmentLabel = document.getElementById('checkoutQrisEnvironment');
     if (image) {
       image.src = payment.qrImageUrl;
+      image.alt = 'Kode QRIS untuk pembayaran';
       image.classList.remove('hidden');
     }
     if (loading) loading.classList.add('hidden');
@@ -4007,69 +4063,6 @@
         : '';
     }
     setQrisPaymentMessage(message, 'pending');
-  }
-
-  async function startQrisPayment(items = getPurchasedCartItems()) {
-    if (qrisCreatePending || activeQrisPayment) return;
-    if (!items.length) {
-      setQrisPaymentMessage('Tidak ada barang terpilih untuk dibayar.', 'error');
-      return;
-    }
-
-    const total = calculateCurrentSubtotal();
-    if (!Number.isSafeInteger(total) || total < 1 || total > appState.budgetLimit) {
-      setQrisPaymentMessage('Total pembayaran tidak valid atau melebihi anggaran.', 'error');
-      return;
-    }
-
-    qrisCreatePending = true;
-    updateCheckoutPaymentButton();
-    const image = document.getElementById('checkoutQrisImage');
-    const loading = document.getElementById('checkoutQrisLoading');
-    if (image) {
-      image.src = '';
-      image.classList.add('hidden');
-    }
-    if (loading) {
-      loading.textContent = 'Menyiapkan QRIS pembayaran...';
-      loading.classList.remove('hidden');
-    }
-    setQrisPaymentMessage('Menghubungkan ke penyedia pembayaran...', 'pending');
-
-    try {
-      const headers = await getQrisRequestHeaders();
-      const itemsPayload = items.map(item => ({
-        id: String(item.id || ''),
-        name: item.name,
-        price: calculateDiscount(item.price, item.discountRaw).finalUnitPrice,
-        quantity: Number(item.qty)
-      }));
-      const response = await fetch('/api/payments/qris/create', {
-        method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total, items: itemsPayload })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(result.error || 'QRIS belum dapat dibuat.');
-
-      activeQrisPayment = {
-        ...result,
-        userId: String(appState.currentUser?.id || ''),
-        itemsSnapshot: items.map(item => ({ ...item }))
-      };
-      savePendingQrisPayment(activeQrisPayment);
-      renderQrisPayment(activeQrisPayment, 'Pindai QRIS dengan aplikasi pembayaran, lalu selesaikan pembayaran.');
-      scheduleQrisStatusCheck();
-    } catch (error) {
-      if (loading) {
-        loading.textContent = 'Kode QRIS belum tersedia.';
-        loading.classList.remove('hidden');
-      }
-      setQrisPaymentMessage(error.message || 'QRIS belum dapat dibuat. Coba lagi.', 'error');
-    } finally {
-      qrisCreatePending = false;
-      updateCheckoutPaymentButton();
-    }
   }
 
   function scheduleQrisStatusCheck() {
